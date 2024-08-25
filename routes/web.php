@@ -26,7 +26,3 @@ Route::middleware([
 
 // ------- maquinas y sus variables rutas --------
 Route::resource('machine-variables', MachineVariableController::class);
-
-// ------- Robag rutas --------
-// Route::resource('robag', RobagDataController::class);
-
