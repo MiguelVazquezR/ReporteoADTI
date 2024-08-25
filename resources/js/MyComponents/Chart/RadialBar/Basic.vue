@@ -1,54 +1,31 @@
 <template>
     <div id="chart">
-        <apexchart type="radialBar" :options="chartOptions" :series="series"></apexchart>
+        <apexchart type="radialBar" height="150" :options="chartOptions" :series="series"></apexchart>
     </div>
 </template>
 <script>
 export default {
     data() {
         return {
-            // series: [80],
+            // series: [70],
             chartOptions: {
                 chart: {
+                    height: 150,
                     type: 'radialBar',
-                    offsetY: -20,
-                    sparkline: {
-                        enabled: true
-                    }
                 },
                 plotOptions: {
                     radialBar: {
-                        startAngle: -90,
-                        endAngle: 90,
-                        track: {
-                            background: "#e7e7e7",
-                            strokeWidth: '97%',
-                            margin: 5, // margin is in pixels
-                            dropShadow: {
-                                enabled: true,
-                                top: 2,
-                                left: 0,
-                                color: '#999',
-                                opacity: 1,
-                                blur: 2
-                            }
+                        hollow: {
+                            size: '60%',
                         },
                         dataLabels: {
-                            name: {
-                                show: false
-                            },
                             value: {
-                                offsetY: -2,
-                                fontSize: '14px',
-                                color: '#fff'
-                            }
-                        }
-                    }
-                },
-                grid: {
-                    padding: {
-                        top: -10
-                    }
+                                offsetY: -10,
+                                color: '#FFF', // Cambia el color de la etiqueta del porcentaje
+                                fontSize: '14px', // Puedes ajustar el tamaño si es necesario
+                            },
+                        },
+                    },
                 },
                 fill: {
                     type: 'gradient',
@@ -63,7 +40,7 @@ export default {
                         colorStops: []
                     }
                 },
-                // labels: ['Average Results'],
+                labels: [''],
             },
         }
     },

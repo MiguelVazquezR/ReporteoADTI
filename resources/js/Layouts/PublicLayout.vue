@@ -14,10 +14,10 @@
                             </Link>
 
                             <!-- Login y navegación -->
-                            <div class="lg:flex items-center space-x-9 hidden">
+                            <!-- <div class="lg:flex items-center space-x-9 hidden">
                                 <button :class="route().current('home') ? 'text-primary' : ''" @click="$inertia.get(route('home'))">Inicio</button>
                                 <PrimaryButton @click="$inertia.visit(route('login'))">Iniciar sesión</PrimaryButton>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </nav>
