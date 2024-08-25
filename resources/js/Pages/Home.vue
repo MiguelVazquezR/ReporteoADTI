@@ -107,7 +107,7 @@
                             <!-- HISTOGRAMA -->
                             <div class="rounded-xl border border-grayD9 p-4 w-2/5">
                                 <p class="text-[#6D6E72] text-sm">HISTOGRAMA</p>
-                                <!-- <ColumnWithMarkers /> -->
+                                <WithRotatedLabels />
                             </div>
                         </div>
                     </div>
@@ -184,6 +184,7 @@ import Basic from '@/MyComponents/Chart/RadialBar/Basic.vue';
 import CircleCustomAngle from '@/MyComponents/Chart/RadialBar/CircleCustomAngle.vue';
 import ColumnWithMarkers from '@/MyComponents/Chart/Column/ColumnWithMarkers.vue';
 import BasicArea from '@/MyComponents/Chart/Area/BasicArea.vue';
+import WithRotatedLabels from '@/MyComponents/Chart/Column/WithRotatedLabels.vue';
 
 export default {
     data() {
@@ -202,6 +203,7 @@ export default {
         Semicircle, //chart
         PublicLayout,
         PrimaryButton,
+        WithRotatedLabels, //chart
         CircleCustomAngle, //chart
         ColumnWithMarkers, //chart
     },
