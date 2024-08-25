@@ -1,146 +1,143 @@
 <template>
     <div id="chart">
-        <apexchart type="bar" height="350" :options="chartOptions" :series="series"></apexchart>
+        <apexchart type="bar" height="280" :options="chartOptions" :series="series"></apexchart>
     </div>
 </template>
 <script>
 export default {
     data() {
         return {
-            // series: [
-            //     {
-            //         name: 'Actual',
-            //         data: [
-            //             {
-            //                 x: '2011',
-            //                 y: 1292,
-            //                 goals: [
-            //                     {
-            //                         name: 'Expected',
-            //                         value: 1400,
-            //                         strokeHeight: 5,
-            //                         strokeColor: '#775DD0'
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 x: '2012',
-            //                 y: 4432,
-            //                 goals: [
-            //                     {
-            //                         name: 'Expected',
-            //                         value: 5400,
-            //                         strokeHeight: 5,
-            //                         strokeColor: '#775DD0'
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 x: '2013',
-            //                 y: 5423,
-            //                 goals: [
-            //                     {
-            //                         name: 'Expected',
-            //                         value: 5200,
-            //                         strokeHeight: 5,
-            //                         strokeColor: '#775DD0'
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 x: '2014',
-            //                 y: 6653,
-            //                 goals: [
-            //                     {
-            //                         name: 'Expected',
-            //                         value: 6500,
-            //                         strokeHeight: 5,
-            //                         strokeColor: '#775DD0'
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 x: '2015',
-            //                 y: 8133,
-            //                 goals: [
-            //                     {
-            //                         name: 'Expected',
-            //                         value: 6600,
-            //                         strokeHeight: 13,
-            //                         strokeWidth: 0,
-            //                         strokeLineCap: 'round',
-            //                         strokeColor: '#775DD0'
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 x: '2016',
-            //                 y: 7132,
-            //                 goals: [
-            //                     {
-            //                         name: 'Expected',
-            //                         value: 7500,
-            //                         strokeHeight: 5,
-            //                         strokeColor: '#775DD0'
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 x: '2017',
-            //                 y: 7332,
-            //                 goals: [
-            //                     {
-            //                         name: 'Expected',
-            //                         value: 8700,
-            //                         strokeHeight: 5,
-            //                         strokeColor: '#775DD0'
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 x: '2018',
-            //                 y: 6553,
-            //                 goals: [
-            //                     {
-            //                         name: 'Expected',
-            //                         value: 7300,
-            //                         strokeHeight: 2,
-            //                         strokeDashArray: 2,
-            //                         strokeColor: '#775DD0'
-            //                     }
-            //                 ]
-            //             }
-            //         ]
-            //     }
-            // ],
-            // chartOptions: {
-            //     chart: {
-            //         height: 350,
-            //         type: 'bar'
-            //     },
-            //     plotOptions: {
-            //         bar: {
-            //             columnWidth: '60%'
-            //         }
-            //     },
-            //     colors: ['#00E396'],
-            //     dataLabels: {
-            //         enabled: false
-            //     },
-            //     legend: {
-            //         show: true,
-            //         showForSingleSeries: true,
-            //         customLegendItems: ['Actual', 'Expected'],
-            //         markers: {
-            //             fillColors: ['#00E396', '#775DD0']
-            //         }
-            //     }
-            // },
+            series: [
+                {
+                    name: 'Actual',
+                    data: [
+                        {
+                            x: '02 Ago',
+                            y: 1292,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 1400,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '03 Ago',
+                            y: 4432,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 5400,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '04 Ago',
+                            y: 5423,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 5200,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '05 Ago',
+                            y: 6653,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 6500,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '06 Ago',
+                            y: 8133,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 6600,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '07 Ago',
+                            y: 7132,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 7500,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '08 Ago',
+                            y: 7332,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 8700,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '09 Ago',
+                            y: 6553,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 7300,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            chartOptions: {
+                chart: {
+                    height: 280,
+                    type: 'bar'
+                },
+                plotOptions: {
+                    bar: {
+                        columnWidth: '40%'
+                    }
+                },
+                colors: ['#1A1A1A'],
+                dataLabels: {
+                    enabled: false
+                },
+                legend: {
+                    show: true,
+                    showForSingleSeries: true,
+                    customLegendItems: ['Actual', 'Objetivo'],
+                    markers: {
+                        fillColors: ['#373737', '#077B27']
+                    }
+                }
+            },
         }
     },
     props: {
-        series: Array,
-        chartOptions: Object,
+        // series: Array,
+        // chartOptions: Object,
     }
 }
 </script>
