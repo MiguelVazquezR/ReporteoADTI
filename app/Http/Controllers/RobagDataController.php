@@ -20,7 +20,7 @@ class RobagDataController extends Controller
 
     public function store(Request $request)
     {
-        // Aquí asumes que el request tiene un JSON con los datos de la máquina
+        // Aquí se asume que el request tiene un JSON con los datos de la máquina
         $data = $request->all();
 
         // Guardar los datos en la base de datos
