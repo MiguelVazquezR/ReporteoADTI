@@ -24,11 +24,7 @@ class RobagDataController extends Controller
         $data = $request->all();
 
         // Guardar los datos en la base de datos
-        $machineData = new RobagData();
-        $machineData->variable1 = $data['variable1'];
-        $machineData->variable2 = $data['variable2'];
-        // Agrega tantos campos como sea necesario
-        $machineData->save();
+        RobagData::create($data);
 
         // Responder con un mensaje de éxito
         return response()->json(['message' => 'Datos guardados correctamente'], 200);
