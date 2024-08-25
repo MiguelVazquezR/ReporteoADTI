@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\MachineVariableController;
-use App\Http\Controllers\RobagDataController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,9 +24,9 @@ Route::middleware([
     })->name('dashboard');
 });
 
-// ------- Robag rutas --------
-Route::resource('Robag', RobagDataController::class);
-
-
 // ------- maquinas y sus variables rutas --------
 Route::resource('machine-variables', MachineVariableController::class);
+
+// ------- Robag rutas --------
+// Route::resource('robag', RobagDataController::class);
+
