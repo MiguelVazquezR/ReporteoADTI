@@ -53,51 +53,25 @@
                             <TimePanel />
 
                             <!-- PRODUCCIÓN DIARIA -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-3/4">
-                                <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN DIARIA</p>
-                                <ColumnWithMarkers :series="dayliProduccion" />
-                            </div>
+                            <ProductionPanel />
                         </div>
 
                         <!-- Segunda fila -->
                         <div class="flex space-x-4">
                             <!-- Velocidad -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-3/5">
-                                <p class="text-[#6D6E72] font-bold text-sm">VELOCIDAD</p>
-                                <BasicArea :series="velocityData" />
-                            </div>
+                            <VelocityPanel />
 
                             <!-- HISTOGRAMA -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-2/5">
-                                <p class="text-[#6D6E72] font-bold text-sm">HISTOGRAMA</p>
-                                <WithRotatedLabels :series="deviacionData" />
-                            </div>
+                            <DesviacionPanel />
                         </div>
 
                         <!-- Tercera fila -->
                         <div class="flex space-x-4">
                             <!-- PELICULA -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-1/2">
-                                <p class="text-[#6D6E72] font-bold text-sm">USO DE PELÍCULA</p>
-                                <SimpleDonut width="450" :series="filmChart.series" :chartOptions="filmChart.chartOptions" />
-                            </div>
+                            <FilmPanel />
 
                             <!-- BASCULA -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-1/2">
-                                <p class="text-[#6D6E72] font-bold text-sm">ESTADÍSTICAS DE LA BÁSCULA </p>
-                                <div v-for="(item, index) in scaleStatistics" :key="index"
-                                    class="flex items-center justify-between mt-3">
-                                    <p class="flex items-center space-x-2">
-                                        <i class="fa-regular fa-circle text-[5px]"></i>
-                                        <span class="text-sm">{{ item.name }}</span>
-                                    </p>
-                                    <hr class="flex-1 border-dashed border-black mx-4">
-                                    <el-tag :color="item.tagColor" style="color: #373737; border: transparent;"
-                                        effect="light" round>
-                                        {{ item.value }}
-                                    </el-tag>
-                                </div>
-                            </div>
+                            <ScalePanel />
                         </div>
                     </div>
                 </article>
@@ -165,203 +139,31 @@ import PublicLayout from '@/Layouts/PublicLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import OEEPanel from '@/MyComponents/Home/OEEPanel.vue';
 import TimePanel from '@/MyComponents/Home/TimePanel.vue';
-import ColumnWithMarkers from '@/MyComponents/Chart/Column/ColumnWithMarkers.vue';
-import BasicArea from '@/MyComponents/Chart/Area/BasicArea.vue';
-import WithRotatedLabels from '@/MyComponents/Chart/Column/WithRotatedLabels.vue';
-import SimpleDonut from '@/MyComponents/Chart/Pie/SimpleDonut.vue';
+import ProductionPanel from '@/MyComponents/Home/ProductionPanel.vue';
+import VelocityPanel from '@/MyComponents/Home/VelocityPanel.vue';
+import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
+import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
+import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
 
 export default {
     data() {
-
-
         return {
             activeTab: '1',
             searchDate: null,
             startDate: null, //vista movil
             finishDate: null, //vista movil
-            dayliProduccion: [
-                {
-                    name: 'Actual',
-                    data: [
-                        {
-                            x: '02 Ago',
-                            y: 1292,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 1400,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '03 Ago',
-                            y: 4432,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 5400,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '04 Ago',
-                            y: 5423,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 5200,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '05 Ago',
-                            y: 6653,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 6500,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '06 Ago',
-                            y: 8133,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 6600,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '07 Ago',
-                            y: 7132,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 7500,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '08 Ago',
-                            y: 7332,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 8700,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '09 Ago',
-                            y: 6553,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 7300,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-            velocityData: [{
-                name: "Bolsas por minuto",
-                data: [34, 44, 54, 21, 12, 43, 33, 23, 66, 66, 58] // Datos de ejemplo
-            }],
-            deviacionData: [{
-                name: 'Bolsas',
-                data: [0, 0, 1000, 6000, 3000, 2000, 3, 500]
-            }],
-            scaleStatistics: [
-                {
-                    name: 'Peso medio',
-                    value: '142.52',
-                    tagColor: '#E6EFFC',
-                },
-                {
-                    name: 'Desviación estándar',
-                    value: '16.05',
-                    tagColor: '#F7E7FD',
-                },
-                {
-                    name: 'Peso total de descarga',
-                    value: '65153.82',
-                    tagColor: '#FAFDE6',
-                },
-                {
-                    name: 'Total regalado',
-                    value: '1249.30',
-                    tagColor: '#FFF2DE',
-                },
-                {
-                    name: 'Porcentaje regalado',
-                    value: '1.82',
-                    tagColor: '#FFDEDE',
-                },
-            ],
-            filmChart: {
-                series: [219758, 25000, 6991, 5964, 1952],
-                chartOptions: {
-                    labels: ["Bolsas llenas", "Bolsas vacias", "Bolsas movidas", "Bolsas desperdiciadas", "Bolsas de prueba"],
-                    colors: ["#17A281", "#F48B0F", "#F5B91F", "#A24917", "#373737"],
-                    chart: {
-                        type: 'donut',
-                    },
-                    responsive: [{
-                        breakpoint: 480,
-                        options: {
-                            chart: {
-                                width: 300
-                            },
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }],
-                    plotOptions: {
-                        pie: {
-                            donut: {
-                                labels: {
-                                    show: true,
-                                    total: {
-                                        showAlways: true,
-                                        show: true
-                                    }
-                                }
-                            }
-                        }
-                    },
-                },
-            },
-        }
+            }
     },
     components: {
-        OEEPanel,
-        TimePanel,
-        BasicArea, //chart
         PublicLayout,
         PrimaryButton,
-        WithRotatedLabels, //chart
-        ColumnWithMarkers, //chart
-        SimpleDonut, //chart
+        ProductionPanel,
+        DesviacionPanel,
+        VelocityPanel,
+        ScalePanel,
+        TimePanel,
+        FilmPanel,
+        OEEPanel,
     },
     props: {
 
