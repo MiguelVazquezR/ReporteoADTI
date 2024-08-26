@@ -8,10 +8,10 @@
 export default {
     data() {
         return {
-            series: [{
-                name: "Bolsas por minuto",
-                data: [34, 44, 54, 21, 12, 43, 33, 23, 66, 66, 58] // Datos de ejemplo
-            }],
+            // series: [{
+            //     name: "Bolsas por minuto",
+            //     data: [34, 44, 54, 21, 12, 43, 33, 23, 66, 66, 58] // Datos de ejemplo
+            // }],
             chartOptions: {
                 stroke: {
                     curve: 'straight',
@@ -67,7 +67,7 @@ export default {
         }
     },
     props: {
-        // series: Array,
+        series: Array,
         // chartOptions: Object,
     }
 }

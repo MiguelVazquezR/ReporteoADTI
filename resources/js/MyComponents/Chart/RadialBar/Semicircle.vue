@@ -40,7 +40,7 @@ export default {
                             value: {
                                 offsetY: -2,
                                 fontSize: '14px',
-                                color: '#fff'
+                                color: '#000'
                             }
                         }
                     }
