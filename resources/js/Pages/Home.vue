@@ -10,12 +10,11 @@
                     <h1 class="font-bold text-xl mb-6 ml-4">Empacadora TNA</h1>
                     <img class="rounded-xl border border-grayD9 p-4" src="@/../../public/images/machine_1.png" alt="">
                 </figure>
-                
+
                 <!-- Infomracion de producción (parte derecha) -->
                 <article class="w-3/4">
                     <div class="flex items-center justify-between space-x-3">
-                        <div
-                            class="lg:-left-40 z-10 w-80">
+                        <div class="lg:-left-40 z-10 w-80">
                             <div v-if="isMobile" class="flex items-center space-x-2">
                                 <el-date-picker @change="handleStartDateChange" :disabled-date="disabledPrevDays"
                                     v-model="startDate" type="date" class="!w-1/2" placeholder="Inicio" size="small" />
@@ -24,7 +23,8 @@
                             </div>
                             <div v-else>
                                 <el-date-picker v-model="searchDate" type="daterange" range-separator="A"
-                                    start-placeholder="Fecha de inicio" end-placeholder="Fecha de fin" class="!w-full" />
+                                    start-placeholder="Fecha de inicio" end-placeholder="Fecha de fin"
+                                    class="!w-full" />
                             </div>
                         </div>
 
@@ -71,16 +71,19 @@
                         <!-- chart 5 -->
                         <div class="flex flex-col justify-center space-y-3 px-2">
                             <div class="text-left">
-                                <p class="text-gray9A">Bolsas totales: <strong class="text-white ml-2">{{ '7,000' }}</strong></p>
-                                <p class="text-gray9A">Bolsas buenas: <strong class="text-white ml-2">{{ '6,000' }}</strong></p>
-                                <p class="text-gray9A">Bolsas malas: <strong class="text-white ml-2">{{ '1,000' }}</strong></p>
+                                <p class="text-gray9A">Bolsas totales: <strong class="text-white ml-2">{{ '7,000'
+                                        }}</strong></p>
+                                <p class="text-gray9A">Bolsas buenas: <strong class="text-white ml-2">{{ '6,000'
+                                        }}</strong></p>
+                                <p class="text-gray9A">Bolsas malas: <strong class="text-white ml-2">{{ '1,000'
+                                        }}</strong></p>
                             </div>
                         </div>
-                    </div>  
+                    </div>
 
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-5 space-y-4">
-                        
+
                         <!-- primer fila -->
                         <div class="flex space-x-4">
                             <!-- Tiempos -->
@@ -110,6 +113,32 @@
                                 <!-- <ColumnWithMarkers /> -->
                             </div>
                         </div>
+
+                        <!-- Tercera fila -->
+                        <div class="flex space-x-4">
+                            <!-- PELICULA -->
+                            <div class="rounded-[20px] border border-grayD9 p-4 w-3/5">
+                                <p class="text-[#6D6E72] font-bold text-sm">USO DE PELÍCULA</p>
+                                <SimpleDonut width="450" :series="filmChart.series" :chartOptions="filmChart.chartOptions" />
+                            </div>
+
+                            <!-- BASCULA -->
+                            <div class="rounded-[20px] border border-grayD9 p-4 w-2/5">
+                                <p class="text-[#6D6E72] font-bold text-sm">ESTADÍSTICAS DE LA BÁSCULA </p>
+                                <div v-for="(item, index) in scaleStatistics" :key="index"
+                                    class="flex items-center justify-between mt-3">
+                                    <p class="flex items-center space-x-2">
+                                        <i class="fa-regular fa-circle text-[5px]"></i>
+                                        <span class="text-sm">{{ item.name }}</span>
+                                    </p>
+                                    <hr class="flex-1 border-dashed border-black mx-4">
+                                    <el-tag :color="item.tagColor" style="color: #373737; border: transparent;"
+                                        effect="light" round>
+                                        {{ item.value }}
+                                    </el-tag>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </article>
 
@@ -129,28 +158,28 @@
                             <span>Datos de Peso</span>
                         </div>
                     </template>
-                    Aqui va el componente 1.
-                </el-tab-pane>
-                <el-tab-pane name="2">
-                    <template #label>
+Aqui va el componente 1.
+</el-tab-pane>
+<el-tab-pane name="2">
+    <template #label>
                         <div class="flex items-center">
                             <i class="fa-regular fa-clock mr-1"></i>
                             <span>Tiempos</span>
                         </div>
                     </template>
-                    Aqui va el componente 2.
-                </el-tab-pane>
-                <el-tab-pane name="3">
-                    <template #label>
+    Aqui va el componente 2.
+</el-tab-pane>
+<el-tab-pane name="3">
+    <template #label>
                         <div class="flex items-center">
                             <i class="fa-solid fa-arrow-up-short-wide mr-1"></i>
                             <span>Uso de película</span>
                         </div>
                     </template>
-                    Aqui va el componente 3.
-                </el-tab-pane>
-                <el-tab-pane name="4">
-                    <template #label>
+    Aqui va el componente 3.
+</el-tab-pane>
+<el-tab-pane name="4">
+    <template #label>
                         <div class="flex items-center">
                             <svg class="size-4 mr-1" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M1.875 1V7.5625C1.875 7.9106 2.01328 8.24444 2.25942 8.49058C2.50556 8.73672 2.8394 8.875 3.1875 8.875H4.5M1.875 1H1M1.875 1H11.5M4.5 8.875H8.875M4.5 8.875L3.91667 10.625M11.5 1H12.375M11.5 1V7.5625C11.5 7.9106 11.3617 8.24444 11.1156 8.49058C10.8694 8.73672 10.5356 8.875 10.1875 8.875H8.875M8.875 8.875L9.45833 10.625M3.91667 10.625H9.45833M3.91667 10.625L3.625 11.5M9.45833 10.625L9.75 11.5M4.0625 6.25L5.8125 4.5L7.0655 5.753C7.6542 4.90792 8.42126 4.2024 9.3125 3.68625" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
@@ -158,10 +187,10 @@
                             <span>Estadística de escala</span>
                         </div>
                     </template>
-                    Aqui va el componente 4.
-                </el-tab-pane>
-                <el-tab-pane name="5">
-                    <template #label>
+    Aqui va el componente 4.
+</el-tab-pane>
+<el-tab-pane name="5">
+    <template #label>
                         <div class="flex items-center">
                             <svg class="size-4 mr-1" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M4.5 6.85433L5.8125 8.16683L8 5.10433M6.25 1C4.92918 2.2543 3.17015 2.94225 1.34884 2.91683C1.11716 3.62265 0.999403 4.36088 1 5.10375C1 8.36575 3.23067 11.1062 6.25 11.8838C9.26934 11.1068 11.5 8.36633 11.5 5.10433C11.5 4.34017 11.3775 3.60458 11.1512 2.91625H11.0625C9.19817 2.91625 7.50417 2.18825 6.25 1Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
@@ -169,9 +198,9 @@
                             <span>OEE</span>
                         </div>
                     </template>
-                    Aqui va el componente 5.
-                </el-tab-pane>
-            </el-tabs> -->
+    Aqui va el componente 5.
+</el-tab-pane>
+</el-tabs> -->
         </main>
     </PublicLayout>
 </template>
@@ -184,19 +213,81 @@ import Basic from '@/MyComponents/Chart/RadialBar/Basic.vue';
 import CircleCustomAngle from '@/MyComponents/Chart/RadialBar/CircleCustomAngle.vue';
 import ColumnWithMarkers from '@/MyComponents/Chart/Column/ColumnWithMarkers.vue';
 import BasicArea from '@/MyComponents/Chart/Area/BasicArea.vue';
+import SimpleDonut from '@/MyComponents/Chart/Pie/SimpleDonut.vue';
 
 export default {
     data() {
-        
-        
+
+
         return {
             activeTab: '1',
             searchDate: null,
             startDate: null, //vista movil
             finishDate: null, //vista movil
+            scaleStatistics: [
+                {
+                    name: 'Peso medio',
+                    value: '142.52',
+                    tagColor: '#E6EFFC',
+                },
+                {
+                    name: 'Desviación estándar',
+                    value: '16.05',
+                    tagColor: '#F7E7FD',
+                },
+                {
+                    name: 'Peso total de descarga',
+                    value: '65153.82',
+                    tagColor: '#FAFDE6',
+                },
+                {
+                    name: 'Total regalado',
+                    value: '1249.30',
+                    tagColor: '#FFF2DE',
+                },
+                {
+                    name: 'Porcentaje regalado',
+                    value: '1.82',
+                    tagColor: '#FFDEDE',
+                },
+            ],
+            filmChart: {
+                series: [219758, 25000, 6991, 5964, 1952],
+                chartOptions: {
+                    labels: ["Bolsas llenas", "Bolsas vacias", "Bolsas movidas", "Bolsas desperdiciadas", "Bolsas de prueba"],
+                    colors: ["#17A281", "#F48B0F", "#F5B91F", "#A24917", "#373737"],
+                    chart: {
+                        type: 'donut',
+                    },
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            chart: {
+                                width: 300
+                            },
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }],
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                labels: {
+                                    show: true,
+                                    total: {
+                                        showAlways: true,
+                                        show: true
+                                    }
+                                }
+                            }
+                        }
+                    },
+                },
+            },
         }
     },
-    components:{
+    components: {
         Basic, //chart
         BasicArea, //chart
         Semicircle, //chart
@@ -204,8 +295,9 @@ export default {
         PrimaryButton,
         CircleCustomAngle, //chart
         ColumnWithMarkers, //chart
+        SimpleDonut, //chart
     },
-    props:{
+    props: {
 
     },
     methods: {
