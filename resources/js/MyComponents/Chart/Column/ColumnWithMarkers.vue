@@ -115,6 +115,11 @@ export default {
                     height: 280,
                     type: 'bar'
                 },
+                yaxis: {
+                    title: {
+                        text: 'Bolsas',
+                    },
+                },
                 plotOptions: {
                     bar: {
                         columnWidth: '40%'
