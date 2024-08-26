@@ -3,12 +3,12 @@
         <main class="lg:py-10 lg:px-14">
 
             <!-- Cuerpo del documento -->
-            <section class="flex space-x-1 w-full">
+            <section class="flex space-x-4 w-full">
 
                 <!-- Imagen de la maquina (parte izquierda) -->
                 <figure class="w-1/4">
                     <h1 class="font-bold text-xl mb-6 ml-4">Empacadora TNA</h1>
-                    <img class="rounded-xl border border-grayD9 p-4" src="@/../../public/images/machine_1.png" alt="">
+                    <img class="rounded-xl border border-grayD9 p-4 w-full" src="@/../../public/images/machine_1.png" alt="">
                 </figure>
 
                 <!-- Infomracion de producción (parte derecha) -->
@@ -82,19 +82,19 @@
                     </div>
 
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
-                    <div class="mt-5 space-y-4">
+                    <div class="mt-4 space-y-4">
 
                         <!-- primer fila -->
                         <div class="flex space-x-4">
                             <!-- Tiempos -->
                             <div class="rounded-xl border border-grayD9 p-4 w-1/4">
-                                <p class="text-[#6D6E72] text-sm">TIEMPOS</p>
+                                <p class="text-[#6D6E72] font-bold text-sm">TIEMPOS</p>
                                 <CircleCustomAngle :series="[76, 67, 61]" />
                             </div>
 
                             <!-- PRODUCCIÓN DIARIA -->
                             <div class="rounded-xl border border-grayD9 p-4 w-3/4">
-                                <p class="text-[#6D6E72] text-sm">PRODUCCIÓN DIARIA</p>
+                                <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN DIARIA</p>
                                 <ColumnWithMarkers />
                             </div>
                         </div>
@@ -103,27 +103,27 @@
                         <div class="flex space-x-4">
                             <!-- Velocidad -->
                             <div class="rounded-xl border border-grayD9 p-4 w-3/5">
-                                <p class="text-[#6D6E72] text-sm">VELOCIDAD</p>
+                                <p class="text-[#6D6E72] font-bold text-sm">VELOCIDAD</p>
                                 <BasicArea />
                             </div>
 
                             <!-- HISTOGRAMA -->
                             <div class="rounded-xl border border-grayD9 p-4 w-2/5">
-                                <p class="text-[#6D6E72] text-sm">HISTOGRAMA</p>
-                                <!-- <ColumnWithMarkers /> -->
+                                <p class="text-[#6D6E72] font-bold text-sm">HISTOGRAMA</p>
+                                <WithRotatedLabels />
                             </div>
                         </div>
 
                         <!-- Tercera fila -->
                         <div class="flex space-x-4">
                             <!-- PELICULA -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-3/5">
+                            <div class="rounded-[20px] border border-grayD9 p-4 w-1/2">
                                 <p class="text-[#6D6E72] font-bold text-sm">USO DE PELÍCULA</p>
                                 <SimpleDonut width="450" :series="filmChart.series" :chartOptions="filmChart.chartOptions" />
                             </div>
 
                             <!-- BASCULA -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-2/5">
+                            <div class="rounded-[20px] border border-grayD9 p-4 w-1/2">
                                 <p class="text-[#6D6E72] font-bold text-sm">ESTADÍSTICAS DE LA BÁSCULA </p>
                                 <div v-for="(item, index) in scaleStatistics" :key="index"
                                     class="flex items-center justify-between mt-3">
@@ -143,11 +143,6 @@
                 </article>
 
             </section>
-
-
-
-
-
             <!-- <el-tabs v-model="activeTab" @tab-click="handleClick">
                 <el-tab-pane name="1">
                     <template #label>
@@ -213,6 +208,7 @@ import Basic from '@/MyComponents/Chart/RadialBar/Basic.vue';
 import CircleCustomAngle from '@/MyComponents/Chart/RadialBar/CircleCustomAngle.vue';
 import ColumnWithMarkers from '@/MyComponents/Chart/Column/ColumnWithMarkers.vue';
 import BasicArea from '@/MyComponents/Chart/Area/BasicArea.vue';
+import WithRotatedLabels from '@/MyComponents/Chart/Column/WithRotatedLabels.vue';
 import SimpleDonut from '@/MyComponents/Chart/Pie/SimpleDonut.vue';
 
 export default {
@@ -293,6 +289,7 @@ export default {
         Semicircle, //chart
         PublicLayout,
         PrimaryButton,
+        WithRotatedLabels, //chart
         CircleCustomAngle, //chart
         ColumnWithMarkers, //chart
         SimpleDonut, //chart
