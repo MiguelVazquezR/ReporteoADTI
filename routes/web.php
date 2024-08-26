@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MachineVariableController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,3 +23,6 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 });
+
+// ------- maquinas y sus variables rutas --------
+Route::resource('machine-variables', MachineVariableController::class);
