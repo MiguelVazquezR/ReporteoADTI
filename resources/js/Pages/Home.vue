@@ -8,7 +8,7 @@
                 <!-- Imagen de la maquina (parte izquierda) -->
                 <figure class="w-1/4">
                     <h1 class="font-bold text-xl mb-6 ml-4">Empacadora TNA</h1>
-                    <img class="rounded-xl border border-grayD9 p-4 w-full" src="@/../../public/images/machine_1.png" alt="">
+                    <img class="rounded-[20px] border border-grayD9 p-4 w-full" src="@/../../public/images/machine_1.png" alt="">
                 </figure>
 
                 <!-- Infomracion de producción (parte derecha) -->
@@ -35,7 +35,7 @@
                     </div>
 
                     <!-- graficas en rectangulo negro -->
-                    <div class="bg-black rounded-xl grid grid-cols-5 p-4 mt-5">
+                    <div class="bg-black rounded-[20px] grid grid-cols-5 p-4 mt-5">
                         <!-- chart 1 -->
                         <div class="border-r border-white">
                             <p class="text-white">OEE</p>
@@ -87,13 +87,13 @@
                         <!-- primer fila -->
                         <div class="flex space-x-4">
                             <!-- Tiempos -->
-                            <div class="rounded-xl border border-grayD9 p-4 w-1/4">
+                            <div class="rounded-[20px] border border-grayD9 p-4 w-1/4">
                                 <p class="text-[#6D6E72] font-bold text-sm">TIEMPOS</p>
                                 <CircleCustomAngle :series="[76, 67, 61]" />
                             </div>
 
                             <!-- PRODUCCIÓN DIARIA -->
-                            <div class="rounded-xl border border-grayD9 p-4 w-3/4">
+                            <div class="rounded-[20px] border border-grayD9 p-4 w-3/4">
                                 <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN DIARIA</p>
                                 <ColumnWithMarkers />
                             </div>
@@ -102,13 +102,13 @@
                         <!-- Segunda fila -->
                         <div class="flex space-x-4">
                             <!-- Velocidad -->
-                            <div class="rounded-xl border border-grayD9 p-4 w-3/5">
+                            <div class="rounded-[20px] border border-grayD9 p-4 w-3/5">
                                 <p class="text-[#6D6E72] font-bold text-sm">VELOCIDAD</p>
                                 <BasicArea />
                             </div>
 
                             <!-- HISTOGRAMA -->
-                            <div class="rounded-xl border border-grayD9 p-4 w-2/5">
+                            <div class="rounded-[20px] border border-grayD9 p-4 w-2/5">
                                 <p class="text-[#6D6E72] font-bold text-sm">HISTOGRAMA</p>
                                 <WithRotatedLabels />
                             </div>
