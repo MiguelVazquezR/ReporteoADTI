@@ -21,9 +21,22 @@ export default {
                         dataLabels: {
                             value: {
                                 offsetY: -10,
-                                color: '#FFF', // Cambia el color de la etiqueta del porcentaje
+                                color: '#000', // Cambia el color de la etiqueta del porcentaje
                                 fontSize: '14px', // Puedes ajustar el tamaño si es necesario
                             },
+                        },
+                        track: {
+                            background: "#e7e7e7",
+                            strokeWidth: '97%',
+                            margin: 5, // margin is in pixels
+                            dropShadow: {
+                                enabled: true,
+                                top: 2,
+                                left: 0,
+                                color: '#999',
+                                opacity: 1,
+                                blur: 2
+                            }
                         },
                     },
                 },

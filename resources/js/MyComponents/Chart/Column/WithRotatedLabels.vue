@@ -7,10 +7,10 @@
 export default {
     data() {
         return {
-            series: [{
-                name: 'Bolsas',
-                data: [0, 0, 1000, 6000, 3000, 2000, 3, 500]
-            }],
+            // series: [{
+            //     name: 'Bolsas',
+            //     data: [0, 0, 1000, 6000, 3000, 2000, 3, 500]
+            // }],
             chartOptions: {
                 annotations: {
                 points: [{
@@ -91,7 +91,7 @@ export default {
         }
     },
     props: {
-        // series: Array,
+        series: Array,
         // chartOptions: Object,
     }
 }

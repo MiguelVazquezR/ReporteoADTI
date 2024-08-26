@@ -30,72 +30,32 @@
 
                         <!-- Boton para generar reporte -->
                         <div>
-                            <PrimaryButton class="!py-[6px]">Generar reporte</PrimaryButton>
+                            <el-dropdown split-button type="primary" @click="handleClick">
+                                Generar reporte
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item>Enviar por email</el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
                         </div>
                     </div>
 
                     <!-- graficas en rectangulo negro -->
-                    <div class="bg-black rounded-[20px] grid grid-cols-5 p-4 mt-5">
-                        <!-- chart 1 -->
-                        <div class="border-r border-white">
-                            <p class="text-white">OEE</p>
-                            <Semicircle :series="[80]" />
-                        </div>
-
-                        <!-- chart 2 -->
-                        <div class="flex space-x-3 items-center border-r border-white px-2">
-                            <div class="text-center">
-                                <p class="text-gray9A">Tiempo disponible</p>
-                                <p class="text-white">390 min</p>
-                            </div>
-                            <Basic :series="[75]" />
-                        </div>
-
-                        <!-- chart 3 -->
-                        <div class="flex space-x-3 items-center border-r border-white px-2">
-                            <div class="text-center">
-                                <p class="text-gray9A">Tiempo de producción</p>
-                                <p class="text-white">170 min</p>
-                            </div>
-                            <Basic :series="[25]" />
-                        </div>
-
-                        <!-- chart 4 -->
-                        <div class="flex space-x-3 items-center border-r border-white px-2">
-                            <div class="text-center">
-                                <p class="text-gray9A">Calidad</p>
-                            </div>
-                            <Basic :series="[50]" />
-                        </div>
-
-                        <!-- chart 5 -->
-                        <div class="flex flex-col justify-center space-y-3 px-2">
-                            <div class="text-left">
-                                <p class="text-gray9A">Bolsas totales: <strong class="text-white ml-2">{{ '7,000'
-                                        }}</strong></p>
-                                <p class="text-gray9A">Bolsas buenas: <strong class="text-white ml-2">{{ '6,000'
-                                        }}</strong></p>
-                                <p class="text-gray9A">Bolsas malas: <strong class="text-white ml-2">{{ '1,000'
-                                        }}</strong></p>
-                            </div>
-                        </div>
-                    </div>
-
+                    <OEEPanel />
+                    
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
 
                         <!-- primer fila -->
                         <div class="flex space-x-4">
                             <!-- Tiempos -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-1/4">
-                                <p class="text-[#6D6E72] font-bold text-sm">TIEMPOS</p>
-                                <CircleCustomAngle :series="[76, 67, 61]" />
-                            </div>
+                            <TimePanel />
 
                             <!-- PRODUCCIÓN DIARIA -->
                             <div class="rounded-[20px] border border-grayD9 p-4 w-3/4">
                                 <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN DIARIA</p>
-                                <ColumnWithMarkers />
+                                <ColumnWithMarkers :series="dayliProduccion" />
                             </div>
                         </div>
 
@@ -104,13 +64,13 @@
                             <!-- Velocidad -->
                             <div class="rounded-[20px] border border-grayD9 p-4 w-3/5">
                                 <p class="text-[#6D6E72] font-bold text-sm">VELOCIDAD</p>
-                                <BasicArea />
+                                <BasicArea :series="velocityData" />
                             </div>
 
                             <!-- HISTOGRAMA -->
                             <div class="rounded-[20px] border border-grayD9 p-4 w-2/5">
                                 <p class="text-[#6D6E72] font-bold text-sm">HISTOGRAMA</p>
-                                <WithRotatedLabels />
+                                <WithRotatedLabels :series="deviacionData" />
                             </div>
                         </div>
 
@@ -203,9 +163,8 @@ Aqui va el componente 1.
 <script>
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import Semicircle from '@/MyComponents/Chart/RadialBar/Semicircle.vue';
-import Basic from '@/MyComponents/Chart/RadialBar/Basic.vue';
-import CircleCustomAngle from '@/MyComponents/Chart/RadialBar/CircleCustomAngle.vue';
+import OEEPanel from '@/MyComponents/Home/OEEPanel.vue';
+import TimePanel from '@/MyComponents/Home/TimePanel.vue';
 import ColumnWithMarkers from '@/MyComponents/Chart/Column/ColumnWithMarkers.vue';
 import BasicArea from '@/MyComponents/Chart/Area/BasicArea.vue';
 import WithRotatedLabels from '@/MyComponents/Chart/Column/WithRotatedLabels.vue';
@@ -220,6 +179,117 @@ export default {
             searchDate: null,
             startDate: null, //vista movil
             finishDate: null, //vista movil
+            dayliProduccion: [
+                {
+                    name: 'Actual',
+                    data: [
+                        {
+                            x: '02 Ago',
+                            y: 1292,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 1400,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '03 Ago',
+                            y: 4432,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 5400,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '04 Ago',
+                            y: 5423,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 5200,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '05 Ago',
+                            y: 6653,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 6500,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '06 Ago',
+                            y: 8133,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 6600,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '07 Ago',
+                            y: 7132,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 7500,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '08 Ago',
+                            y: 7332,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 8700,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        },
+                        {
+                            x: '09 Ago',
+                            y: 6553,
+                            goals: [
+                                {
+                                    name: 'Expected',
+                                    value: 7300,
+                                    strokeHeight: 5,
+                                    strokeColor: '#077B27'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            velocityData: [{
+                name: "Bolsas por minuto",
+                data: [34, 44, 54, 21, 12, 43, 33, 23, 66, 66, 58] // Datos de ejemplo
+            }],
+            deviacionData: [{
+                name: 'Bolsas',
+                data: [0, 0, 1000, 6000, 3000, 2000, 3, 500]
+            }],
             scaleStatistics: [
                 {
                     name: 'Peso medio',
@@ -284,13 +354,12 @@ export default {
         }
     },
     components: {
-        Basic, //chart
+        OEEPanel,
+        TimePanel,
         BasicArea, //chart
-        Semicircle, //chart
         PublicLayout,
         PrimaryButton,
         WithRotatedLabels, //chart
-        CircleCustomAngle, //chart
         ColumnWithMarkers, //chart
         SimpleDonut, //chart
     },
@@ -317,6 +386,9 @@ export default {
             }
             return false;
         },
+        handleClick () {
+            console.log('generar reporte');
+        }
         // handleClick(tab) {
         //     // Agrega la variable currentTab=tab.props.name a la URL para mejorar la navegacion al actalizar o cambiar de pagina
         //     const currentURL = new URL(window.location.href);
