@@ -28,14 +28,8 @@ class DatabaseSeeder extends Seeder
             MachineVariableSeeder::class,
         ]);
 
-        // Iterar y crear lotes de 50 registros con fechas consecutivas
-        for ($i = 0; $i < 6; $i++) {
-            $date = Carbon::today()->subDays($i)->toDateString();
+        RobagData::factory()->count(500)->create();
 
-            RobagData::factory()->count(50)->create([
-                'created_at' => $date,
-                'updated_at' => $date,
-            ]);
-        }
     }
+    
 }

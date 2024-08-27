@@ -123,7 +123,7 @@ export default {
                 plotOptions: {
                     bar: {
                         columnWidth: '40%'
-                    }
+                    },
                 },
                 colors: ['#1A1A1A'],
                 dataLabels: {
