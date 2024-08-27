@@ -57,7 +57,12 @@ class RobagDataController extends Controller
         $end = Carbon::parse($request->date[1])->toDateTimeString();
         
         // Ventas y gastos de la semana seleccionada
-        $data = RobagData::whereBetween('created_at', [$start, $end])->get();
+        $data = RobagData::whereBetween('created_at', [$start, $end])
+        ->get([
+            'id','bags_per_minute','empty_bags','full_bags','mean_weight','out_on_film_time','paused_time','robag_up_time','run_time','fault_time','created_at',
+            'scale_bpm','scale_good_bags','scale_low_product','scale_overscale_count','scale_overweight_bags','scale_underweight_bags','standard_deviation', 'target_weight',
+            'total_bags','total_waste'
+        ]);
 
         return response()->json(compact('data'));
     }
