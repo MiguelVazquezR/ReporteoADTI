@@ -41,11 +41,11 @@ export default {
             });
 
             const averages = {
-                mean_weight: itemCount ? (totals.mean_weight / itemCount).toFixed(2) : '0.00',
+                mean_weight: itemCount ? (totals.mean_weight / itemCount).toFixed(2) + ' g' : '0.00',
                 standard_deviation: itemCount ? (totals.standard_deviation / itemCount).toFixed(2) : '0.00',
-                total_dump_weight: itemCount ? (totals.total_dump_weight / itemCount).toFixed(2) : '0.00',
-                total_giveaway: itemCount ? (totals.total_giveaway / itemCount).toFixed(2) : '0.00',
-                giveaway_percentage: itemCount ? (totals.giveaway_percentage / itemCount).toFixed(2) : '0.00'
+                total_dump_weight: itemCount ? (totals.total_dump_weight / itemCount).toFixed(2) + ' g' : '0.00',
+                total_giveaway: itemCount ? (totals.total_giveaway / itemCount).toFixed(2) + ' g' : '0.00',
+                giveaway_percentage: itemCount ? (totals.giveaway_percentage / itemCount).toFixed(2) + '%' : '0.00'
             };
 
             return [
