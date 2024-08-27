@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -54,6 +55,27 @@ class RobagDataFactory extends Factory
             'heads_per_dump' => (string) $this->faker->numberBetween(1, 10),
             'average_weight_in_ready_heads' => (string) $this->faker->randomFloat(2, 10, 100),
             'short_term_scale_efficiency_percentage' => (string) $this->faker->randomFloat(2, 70, 100),
+            'created_at' => $this->randomDateTimeThisMonth(),
+            'updated_at' => $this->randomDateTimeThisMonth(),
         ];
+    }
+
+    /**
+     * Genera una fecha y hora aleatoria dentro del mes en curso.
+     */
+    private function randomDateTimeThisMonth()
+    {
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $currentDate = Carbon::now();
+
+        // Genera una fecha aleatoria entre el inicio del mes y hoy
+        $randomDate = Carbon::createFromTimestamp(rand($startOfMonth->timestamp, $currentDate->timestamp));
+
+        // Asigna una hora, minutos y segundos aleatorios
+        return $randomDate->setTime(
+            rand(0, 23),  // Hora aleatoria entre 0 y 23
+            rand(0, 59),  // Minutos aleatorios entre 0 y 59
+            rand(0, 59)   // Segundos aleatorios entre 0 y 59
+        );
     }
 }
