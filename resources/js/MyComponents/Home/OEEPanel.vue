@@ -36,9 +36,9 @@
             <section class="flex space-x-3 items-center" v-else>
                 <div class="text-center">
                     <p class="text-gray9A">Tiempo de producción</p>
-                    <p class="text-black">{{ productionTime }} min</p>
+                    <p class="text-black">{{ formatNumber(productionTime) }} min</p>
                 </div>
-                <Basic :series="basicSeries2" />
+                <Basic :series="productionPercentage" />
             </section>
         </div>
 
@@ -52,7 +52,7 @@
                 <div class="text-center">
                     <p class="text-gray9A">Calidad</p>
                 </div>
-                <Basic :series="basicSeries3" />
+                <Basic :series="quality" />
             </section>
         </div>
 
@@ -64,15 +64,15 @@
             <div v-else class="text-left">
                 <div class="flex items-center space-x-1">
                     <p class="text-gray9A w-28">Bolsas totales:</p>
-                    <strong class="text-black ml-2">{{ '7,000'}}</strong>
+                    <strong class="text-black ml-2">{{ formatNumber(totalBags) }}</strong>
                 </div>
                 <div class="flex items-center space-x-1">
                     <p class="text-gray9A w-28">Bolsas buenas:</p>
-                    <strong class="text-black ml-2">{{ '6,000'}}</strong>
+                    <strong class="text-black ml-2">{{ formatNumber(totalGoodBags) }}</strong>
                 </div>
                 <div class="flex items-center space-x-1">
                     <p class="text-gray9A w-28">Bolsas malas:</p>
-                    <strong class="text-black ml-2">{{ '1,000'}}</strong>
+                    <strong class="text-black ml-2">{{ formatNumber(totalWasteBags) }}</strong>
                 </div>
             </div>
         </div>
@@ -88,10 +88,13 @@ data () {
     return {
         OEE: [80], //OEE
         basicSeries1: [75], //tiempo disponible
-        basicSeries2: [25], //Tiempo de producción
-        basicSeries3: [50], //calidad
+        productionPercentage: [0], //Tiempo de producción
+        quality: [0], //calidad
         timeAvailable: null, //tiempo en minutos tomado del intervalo seleccionado en filtro
         productionTime: null, //tiempo en minutos de el tiempo de produccion.
+        totalBags: null, //total de bolsas producidas/empacadas
+        totalWasteBags: null, //total de bolsas malas producidas/empacadas
+        totalGoodBags: null, //total de bolsas buenas producidas/empacadas
     }
 },
 components:{
@@ -118,6 +121,22 @@ methods:{
 
         const productionTime = this.timeAvailable - totalDowntime;
         this.productionTime = productionTime;
+
+        //calcular el porcentage de producción
+        this.productionPercentage = [((this.productionTime / this.timeAvailable) * 100).toFixed(1)];
+    },
+    calculateQuality() {
+        const quality = this.data.reduce((total, item) => {
+            return total + (parseFloat(item.scale_good_bags) - parseFloat(item.empty_bags)) 
+                / (parseFloat(item.full_bags) - parseFloat(item.empty_bags));
+        }, 0) / this.data.length;
+        
+        this.quality = [quality.toFixed(1)];
+    },
+    calculateTotalBags() {
+        this.totalBags = this.data.reduce((total, item) => total + parseInt(item.total_bags), 0);
+        this.totalWasteBags = this.data.reduce((total, item) => total + parseInt(item.total_waste), 0);
+        this.totalGoodBags = this.totalBags - this.totalWasteBags;
     },
 },
 watch:{
@@ -143,7 +162,9 @@ watch:{
         this.timeAvailable = totalMinutes; //tiempo en minutos tomado del intervalo seleccionado en filtro
         // console.log(`Total minutos: ${totalMinutes}`);
 
-        this.calculateProductionTime();
+        this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
+        this.calculateQuality(); //calcula las variables para la calidad
+        this.calculateTotalBags(); //calcula las variables para la calidad
     }
 },
 mounted() {
