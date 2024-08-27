@@ -1,7 +1,7 @@
 <template>
     <main class="rounded-[20px] border border-grayD9 p-4 w-1/2">
         <p class="text-[#6D6E72] font-bold text-sm">USO DE PELÍCULA</p>
-        <SimpleDonut width="450" :series="filmChart.series" :chartOptions="filmChart.chartOptions" />
+        <SimpleDonut width="400" :series="Object.values(getFilmChartSeries)" :chartOptions="chartOptions" />
     </main>
 </template>
 
@@ -9,13 +9,13 @@
 import SimpleDonut from '@/MyComponents/Chart/Pie/SimpleDonut.vue';
 
 export default {
-data() {
-    return {
-        filmChart: {
-            series: [219758, 25000, 6991, 5964, 1952],
+    data() {
+        return {
             chartOptions: {
-                labels: ["Bolsas llenas", "Bolsas vacias", "Bolsas movidas", "Bolsas desperdiciadas", "Bolsas de prueba"],
-                colors: ["#17A281", "#F48B0F", "#F5B91F", "#A24917", "#373737"],
+                // labels: ["Bolsas llenas", "Bolsas vacias", "Bolsas movidas", "Bolsas desperdiciadas", "Bolsas de prueba"],
+                labels: ["Bolsas llenas", "Bolsas vacias"],
+                // colors: ["#17A281", "#F48B0F", "#F5B91F", "#A24917", "#373737"],
+                colors: ["#17A281", "#F48B0F"],
                 chart: {
                     type: 'donut',
                 },
@@ -23,7 +23,7 @@ data() {
                     breakpoint: 480,
                     options: {
                         chart: {
-                            width: 300
+                            width: 400
                         },
                         legend: {
                             position: 'bottom'
@@ -44,17 +44,26 @@ data() {
                     }
                 },
             },
+        }
+    },
+    components: {
+        SimpleDonut
+    },
+    props: {
+        items: {
+            default: [],
+            required: true,
+            type: Array,
         },
+    },
+    computed: {
+        getFilmChartSeries() {
+            return this.items.reduce((acc, item) => {
+                acc.full_bags += parseInt(item.full_bags) || 0;
+                acc.total_waste += parseInt(item.total_waste) || 0;
+                return acc;
+            }, { full_bags: 0, total_waste: 0 });
+        }
     }
-},
-components:{
-    SimpleDonut
-},
-props:{
-
-},
-methods:{
-
-}
 }
 </script>

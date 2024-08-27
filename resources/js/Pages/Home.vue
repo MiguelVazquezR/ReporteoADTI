@@ -64,16 +64,16 @@
                             <VelocityPanel />
 
                             <!-- HISTOGRAMA -->
-                            <DesviacionPanel />
+                            <DesviacionPanel :items="data" />
                         </div>
 
                         <!-- Tercera fila -->
                         <div class="flex space-x-4">
                             <!-- PELICULA -->
-                            <FilmPanel />
+                            <FilmPanel :items="data" />
 
                             <!-- BASCULA -->
-                            <ScalePanel />
+                            <ScalePanel :items="data" />
                         </div>
                     </div>
                 </article>
@@ -222,7 +222,6 @@ export default {
             try {
                 const response = await axios.post(route('robag.get-data-by-date-range'), {date: this.searchDate} );
                 if ( response.status === 200 ) {
-                    console.log(response.data.data);
                     this.data = response.data.data;
                 }
 
