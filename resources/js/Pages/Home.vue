@@ -23,15 +23,9 @@
                                     v-model="finishDate" type="date" class="!w-1/2" placeholder="Final" size="small" />
                             </div>
                             <div v-else>
-                                <el-date-picker
-                                    @change="filterData"
-                                    v-model="searchDate"
-                                    type="datetimerange"
-                                    range-separator="A"
-                                    start-placeholder="Fecha de inicio"
-                                    end-placeholder="Fecha de fin"
-                                    class="!w-full"
-                                />
+                                <el-date-picker @change="filterData" v-model="searchDate" type="datetimerange"
+                                    range-separator="A" start-placeholder="Fecha de inicio"
+                                    end-placeholder="Fecha de fin" class="!w-full" />
                             </div>
                         </div>
 
@@ -51,7 +45,7 @@
 
                     <!-- graficas en rectangulo negro -->
                     <OEEPanel :date="searchDate" />
-                    
+
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
 
@@ -139,9 +133,20 @@ import VelocityPanel from '@/MyComponents/Home/VelocityPanel.vue';
 import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
 import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
 import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
+import { useForm } from '@inertiajs/vue3';
+import DialogModal from '@/Components/DialogModal.vue';
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
 
 export default {
     data() {
+        const emailForm = useForm({
+            main_email: null,
+            cco: [],
+            subject: null,
+            description: null,
+        });
+
         return {
             // formularios
             emailForm,
@@ -153,7 +158,7 @@ export default {
             searchDate: null,
             startDate: null, //vista movil
             finishDate: null, //vista movil
-            }
+        }
     },
     components: {
         PublicLayout,
@@ -165,6 +170,9 @@ export default {
         TimePanel,
         FilmPanel,
         OEEPanel,
+        DialogModal,
+        InputError,
+        InputLabel,
     },
     props: {
 
@@ -199,6 +207,11 @@ export default {
             }
             return false;
         },
+        handleDropdownCommand(command) {
+            if (command == 'email') {
+                this.showEmailModal = true;
+            }
+        },
         handleClick() {
             console.log('generar reporte');
         },
@@ -211,17 +224,19 @@ export default {
             return window.innerWidth < 768;
         }
     },
-    mounted() {
-        const start = new Date();
-        start.setHours(0, 0, 0, 0); // 6:00 AM
+    created() {
+        const today = new Date(); // Obtiene la fecha actual
 
-        const end = new Date();
-        end.setHours(14, 0, 0, 0); // 8:00 PM
+        // Crear la primera fecha con la hora 6:00 AM
+        const startDate = new Date(today);
+        startDate.setHours(6, 0, 0, 0); // Establecer hora a 6:00 AM
 
-        this.searchDate = [
-            start.toISOString().slice(0, 19).replace('T', ' '),  // 'YYYY-MM-DD HH:mm:ss'
-            end.toISOString().slice(0, 19).replace('T', ' ')    // 'YYYY-MM-DD HH:mm:ss'
-        ]
+        // Crear la segunda fecha con la hora 8:00 PM
+        const endDate = new Date(today);
+        endDate.setHours(20, 0, 0, 0); // Establecer hora a 8:00 PM (20:00)
+
+        // Inicializar searchDate con las dos fechas
+        this.searchDate = [startDate, endDate];
     },
 }
 </script>
