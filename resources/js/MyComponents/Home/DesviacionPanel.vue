@@ -104,8 +104,14 @@ export default {
             type: Array,
         },
     },
-    methods: {
-
-    }
+    computed: {
+        getChartSeries() {
+            return this.items.reduce((acc, item) => {
+                acc.full_bags += parseInt(item.full_bags) || 0;
+                acc.total_waste += parseInt(item.total_waste) || 0;
+                return acc;
+            }, { full_bags: 0, total_waste: 0 });
+        }
+    },
 }
 </script>
