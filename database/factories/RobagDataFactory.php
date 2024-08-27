@@ -22,12 +22,12 @@ class RobagDataFactory extends Factory
             'scale_low_product' => (string) $this->faker->boolean(),
             'reset_counters' => (string) $this->faker->boolean(),
             'scale_internal_status' => (string) $this->faker->randomElement(['OK', 'error']),
-            'robag_up_time' => (string) $this->faker->numberBetween(700, 840 ),
+            'robag_up_time' => (string) $this->faker->numberBetween(30000, 50000 ), //Tiempo en segundos desde que se encendió el Robag o se reinició el software
             'reason_for_stop_status' => (string) $this->faker->randomElement(['maintenance', 'fault', 'manual_stop']),
-            'run_time' => (string) $this->faker->numberBetween(100, 840),
-            'paused_time' => (string) $this->faker->numberBetween(0, 60),
-            'fault_time' => (string) $this->faker->numberBetween(0, 60),
-            'out_on_film_time' => (string) $this->faker->numberBetween(0, 60),
+            'run_time' => (string) $this->faker->numberBetween(25000, 50000), //Tiempo en ejecución en segundos
+            'paused_time' => (string) $this->faker->numberBetween(0, 3600), //Tiempo en pausa en segundos
+            'fault_time' => (string) $this->faker->numberBetween(0, 3600), //Tiempo de falla en segundos
+            'out_on_film_time' => (string) $this->faker->numberBetween(0, 3600), //Tiempo en estado sin película en segundos
             'last_metal_detect_time' => (string) $this->faker->time(),
             'bags_this_roll' => (string) $this->faker->numberBetween(0, 10000),
             'bags_last_roll' => (string) $this->faker->numberBetween(0, 10000),
