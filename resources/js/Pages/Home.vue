@@ -55,13 +55,13 @@
                             <TimePanel />
 
                             <!-- PRODUCCIÓN DIARIA -->
-                            <ProductionPanel />
+                            <ProductionPanel :items="data" />
                         </div>
 
                         <!-- Segunda fila -->
                         <div class="flex space-x-4">
                             <!-- Velocidad -->
-                            <VelocityPanel />
+                            <VelocityPanel :items="data" />
 
                             <!-- HISTOGRAMA -->
                             <DesviacionPanel :items="data" />

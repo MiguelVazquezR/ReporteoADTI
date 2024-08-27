@@ -110,39 +110,39 @@ export default {
             //         ]
             //     }
             // ],
-            chartOptions: {
-                chart: {
-                    height: 280,
-                    type: 'bar'
-                },
-                yaxis: {
-                    title: {
-                        text: 'Bolsas',
-                    },
-                },
-                plotOptions: {
-                    bar: {
-                        columnWidth: '40%'
-                    },
-                },
-                colors: ['#1A1A1A'],
-                dataLabels: {
-                    enabled: false
-                },
-                legend: {
-                    show: true,
-                    showForSingleSeries: true,
-                    customLegendItems: ['Actual', 'Objetivo'],
-                    markers: {
-                        fillColors: ['#373737', '#077B27']
-                    }
-                }
-            },
+            // chartOptions: {
+            //     chart: {
+            //         height: 280,
+            //         type: 'bar'
+            //     },
+            //     yaxis: {
+            //         title: {
+            //             text: 'Bolsas',
+            //         },
+            //     },
+            //     plotOptions: {
+            //         bar: {
+            //             columnWidth: '40%'
+            //         },
+            //     },
+            //     colors: ['#1A1A1A'],
+            //     dataLabels: {
+            //         enabled: false
+            //     },
+            //     legend: {
+            //         show: true,
+            //         showForSingleSeries: true,
+            //         customLegendItems: ['Actual', 'Objetivo'],
+            //         markers: {
+            //             fillColors: ['#373737', '#077B27']
+            //         }
+            //     }
+            // },
         }
     },
     props: {
         series: Array,
-        // chartOptions: Object,
+        chartOptions: Object,
     }
 }
 </script>

@@ -1,129 +1,90 @@
 <template>
     <main class="rounded-[20px] border border-grayD9 p-4 w-3/4">
-        <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN DIARIA</p>
-        <ColumnWithMarkers :series="dayliProduccion" />
+        <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN POR DIA</p>
+        <ColumnWithMarkers :series="updatedSeries" :chartOptions="chartOptions" />
     </main>
 </template>
 
 <script>
 import ColumnWithMarkers from '@/MyComponents/Chart/Column/ColumnWithMarkers.vue';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export default {
-data() {
-    return {
-        dayliProduccion: [
-                {
-                    name: 'Actual',
-                    data: [
+    data() {
+        return {
+            chartOptions: {
+                chart: {
+                    height: 280,
+                    type: 'bar'
+                },
+                yaxis: {
+                    title: {
+                        text: 'Bolsas',
+                    },
+                },
+                plotOptions: {
+                    bar: {
+                        columnWidth: '40%'
+                    },
+                },
+                colors: ['#1A1A1A'],
+                dataLabels: {
+                    enabled: false
+                },
+                legend: {
+                    show: true,
+                    showForSingleSeries: true,
+                    customLegendItems: ['Real', 'Esperado'],
+                    markers: {
+                        fillColors: ['#373737', '#077B27']
+                    }
+                }
+            },
+        }
+    },
+    components: {
+        ColumnWithMarkers
+    },
+    props: {
+        items: {
+            default: [],
+            required: true,
+            type: Array,
+        },
+    },
+    computed: {
+        uniqueFormattedDates() {
+            const dates = this.items.map(item => format(new Date(item.created_at), 'yyyy-MM-dd'));
+            const uniqueDates = [...new Set(dates)];
+            uniqueDates.sort((a, b) => new Date(a) - new Date(b));
+            return uniqueDates;
+        },
+        maxFullBagsData() {
+            return this.uniqueFormattedDates.map(date => {
+                const filteredItems = this.items.filter(item => format(new Date(item.created_at), 'yyyy-MM-dd') === date);
+                const maxFullBags = Math.max(...filteredItems.map(item => parseFloat(item.full_bags) || 0));
+
+                return {
+                    x: format(new Date(date), "dd MMM yy", { locale: es }), // Formato con el mes en español
+                    y: maxFullBags,
+                    goals: [
                         {
-                            x: '02 Ago',
-                            y: 1292,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 1400,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '03 Ago',
-                            y: 4432,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 5400,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '04 Ago',
-                            y: 5423,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 5200,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '05 Ago',
-                            y: 6653,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 6500,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '06 Ago',
-                            y: 8133,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 6600,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '07 Ago',
-                            y: 7132,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 7500,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '08 Ago',
-                            y: 7332,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 8700,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
-                        },
-                        {
-                            x: '09 Ago',
-                            y: 6553,
-                            goals: [
-                                {
-                                    name: 'Expected',
-                                    value: 7300,
-                                    strokeHeight: 5,
-                                    strokeColor: '#077B27'
-                                }
-                            ]
+                            name: 'Esperado',
+                            value: 8000,  // Aquí puedes personalizar o calcular el valor esperado
+                            strokeHeight: 5,
+                            strokeColor: '#077B27'
                         }
                     ]
-                }
-            ],
+                };
+            });
+        },
+        updatedSeries() {
+            return [{
+                name: 'Real',
+                data: this.maxFullBagsData
+            }];
+        },
     }
-},
-components:{
-    ColumnWithMarkers
-},
-props:{
-
-},
-methods:{
-
-}
 }
 </script>
