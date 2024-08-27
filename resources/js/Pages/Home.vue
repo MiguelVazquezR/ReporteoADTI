@@ -8,7 +8,8 @@
                 <!-- Imagen de la maquina (parte izquierda) -->
                 <figure class="w-1/4">
                     <h1 class="font-bold text-xl mb-6 ml-4">Empacadora TNA</h1>
-                    <img class="rounded-[20px] border border-grayD9 p-4 w-full" src="@/../../public/images/machine_1.png" alt="">
+                    <img class="rounded-[20px] border border-grayD9 p-4 w-full"
+                        src="@/../../public/images/machine_1.png" alt="">
                 </figure>
 
                 <!-- Infomracion de producción (parte derecha) -->
@@ -30,11 +31,12 @@
 
                         <!-- Boton para generar reporte -->
                         <div>
-                            <el-dropdown split-button type="primary" @click="handleClick">
+                            <el-dropdown split-button type="primary" @click="handleClick"
+                                @command="handleDropdownCommand">
                                 Generar reporte
                                 <template #dropdown>
                                     <el-dropdown-menu>
-                                        <el-dropdown-item>Enviar por email</el-dropdown-item>
+                                        <el-dropdown-item command="email">Enviar por correo</el-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -43,7 +45,7 @@
 
                     <!-- graficas en rectangulo negro -->
                     <OEEPanel />
-                    
+
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
 
@@ -79,7 +81,8 @@
                             <!-- PELICULA -->
                             <div class="rounded-[20px] border border-grayD9 p-4 w-1/2">
                                 <p class="text-[#6D6E72] font-bold text-sm">USO DE PELÍCULA</p>
-                                <SimpleDonut width="450" :series="filmChart.series" :chartOptions="filmChart.chartOptions" />
+                                <SimpleDonut width="450" :series="filmChart.series"
+                                    :chartOptions="filmChart.chartOptions" />
                             </div>
 
                             <!-- BASCULA -->
@@ -101,7 +104,6 @@
                         </div>
                     </div>
                 </article>
-
             </section>
             <!-- <el-tabs v-model="activeTab" @tab-click="handleClick">
                 <el-tab-pane name="1">
@@ -157,6 +159,47 @@ Aqui va el componente 1.
 </el-tab-pane>
 </el-tabs> -->
         </main>
+        <DialogModal :show="showEmailModal" @close="showEmailModal = false">
+            <template #title>
+                <h1>Enviar reporte por correo</h1>
+            </template>
+            <template #content>
+                <form @submit.prevent="sendEmail">
+                    <div>
+                        <InputLabel value="Correo electrónico detinatario*" />
+                        <el-input v-model="emailForm.main_email" placeholder="Ej. admin@gmail.com" clearable />
+                        <InputError :message="emailForm.errors.main_email" />
+                    </div>
+                    <div class="mt-3">
+                        <InputLabel value="CCO" />
+                        <el-select v-model="emailForm.cco" multiple filterable allow-create default-first-option
+                            :reserve-keyword="false" placeholder="Agrega cualquier correo">
+                            <el-option v-for="item in ccoList" :key="item.value" :label="item.label"
+                                :value="item.value" />
+                        </el-select>
+                        <InputError :message="emailForm.errors.cco" />
+                    </div>
+                    <div class="mt-3">
+                        <InputLabel value="Asunto*" />
+                        <el-input v-model="emailForm.subject" placeholder="Reporte de ..." clearable />
+                        <InputError :message="emailForm.errors.subject" />
+                    </div>
+                    <div class="mt-3">
+                        <InputLabel value="Descripción del correo" />
+                        <el-input v-model="emailForm.description" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
+                            placeholder="Escribe una descripción del producto si es necesario" clearable />
+                        <InputError :message="emailForm.errors.description" />
+                    </div>
+                    <div class="mt-3">
+                        <InputLabel value="Adjunto" />
+                        <p class="text-secondary text-xs">Reporte Robag 03_ago_2024 a 23_ago_2024.xls</p>
+                    </div>
+                </form>
+            </template>
+            <template #footer>
+                <PrimaryButton @click="sendEmail">Enviar correo</PrimaryButton>
+            </template>
+        </DialogModal>
     </PublicLayout>
 </template>
 
@@ -169,12 +212,27 @@ import ColumnWithMarkers from '@/MyComponents/Chart/Column/ColumnWithMarkers.vue
 import BasicArea from '@/MyComponents/Chart/Area/BasicArea.vue';
 import WithRotatedLabels from '@/MyComponents/Chart/Column/WithRotatedLabels.vue';
 import SimpleDonut from '@/MyComponents/Chart/Pie/SimpleDonut.vue';
+import DialogModal from '@/Components/DialogModal.vue';
+import { useForm } from '@inertiajs/vue3';
+import InputLabel from '@/Components/InputLabel.vue';
+import InputError from '@/Components/InputError.vue';
 
 export default {
     data() {
-
+        const emailForm = useForm({
+            main_email: null,
+            cco: [],
+            subject: null,
+            description: null,
+        });
 
         return {
+            // formularios
+            emailForm,
+            // modales
+            showEmailModal: false,
+            // general
+            ccoList: [],
             activeTab: '1',
             searchDate: null,
             startDate: null, //vista movil
@@ -362,11 +420,17 @@ export default {
         WithRotatedLabels, //chart
         ColumnWithMarkers, //chart
         SimpleDonut, //chart
+        DialogModal,
+        InputLabel,
+        InputError,
     },
     props: {
 
     },
     methods: {
+        sendEmail() {
+
+        },
         handleStartDateChange(value) {
             this.startDate = value;
             // Si finishDate es nulo, aplica la regla de deshabilitación
@@ -386,9 +450,14 @@ export default {
             }
             return false;
         },
-        handleClick () {
+        handleClick() {
             console.log('generar reporte');
-        }
+        },
+        handleDropdownCommand(command) {
+            if (command == 'email') {
+                this.showEmailModal = true;
+            }
+        },
         // handleClick(tab) {
         //     // Agrega la variable currentTab=tab.props.name a la URL para mejorar la navegacion al actalizar o cambiar de pagina
         //     const currentURL = new URL(window.location.href);
