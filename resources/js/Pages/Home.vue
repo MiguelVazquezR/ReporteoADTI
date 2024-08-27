@@ -23,7 +23,7 @@
                                     v-model="finishDate" type="date" class="!w-1/2" placeholder="Final" size="small" />
                             </div>
                             <div v-else>
-                                <el-date-picker @change="filterData" v-model="searchDate" type="datetimerange"
+                                <el-date-picker @change="getDataByDateRange" v-model="searchDate" type="datetimerange"
                                     range-separator="A" start-placeholder="Fecha de inicio"
                                     end-placeholder="Fecha de fin" class="!w-full" />
                             </div>
@@ -44,7 +44,7 @@
                     </div>
 
                     <!-- graficas en rectangulo negro -->
-                    <OEEPanel :date="searchDate" />
+                    <OEEPanel :date="searchDate" :data="data" :loading="loading" />
 
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
@@ -153,6 +153,8 @@ export default {
             // modales
             showEmailModal: false,
             // general
+            loading: false,
+            data: [],
             ccoList: [],
             activeTab: '1',
             searchDate: null,
@@ -215,8 +217,20 @@ export default {
         handleClick() {
             console.log('generar reporte');
         },
-        filterData() {
-            console.log('hola');
+        async getDataByDateRange() {
+            this.loading = true;
+            try {
+                const response = await axios.post(route('robag.get-data-by-date-range'), {date: this.searchDate} );
+                if ( response.status === 200 ) {
+                    console.log(response.data.data);
+                    this.data = response.data.data;
+                }
+
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.loading = false;
+            }
         }
     },
     computed: {
@@ -225,18 +239,20 @@ export default {
         }
     },
     created() {
-        const today = new Date(); // Obtiene la fecha actual
+        const today = new Date(); // Obtiene la fecha y hora actuales
 
         // Crear la primera fecha con la hora 6:00 AM
         const startDate = new Date(today);
         startDate.setHours(6, 0, 0, 0); // Establecer hora a 6:00 AM
 
-        // Crear la segunda fecha con la hora 8:00 PM
+        // Crear la segunda fecha con la hora actual
         const endDate = new Date(today);
-        endDate.setHours(20, 0, 0, 0); // Establecer hora a 8:00 PM (20:00)
+        endDate.setHours(today.getHours(), today.getMinutes(), today.getSeconds(), today.getMilliseconds()); // Establecer la hora actual
 
         // Inicializar searchDate con las dos fechas
         this.searchDate = [startDate, endDate];
-    },
+
+        this.getDataByDateRange(); // Recupera los registros del día de hoy
+    }
 }
 </script>
