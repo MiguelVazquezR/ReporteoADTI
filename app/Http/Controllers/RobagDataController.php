@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RobagData;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class RobagDataController extends Controller
@@ -48,5 +49,16 @@ class RobagDataController extends Controller
     public function destroy(RobagData $robagData)
     {
         //
+    }
+
+    public function getDataByDateRange(Request $request)
+    {   
+        $start = Carbon::parse($request->date[0])->toDateTimeString();
+        $end = Carbon::parse($request->date[1])->toDateTimeString();
+        
+        // Ventas y gastos de la semana seleccionada
+        $data = RobagData::whereBetween('created_at', [$start, $end])->get();
+
+        return response()->json(compact('data'));
     }
 }
