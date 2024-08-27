@@ -112,7 +112,7 @@ class MachineVariableSeeder extends Seeder
                 "variable_address" => "5000",
             ],
             [
-                "variable_name" => "bolsas vacias",
+                "variable_name" => "Bolsas vacias",
                 "variable_description" => "Número de bolsas vacias",
                 "variable_address" => "5002",
             ],
