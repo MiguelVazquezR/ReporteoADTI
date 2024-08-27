@@ -1,5 +1,5 @@
 <template>
-    <main class="rounded-[20px] border border-grayD9 p-4 w-3/4">
+    <main class="rounded-[20px] border border-grayD9 p-4 w-2/3">
         <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN POR DIA</p>
         <ColumnWithMarkers :series="updatedSeries" :chartOptions="chartOptions" />
     </main>

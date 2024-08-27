@@ -52,7 +52,7 @@
                         <!-- primer fila -->
                         <div class="flex space-x-4">
                             <!-- Tiempos -->
-                            <TimePanel :date="searchDate" :data="data" :loading="loading" />
+                            <TimePanel :date="searchDate" :items="data" :loading="loading" />
 
                             <!-- PRODUCCIÓN DIARIA -->
                             <ProductionPanel :items="data" />
@@ -223,7 +223,7 @@ export default {
                 const response = await axios.post(route('robag.get-data-by-date-range'), {date: this.searchDate} );
                 if ( response.status === 200 ) {
                     this.data = response.data.data;
-                    console.log(this.data);
+                    // console.log(this.data);
                 }
 
             } catch (error) {
