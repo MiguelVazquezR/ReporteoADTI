@@ -29,9 +29,10 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-3 w-96">
                             <InputLabel value="Producción teórica (BPM)" />
-                            <el-input v-model="bpm" min="1" max="200" type="number" />
+                            <!-- <el-input v-model="bpm" min="1" max="200" type="number" /> -->
+                            <el-slider @change="bpmUpdated = true" v-model="bpm" :min="50" :max="150" :step="5" show-stops />
                         </div>
 
                         <!-- Boton para generar reporte -->
@@ -49,7 +50,7 @@
                     </div>
 
                     <!-- graficas en rectangulo negro -->
-                    <OEEPanel :date="searchDate" :data="data" :loading="loading" :teoricProduction="bpm" />
+                    <OEEPanel :date="searchDate" :data="data" :loading="loading" :teoricProduction="bpm" :bpmUpdated="bpmUpdated" @finished-bpm-updated="bpmUpdated = false"  />
 
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
@@ -166,6 +167,7 @@ export default {
             searchDate: null,
             startDate: null, //vista movil
             finishDate: null, //vista movil
+            bpmUpdated: false, //bandera que dispara evento de calculo de OEE cuando se cambia el bpm
         }
     },
     components: {
