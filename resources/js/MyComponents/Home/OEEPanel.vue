@@ -110,8 +110,10 @@ props:{
     data: Array, //registros recuperados
     date: Array, //Intervalo de fechas buscadas
     loading: Boolean,
-    teoricProduction: Number //bolsas por minuto a m{axima capacidad de la maquina (valor ajustable desde home)
+    teoricProduction: Number, //bolsas por minuto a m{axima capacidad de la maquina (valor ajustable desde home)
+    bpmUpdated: Boolean //bandera que dispara evento de calculo de OEE cuando se cambia el bpm
 },
+emits:['finished-bpm-updated'],
 
 methods:{
     formatNumber(number) {
@@ -185,8 +187,17 @@ methods:{
     },
 },
 watch:{
+    bpmUpdated() {
+        if ( this.bpmUpdated ) {
+            this.calculateAvailability(); //calcula el porcentaje del tiempo disponible
+            this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
+            this.calculateTotalBags(); //calcula las variables para la calidad
+            this.calculateQuality(); //calcula las variables para la calidad
+            this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
+            this.$emit('finished-bpm-updated');
+        }
+    },
     data() {
-
         //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
         const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString()
 
