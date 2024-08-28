@@ -14,7 +14,7 @@
 
                 <!-- Infomracion de producción (parte derecha) -->
                 <article class="w-3/4">
-                    <div class="flex items-center justify-between space-x-3 w-full">
+                    <div class="flex items-center justify-between space-x-3">
                         <div class="flex items-center space-x-4 lg:-left-40 z-10">
                             <div v-if="isMobile" class="flex items-center space-x-2">
                                 <el-date-picker @change="handleStartDateChange" :disabled-date="disabledPrevDays"
@@ -27,6 +27,11 @@
                                     range-separator="A" start-placeholder="Fecha de inicio"
                                     end-placeholder="Fecha de fin" class="!w-full" />
                             </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <InputLabel value="Producción teórica (BPM)" />
+                            <el-input v-model="bpm" min="1" max="200" type="number" />
                         </div>
 
                         <!-- Boton para generar reporte -->
@@ -44,7 +49,7 @@
                     </div>
 
                     <!-- graficas en rectangulo negro -->
-                    <OEEPanel :date="searchDate" :data="data" />
+                    <OEEPanel :date="searchDate" :data="data" :loading="loading" :teoricProduction="bpm" />
 
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
@@ -153,6 +158,8 @@ export default {
             // modales
             showEmailModal: false,
             // general
+            loading: false,
+            bpm: 120, //bpm a maxima velocidad ajustable
             data: [],
             ccoList: [],
             activeTab: '1',
@@ -217,6 +224,7 @@ export default {
             console.log('generar reporte');
         },
         async getDataByDateRange() {
+            this.loading = true;
             try {
                 const response = await axios.post(route('robag.get-data-by-date-range'), {date: this.searchDate} );
                 if ( response.status === 200 ) {
@@ -226,6 +234,8 @@ export default {
 
             } catch (error) {
                 console.log(error)
+            } finally {
+                this.loading = false;
             }
         }
     },
