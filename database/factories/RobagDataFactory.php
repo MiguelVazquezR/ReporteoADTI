@@ -52,7 +52,7 @@ class RobagDataFactory extends Factory
             'total_waste' => (string) $this->faker->randomFloat(2, 0, 1000), //total de bolsas malas
             'total_bags' => (string) $this->faker->numberBetween(10000, 100000), //bolsas totales empacadas
             'mean_weight' => (string) $this->faker->randomFloat(2, 10, 100),
-            'standard_deviation' => (string) $this->faker->randomFloat(2, 0, 5),
+            'standard_deviation' => (string) $this->faker->randomFloat(2, -4, 4),
             'total_dumps' => (string) $this->faker->numberBetween(0, 1000),
             'gas_total' => (string) $this->faker->randomFloat(2, 100, 10000),
             'scale_bpm' => (string) $this->faker->randomFloat(2, 50, 150),
