@@ -3,7 +3,7 @@
 
         <!-- chart 1 -->
         <div class="border-r border-grayD9">
-            <div v-if="loading" class="text-xs my-4 text-center">
+            <div v-if="loading1" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
             <div v-else>
@@ -14,7 +14,7 @@
 
         <!-- chart 2 -->
         <div class="border-r border-grayD9 px-2">
-            <div v-if="loading" class="text-xs my-4 text-center">
+            <div v-if="loading2" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
 
@@ -34,7 +34,7 @@
 
         <!-- chart 3 -->
         <div class="border-r border-grayD9 px-2">
-            <div v-if="loading" class="text-xs my-4 text-center">
+            <div v-if="loading3" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
 
@@ -54,7 +54,7 @@
 
         <!-- chart 4 -->
         <div class="px-2">
-            <div v-if="loading" class="text-xs my-4 text-center">
+            <div v-if="loading4" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
             
@@ -100,6 +100,10 @@ data () {
         totalBags: null, //total de bolsas producidas/empacadas
         totalWasteBags: null, //total de bolsas malas producidas/empacadas
         totalGoodBags: null, //total de bolsas buenas producidas/empacadas
+        loading1: true, //carga de chart 1 OEE
+        loading2: true, //carga de chart 2 Disponibilidad
+        loading3: true, //carga de chart 3 Rendimiento
+        loading4: true, //carga de chart 4 Calidad
     }
 },
 components:{
@@ -109,10 +113,6 @@ components:{
 props:{
     data: Array, //registros recuperados
     date: Array, //Intervalo de fechas buscadas
-    loading: {
-        type: Boolean,
-        default: false
-    }
 },
 
 methods:{
@@ -132,6 +132,7 @@ methods:{
         }
 
         this.availabilityPercentage = [((this.productionTime * 100) / this.totalTime).toFixed(1)];
+        this.loading2 = false;
     },
     calculateProductionTime() {
         //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
@@ -146,6 +147,7 @@ methods:{
         }
 
         this.performancePercentage = [((this.realProduction * 100) / this.teoricProduction).toFixed(1)];
+        this.loading3 = false;
     },
     calculateTotalBags() {
         //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
@@ -162,37 +164,36 @@ methods:{
             this.totalWasteBags = this.data.reduce((total, item) => total + parseInt(item.total_waste), 0);
             this.totalGoodBags = parseInt(this.totalBags - this.totalWasteBags);
         }
-
-        
     },
     calculateQuality() {
-        // const quality = this.data.reduce((total, item) => {
-        //     return total + (parseFloat(item.scale_good_bags) - parseFloat(item.empty_bags)) 
-        //         / (parseFloat(item.full_bags) - parseFloat(item.empty_bags));
-        // }, 0) / this.data.length;
-        
-        // this.quality = [(quality / 60).toFixed(1)]; //se divide por 60 para convertir los segundos en minutos
-
-        this.quality = [((this.totalGoodBags / this.totalBags)*100).toFixed(1)] //porcentaje de piezas buenas
+        this.quality = [((this.totalGoodBags / this.totalBags) * 100).toFixed(1)] //porcentaje de piezas buenas
+        this.loading4 = false;
     },
     calculateOEE() {
         this.oee = [((this.availabilityPercentage * this.availabilityPercentage * this.quality) / 10000).toFixed(1)];
+        this.loading1 = false;
     },
     resetVariables() {
-        this.oee = [0]
-        this.availabilityPercentage = [0]
-        this.performancePercentage = [0]
-        this.quality = [0]
-        this.totalTime = null
-        this.productionTime = null
-        this.totalBags = null
-        this.totalWasteBags = null
-        this.totalGoodBags = null
+        console.log('reset');
+        this.loading1 = true;
+        this.loading2 = true;
+        this.loading3 = true;
+        this.loading4 = true;
+        this.oee = [0];
+        this.availabilityPercentage = [0];
+        this.performancePercentage = [0];
+        this.quality = [0];
+        this.totalTime = null;
+        this.productionTime = null;
+        this.totalBags = null;
+        this.totalWasteBags = null;
+        this.totalGoodBags = null;
+        this.realProduction = null;
     }
 },
 watch:{
     date(newVal) {
-        this.resetVariables();
+        // this.resetVariables();
 
         const start = new Date(newVal[0]);
         const end = new Date(newVal[1]);
@@ -214,15 +215,15 @@ watch:{
 
         this.totalTime = totalMinutes; //tiempo en minutos tomado del intervalo seleccionado en filtro
         // console.log(`Total minutos: ${totalMinutes}`);
-
+        
         this.calculateAvailability(); //calcula el porcentaje del tiempo disponible
         this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
         this.calculateTotalBags(); //calcula las variables para la calidad
-        // this.calculateQuality(); //calcula las variables para la calidad
-        // this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
+        this.calculateQuality(); //calcula las variables para la calidad
+        this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
     }
 },
-mounted() {
+created() {
     const start = new Date(this.date[0]);
     const end = new Date(this.date[1]);
 
@@ -239,8 +240,8 @@ mounted() {
         this.calculateAvailability(); //calcula el porcentaje del tiempo disponible
         this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
         this.calculateTotalBags(); //calcula las variables para la calidad
-        // this.calculateQuality(); //calcula las variables para la calidad
-        // this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
+        this.calculateQuality(); //calcula las variables para la calidad
+        this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
     }, 500);
 }
 
