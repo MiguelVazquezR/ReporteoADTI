@@ -8,13 +8,14 @@
                 <!-- Imagen de la maquina (parte izquierda) -->
                 <figure class="w-1/4">
                     <h1 class="font-bold text-xl mb-6 ml-4">Empacadora TNA</h1>
-                    <img class="rounded-[20px] border border-grayD9 p-4 w-full" src="@/../../public/images/machine_1.png" alt="">
+                    <img class="rounded-[20px] border border-grayD9 p-4 w-full"
+                        src="@/../../public/images/machine_1.png" alt="">
                 </figure>
 
                 <!-- Infomracion de producción (parte derecha) -->
                 <article class="w-3/4">
                     <div class="flex items-center justify-between space-x-3">
-                        <div class="lg:-left-40 z-10 w-80">
+                        <div class="flex items-center space-x-4 lg:-left-40 z-10">
                             <div v-if="isMobile" class="flex items-center space-x-2">
                                 <el-date-picker @change="handleStartDateChange" :disabled-date="disabledPrevDays"
                                     v-model="startDate" type="date" class="!w-1/2" placeholder="Inicio" size="small" />
@@ -22,64 +23,37 @@
                                     v-model="finishDate" type="date" class="!w-1/2" placeholder="Final" size="small" />
                             </div>
                             <div v-else>
-                                <el-date-picker v-model="searchDate" type="daterange" range-separator="A"
-                                    start-placeholder="Fecha de inicio" end-placeholder="Fecha de fin"
-                                    class="!w-full" />
+                                <el-date-picker @change="getDataByDateRange" v-model="searchDate" type="datetimerange"
+                                    range-separator="A" start-placeholder="Fecha de inicio"
+                                    end-placeholder="Fecha de fin" class="!w-full" />
                             </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 w-96">
+                            <InputLabel value="Producción teórica (BPM)" />
+                            <!-- <el-input v-model="bpm" min="1" max="200" type="number" /> -->
+                            <el-slider @change="bpmUpdated = true" v-model="bpm" :min="50" :max="150" :step="5" show-stops />
                         </div>
 
                         <!-- Boton para generar reporte -->
                         <div>
-                            <PrimaryButton class="!py-[6px]">Generar reporte</PrimaryButton>
+                            <el-dropdown split-button type="primary" @click="handleClick"
+                                @command="handleDropdownCommand">
+                                Generar reporte
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item command="email">Enviar por correo</el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
                         </div>
                     </div>
 
                     <!-- graficas en rectangulo negro -->
-                    <div class="bg-black rounded-[20px] grid grid-cols-5 p-4 mt-5">
-                        <!-- chart 1 -->
-                        <div class="border-r border-white">
-                            <p class="text-white">OEE</p>
-                            <Semicircle :series="[80]" />
-                        </div>
-
-                        <!-- chart 2 -->
-                        <div class="flex space-x-3 items-center border-r border-white px-2">
-                            <div class="text-center">
-                                <p class="text-gray9A">Tiempo disponible</p>
-                                <p class="text-white">390 min</p>
-                            </div>
-                            <Basic :series="[75]" />
-                        </div>
-
-                        <!-- chart 3 -->
-                        <div class="flex space-x-3 items-center border-r border-white px-2">
-                            <div class="text-center">
-                                <p class="text-gray9A">Tiempo de producción</p>
-                                <p class="text-white">170 min</p>
-                            </div>
-                            <Basic :series="[25]" />
-                        </div>
-
-                        <!-- chart 4 -->
-                        <div class="flex space-x-3 items-center border-r border-white px-2">
-                            <div class="text-center">
-                                <p class="text-gray9A">Calidad</p>
-                            </div>
-                            <Basic :series="[50]" />
-                        </div>
-
-                        <!-- chart 5 -->
-                        <div class="flex flex-col justify-center space-y-3 px-2">
-                            <div class="text-left">
-                                <p class="text-gray9A">Bolsas totales: <strong class="text-white ml-2">{{ '7,000'
-                                        }}</strong></p>
-                                <p class="text-gray9A">Bolsas buenas: <strong class="text-white ml-2">{{ '6,000'
-                                        }}</strong></p>
-                                <p class="text-gray9A">Bolsas malas: <strong class="text-white ml-2">{{ '1,000'
-                                        }}</strong></p>
-                            </div>
-                        </div>
-                    </div>
+                    <OEEPanel :date="searchDate" :data="data" :loading="loading" 
+                            :teoricProduction="bpm" :bpmUpdated="bpmUpdated" 
+                            @finished-bpm-updated="bpmUpdated = false"  
+                    />
 
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
@@ -87,222 +61,151 @@
                         <!-- primer fila -->
                         <div class="flex space-x-4">
                             <!-- Tiempos -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-1/4">
-                                <p class="text-[#6D6E72] font-bold text-sm">TIEMPOS</p>
-                                <CircleCustomAngle :series="[76, 67, 61]" />
-                            </div>
+                            <TimePanel :date="searchDate" :items="data" :loading="loading" />
 
                             <!-- PRODUCCIÓN DIARIA -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-3/4">
-                                <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN DIARIA</p>
-                                <ColumnWithMarkers />
-                            </div>
+                            <ProductionPanel :items="data" :loading="loading" />
                         </div>
 
                         <!-- Segunda fila -->
                         <div class="flex space-x-4">
                             <!-- Velocidad -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-3/5">
-                                <p class="text-[#6D6E72] font-bold text-sm">VELOCIDAD</p>
-                                <BasicArea />
-                            </div>
+                            <VelocityPanel :items="data" :loading="loading" />
 
                             <!-- HISTOGRAMA -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-2/5">
-                                <p class="text-[#6D6E72] font-bold text-sm">HISTOGRAMA</p>
-                                <WithRotatedLabels />
-                            </div>
+                            <DesviacionPanel :items="data" :loading="loading" />
                         </div>
 
                         <!-- Tercera fila -->
                         <div class="flex space-x-4">
                             <!-- PELICULA -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-1/2">
-                                <p class="text-[#6D6E72] font-bold text-sm">USO DE PELÍCULA</p>
-                                <SimpleDonut width="450" :series="filmChart.series" :chartOptions="filmChart.chartOptions" />
-                            </div>
+                            <FilmPanel :items="data" :loading="loading" />
 
                             <!-- BASCULA -->
-                            <div class="rounded-[20px] border border-grayD9 p-4 w-1/2">
-                                <p class="text-[#6D6E72] font-bold text-sm">ESTADÍSTICAS DE LA BÁSCULA </p>
-                                <div v-for="(item, index) in scaleStatistics" :key="index"
-                                    class="flex items-center justify-between mt-3">
-                                    <p class="flex items-center space-x-2">
-                                        <i class="fa-regular fa-circle text-[5px]"></i>
-                                        <span class="text-sm">{{ item.name }}</span>
-                                    </p>
-                                    <hr class="flex-1 border-dashed border-black mx-4">
-                                    <el-tag :color="item.tagColor" style="color: #373737; border: transparent;"
-                                        effect="light" round>
-                                        {{ item.value }}
-                                    </el-tag>
-                                </div>
-                            </div>
+                            <ScalePanel :items="data" :loading="loading" />
                         </div>
                     </div>
                 </article>
-
             </section>
-            <!-- <el-tabs v-model="activeTab" @tab-click="handleClick">
-                <el-tab-pane name="1">
-                    <template #label>
-                        <div class="flex items-center">
-                            <svg class="size-4 mr-1" stroke="currentColor" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6.6875 1V11.0625M6.6875 11.0625C5.82883 11.0625 5.00633 11.2171 4.24625 11.5M6.6875 11.0625C7.54617 11.0625 8.36867 11.2171 9.12875 11.5M10.625 2.14917C9.3205 1.96606 8.00479 1.87445 6.6875 1.875C5.35108 1.875 4.03625 1.96833 2.75 2.14917M10.625 2.14917C11.2142 2.23258 11.7975 2.33408 12.375 2.4525M10.625 2.14917L12.1533 8.406C12.2245 8.69708 12.0915 9.00567 11.8097 9.10717C11.4297 9.24358 11.0288 9.31305 10.625 9.3125C10.2212 9.31305 9.82033 9.24358 9.44025 9.10717C9.1585 9.00567 9.0255 8.69708 9.09608 8.406L10.625 2.14975V2.14917ZM2.75 2.14917C2.16083 2.23258 1.5775 2.33408 1 2.4525M2.75 2.14917L4.27833 8.406C4.3495 8.69708 4.2165 9.00567 3.93475 9.10717C3.55467 9.24357 3.15382 9.31304 2.75 9.3125C2.34618 9.31304 1.94533 9.24357 1.56525 9.10717C1.2835 9.00567 1.1505 8.69708 1.22108 8.406L2.75 2.14975V2.14917Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>Datos de Peso</span>
-                        </div>
-                    </template>
-Aqui va el componente 1.
-</el-tab-pane>
-<el-tab-pane name="2">
-    <template #label>
-                        <div class="flex items-center">
-                            <i class="fa-regular fa-clock mr-1"></i>
-                            <span>Tiempos</span>
-                        </div>
-                    </template>
-    Aqui va el componente 2.
-</el-tab-pane>
-<el-tab-pane name="3">
-    <template #label>
-                        <div class="flex items-center">
-                            <i class="fa-solid fa-arrow-up-short-wide mr-1"></i>
-                            <span>Uso de película</span>
-                        </div>
-                    </template>
-    Aqui va el componente 3.
-</el-tab-pane>
-<el-tab-pane name="4">
-    <template #label>
-                        <div class="flex items-center">
-                            <svg class="size-4 mr-1" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M1.875 1V7.5625C1.875 7.9106 2.01328 8.24444 2.25942 8.49058C2.50556 8.73672 2.8394 8.875 3.1875 8.875H4.5M1.875 1H1M1.875 1H11.5M4.5 8.875H8.875M4.5 8.875L3.91667 10.625M11.5 1H12.375M11.5 1V7.5625C11.5 7.9106 11.3617 8.24444 11.1156 8.49058C10.8694 8.73672 10.5356 8.875 10.1875 8.875H8.875M8.875 8.875L9.45833 10.625M3.91667 10.625H9.45833M3.91667 10.625L3.625 11.5M9.45833 10.625L9.75 11.5M4.0625 6.25L5.8125 4.5L7.0655 5.753C7.6542 4.90792 8.42126 4.2024 9.3125 3.68625" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>Estadística de escala</span>
-                        </div>
-                    </template>
-    Aqui va el componente 4.
-</el-tab-pane>
-<el-tab-pane name="5">
-    <template #label>
-                        <div class="flex items-center">
-                            <svg class="size-4 mr-1" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4.5 6.85433L5.8125 8.16683L8 5.10433M6.25 1C4.92918 2.2543 3.17015 2.94225 1.34884 2.91683C1.11716 3.62265 0.999403 4.36088 1 5.10375C1 8.36575 3.23067 11.1062 6.25 11.8838C9.26934 11.1068 11.5 8.36633 11.5 5.10433C11.5 4.34017 11.3775 3.60458 11.1512 2.91625H11.0625C9.19817 2.91625 7.50417 2.18825 6.25 1Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>OEE</span>
-                        </div>
-                    </template>
-    Aqui va el componente 5.
-</el-tab-pane>
-</el-tabs> -->
         </main>
+        <DialogModal :show="showEmailModal" @close="showEmailModal = false">
+            <template #title>
+                <h1>Enviar reporte por correo</h1>
+            </template>
+            <template #content>
+                <form @submit.prevent="sendEmail">
+                    <div>
+                        <InputLabel value="Correo electrónico detinatario*" />
+                        <el-input v-model="emailForm.main_email" placeholder="Ej. admin@gmail.com" clearable />
+                        <InputError :message="emailForm.errors.main_email" />
+                    </div>
+                    <div class="mt-3">
+                        <InputLabel value="CCO" />
+                        <el-select v-model="emailForm.cco" multiple filterable allow-create default-first-option
+                            :reserve-keyword="false" placeholder="Agrega cualquier correo">
+                            <el-option v-for="item in ccoList" :key="item.value" :label="item.label"
+                                :value="item.value" />
+                        </el-select>
+                        <InputError :message="emailForm.errors.cco" />
+                    </div>
+                    <div class="mt-3">
+                        <InputLabel value="Asunto*" />
+                        <el-input v-model="emailForm.subject" placeholder="Reporte de ..." clearable />
+                        <InputError :message="emailForm.errors.subject" />
+                    </div>
+                    <div class="mt-3">
+                        <InputLabel value="Descripción del correo" />
+                        <el-input v-model="emailForm.description" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
+                            placeholder="Escribe una descripción del producto si es necesario" clearable />
+                        <InputError :message="emailForm.errors.description" />
+                    </div>
+                    <div class="mt-3">
+                        <InputLabel value="Adjunto" />
+                        <p class="text-secondary text-xs">Reporte Robag 03_ago_2024 a 23_ago_2024.xls</p>
+                    </div>
+                </form>
+            </template>
+            <template #footer>
+                <PrimaryButton @click="sendEmail">Enviar correo</PrimaryButton>
+            </template>
+        </DialogModal>
     </PublicLayout>
 </template>
 
 <script>
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import Semicircle from '@/MyComponents/Chart/RadialBar/Semicircle.vue';
-import Basic from '@/MyComponents/Chart/RadialBar/Basic.vue';
-import CircleCustomAngle from '@/MyComponents/Chart/RadialBar/CircleCustomAngle.vue';
-import ColumnWithMarkers from '@/MyComponents/Chart/Column/ColumnWithMarkers.vue';
-import BasicArea from '@/MyComponents/Chart/Area/BasicArea.vue';
-import WithRotatedLabels from '@/MyComponents/Chart/Column/WithRotatedLabels.vue';
-import SimpleDonut from '@/MyComponents/Chart/Pie/SimpleDonut.vue';
+import OEEPanel from '@/MyComponents/Home/OEEPanel.vue';
+import TimePanel from '@/MyComponents/Home/TimePanel.vue';
+import ProductionPanel from '@/MyComponents/Home/ProductionPanel.vue';
+import VelocityPanel from '@/MyComponents/Home/VelocityPanel.vue';
+import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
+import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
+import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
+import { useForm } from '@inertiajs/vue3';
+import DialogModal from '@/Components/DialogModal.vue';
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
 
 export default {
     data() {
-
+        const emailForm = useForm({
+            main_email: null,
+            cco: [],
+            subject: null,
+            description: null,
+        });
 
         return {
+            // formularios
+            emailForm,
+            // modales
+            showEmailModal: false,
+            // general
+            loading: false,
+            bpm: 120, //bpm a maxima velocidad ajustable
+            data: [],
+            ccoList: [],
             activeTab: '1',
             searchDate: null,
             startDate: null, //vista movil
             finishDate: null, //vista movil
-            scaleStatistics: [
-                {
-                    name: 'Peso medio',
-                    value: '142.52',
-                    tagColor: '#E6EFFC',
-                },
-                {
-                    name: 'Desviación estándar',
-                    value: '16.05',
-                    tagColor: '#F7E7FD',
-                },
-                {
-                    name: 'Peso total de descarga',
-                    value: '65153.82',
-                    tagColor: '#FAFDE6',
-                },
-                {
-                    name: 'Total regalado',
-                    value: '1249.30',
-                    tagColor: '#FFF2DE',
-                },
-                {
-                    name: 'Porcentaje regalado',
-                    value: '1.82',
-                    tagColor: '#FFDEDE',
-                },
-            ],
-            filmChart: {
-                series: [219758, 25000, 6991, 5964, 1952],
-                chartOptions: {
-                    labels: ["Bolsas llenas", "Bolsas vacias", "Bolsas movidas", "Bolsas desperdiciadas", "Bolsas de prueba"],
-                    colors: ["#17A281", "#F48B0F", "#F5B91F", "#A24917", "#373737"],
-                    chart: {
-                        type: 'donut',
-                    },
-                    responsive: [{
-                        breakpoint: 480,
-                        options: {
-                            chart: {
-                                width: 300
-                            },
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }],
-                    plotOptions: {
-                        pie: {
-                            donut: {
-                                labels: {
-                                    show: true,
-                                    total: {
-                                        showAlways: true,
-                                        show: true
-                                    }
-                                }
-                            }
-                        }
-                    },
-                },
-            },
+            bpmUpdated: false, //bandera que dispara evento de calculo de OEE cuando se cambia el bpm
         }
     },
     components: {
-        Basic, //chart
-        BasicArea, //chart
-        Semicircle, //chart
         PublicLayout,
         PrimaryButton,
-        WithRotatedLabels, //chart
-        CircleCustomAngle, //chart
-        ColumnWithMarkers, //chart
-        SimpleDonut, //chart
+        ProductionPanel,
+        DesviacionPanel,
+        VelocityPanel,
+        ScalePanel,
+        TimePanel,
+        FilmPanel,
+        OEEPanel,
+        DialogModal,
+        InputError,
+        InputLabel,
     },
     props: {
 
     },
     methods: {
+        sendEmail() {
+
+        },
         handleStartDateChange(value) {
             this.startDate = value;
             // Si finishDate es nulo, aplica la regla de deshabilitación
             if (!this.finishDate) {
                 this.disabledPrevDays();
+            }
+        },
+        handleFinishDateChange(value) {
+            this.finishDate = value;
+            // Si startDate es nulo, aplica la regla de deshabilitación
+            if (!this.startDate) {
+                this.disabledNextDays();
             }
         },
         disabledPrevDays(date) {
@@ -317,28 +220,50 @@ export default {
             }
             return false;
         },
-        // handleClick(tab) {
-        //     // Agrega la variable currentTab=tab.props.name a la URL para mejorar la navegacion al actalizar o cambiar de pagina
-        //     const currentURL = new URL(window.location.href);
-        //     currentURL.searchParams.set('currentTab', tab.props.name);
-        //     // Actualiza la URL
-        //     window.history.replaceState({}, document.title, currentURL.href);
-        // }
+        handleDropdownCommand(command) {
+            if (command == 'email') {
+                this.showEmailModal = true;
+            }
+        },
+        handleClick() {
+            console.log('generar reporte');
+        },
+        async getDataByDateRange() {
+            this.loading = true;
+            try {
+                const response = await axios.post(route('robag.get-data-by-date-range'), {date: this.searchDate} );
+                if ( response.status === 200 ) {
+                    this.data = response.data.data;
+                    // console.log(this.data);
+                }
+
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.loading = false;
+            }
+        }
     },
     computed: {
         isMobile() {
             return window.innerWidth < 768;
         }
     },
-    // mounted() {
-    //     // Obtener la URL actual
-    //     const currentURL = new URL(window.location.href);
-    //     // Extraer el valor de 'currentTab' de los parámetros de búsqueda
-    //     const currentTabFromURL = currentURL.searchParams.get('currentTab');
+    created() {
+        const today = new Date(); // Obtiene la fecha y hora actuales
 
-    //     if (currentTabFromURL) {
-    //         this.activeTab = currentTabFromURL;
-    //     }
-    // },
+        // Crear la primera fecha con la hora 6:00 AM
+        const startDate = new Date(today);
+        startDate.setHours(6, 0, 0, 0); // Establecer hora a 6:00 AM
+
+        // Crear la segunda fecha con la hora actual
+        const endDate = new Date(today);
+        endDate.setHours(today.getHours(), today.getMinutes(), today.getSeconds(), today.getMilliseconds()); // Establecer la hora actual
+
+        // Inicializar searchDate con las dos fechas
+        this.searchDate = [startDate, endDate];
+
+        this.getDataByDateRange(); // Recupera los registros del día de hoy
+    }
 }
 </script>

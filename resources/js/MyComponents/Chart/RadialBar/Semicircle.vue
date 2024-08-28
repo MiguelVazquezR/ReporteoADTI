@@ -40,7 +40,7 @@ export default {
                             value: {
                                 offsetY: -2,
                                 fontSize: '14px',
-                                color: '#fff'
+                                color: '#000'
                             }
                         }
                     }
@@ -101,7 +101,7 @@ export default {
             this.chartOptions.fill.gradient.colorStops = newColors;
         }
     },
-    mounted() {
+    created() {
         // Asigna el gradiente inicial al montarse el componente
         this.chartOptions.fill.gradient.colorStops = this.gradientColors;
     }

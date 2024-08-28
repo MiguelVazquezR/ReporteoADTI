@@ -2,7 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\RobagData;
 use App\Models\User;
+use Carbon\Carbon;
+use Database\Factories\RobagDataFactory;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -24,5 +27,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             MachineVariableSeeder::class,
         ]);
+
+        RobagData::factory()->count(500)->create();
+
     }
+    
 }

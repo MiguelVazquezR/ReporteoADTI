@@ -10,7 +10,7 @@ defineProps({
     },
     maxWidth: {
         type: String,
-        default: '2xl',
+        default: '4xl',
     },
     closeable: {
         type: Boolean,
@@ -31,8 +31,11 @@ const close = () => {
         @close="close"
     >
         <div class="px-6 py-4">
-            <div class="text-lg font-medium text-gray-900">
+            <div class="text-lg font-medium text-gray-900 flex items-center justify-between">
                 <slot name="title" />
+                <button type="button" @click="close">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
             </div>
 
             <div class="mt-4 text-sm text-gray-600">
@@ -40,7 +43,7 @@ const close = () => {
             </div>
         </div>
 
-        <div class="flex flex-row justify-end px-6 py-4 bg-gray-100 text-end">
+        <div class="flex flex-row justify-end px-6 py-4 text-end">
             <slot name="footer" />
         </div>
     </Modal>

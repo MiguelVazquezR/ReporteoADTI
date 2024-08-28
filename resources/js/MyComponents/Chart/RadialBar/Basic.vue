@@ -21,9 +21,22 @@ export default {
                         dataLabels: {
                             value: {
                                 offsetY: -10,
-                                color: '#FFF', // Cambia el color de la etiqueta del porcentaje
+                                color: '#000', // Cambia el color de la etiqueta del porcentaje
                                 fontSize: '14px', // Puedes ajustar el tamaño si es necesario
                             },
+                        },
+                        track: {
+                            background: "#e7e7e7",
+                            strokeWidth: '97%',
+                            margin: 5, // margin is in pixels
+                            dropShadow: {
+                                enabled: true,
+                                top: 2,
+                                left: 0,
+                                color: '#999',
+                                opacity: 1,
+                                blur: 2
+                            }
                         },
                     },
                 },
@@ -70,7 +83,7 @@ export default {
                     { offset: 100, color: '#00FF00' } // Verde más claro en la parte inferior
                 ];
             }
-        }
+        },
     },
     watch: {
         // Actualiza los colores del gradiente cuando cambie el valor de 'series'
@@ -79,8 +92,8 @@ export default {
         }
     },
     mounted() {
-        // Asigna el gradiente inicial al montarse el componente
+        // Asigna el gradiente inicial al montarse el componente 
         this.chartOptions.fill.gradient.colorStops = this.gradientColors;
-    }
+    },
 }
 </script>
