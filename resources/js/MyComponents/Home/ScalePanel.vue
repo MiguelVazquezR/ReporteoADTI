@@ -1,15 +1,21 @@
 <template>
-    <main class="rounded-[20px] border border-grayD9 p-4 w-1/2">
-        <p class="text-[#6D6E72] font-bold text-sm">ESTADÍSTICAS DE LA BÁSCULA </p>
-        <div v-for="(item, index) in getScaleStatistics" :key="index" class="flex items-center justify-between mt-3">
-            <p class="flex items-center space-x-2">
-                <i class="fa-regular fa-circle text-[5px]"></i>
-                <span class="text-sm">{{ item.name }}</span>
-            </p>
-            <hr class="flex-1 border-dashed border-black mx-4">
-            <el-tag :color="item.tagColor" style="color: #373737; border: transparent;" effect="light" round>
-                {{ item.value }}
-            </el-tag>
+    <main class="rounded-[20px] border border-grayD9 p-4 w-1/2 h-60">
+        <div v-if="loading" class="text-xs my-4 text-center">
+            Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
+        </div>
+
+        <div v-else>
+            <p class="text-[#6D6E72] font-bold text-sm">ESTADÍSTICAS DE LA BÁSCULA </p>
+            <div v-for="(item, index) in getScaleStatistics" :key="index" class="flex items-center justify-between mt-3">
+                <p class="flex items-center space-x-2">
+                    <i class="fa-regular fa-circle text-[5px]"></i>
+                    <span class="text-sm">{{ item.name }}</span>
+                </p>
+                <hr class="flex-1 border-dashed border-black mx-4">
+                <el-tag :color="item.tagColor" style="color: #373737; border: transparent;" effect="light" round>
+                    {{ item.value }}
+                </el-tag>
+            </div>
         </div>
     </main>
 </template>
@@ -83,6 +89,7 @@ export default {
             required: true,
             type: Array,
         },
+        loading: Boolean, //estado de carga al obtener las datos
     },
     methods: {
 

@@ -1,7 +1,12 @@
 <template>
-    <main class="rounded-[20px] border border-grayD9 p-4 w-2/3">
-        <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN POR DIA</p>
-        <ColumnWithMarkers :series="updatedSeries" :chartOptions="chartOptions" />
+    <main class="rounded-[20px] border border-grayD9 p-4 w-2/3 h-80">
+        <div v-if="loading" class="text-xs my-4 text-center">
+            Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
+        </div>
+        <div v-else>
+            <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN POR DIA</p>
+            <ColumnWithMarkers :series="updatedSeries" :chartOptions="chartOptions" />
+        </div>
     </main>
 </template>
 
@@ -52,6 +57,7 @@ export default {
             required: true,
             type: Array,
         },
+        loading: Boolean, //estado de carga al obtener las datos
     },
     computed: {
         uniqueFormattedDates() {

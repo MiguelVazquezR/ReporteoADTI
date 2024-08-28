@@ -95,7 +95,6 @@ data () {
         quality: [0], //calidad
         totalTime: null, //tiempo en minutos tomado del intervalo seleccionado en filtro
         productionTime: null, //tiempo en minutos de el tiempo de produccion.
-        // teoricProduction: 120, //bolsas por minuto a maxima capacidad de la maquina
         realProduction: null, //bolsas por minuto reales en que trabaja la maquina
         totalBags: null, //total de bolsas producidas/empacadas
         totalWasteBags: null, //total de bolsas malas producidas/empacadas
@@ -107,9 +106,13 @@ components:{
     Semicircle
 },
 props:{
-    data: Array, //registros recuperados
+    data: {
+            default: [],
+            required: true,
+            type: Array,
+        }, //registros recuperados
     date: Array, //Intervalo de fechas buscadas
-    loading: Boolean,
+    loading: Boolean, //estado de carga al obtener las datos
     teoricProduction: Number, //bolsas por minuto a m{axima capacidad de la maquina (valor ajustable desde home)
     bpmUpdated: Boolean //bandera que dispara evento de calculo de OEE cuando se cambia el bpm
 },
@@ -189,10 +192,7 @@ methods:{
 watch:{
     bpmUpdated() {
         if ( this.bpmUpdated ) {
-            this.calculateAvailability(); //calcula el porcentaje del tiempo disponible
             this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
-            this.calculateTotalBags(); //calcula las variables para la calidad
-            this.calculateQuality(); //calcula las variables para la calidad
             this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
             this.$emit('finished-bpm-updated');
         }
