@@ -44,7 +44,7 @@
                     </div>
 
                     <!-- graficas en rectangulo negro -->
-                    <OEEPanel :date="searchDate" :data="data" :loading="loading" />
+                    <OEEPanel :date="searchDate" :data="data" />
 
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
@@ -52,7 +52,7 @@
                         <!-- primer fila -->
                         <div class="flex space-x-4">
                             <!-- Tiempos -->
-                            <TimePanel :date="searchDate" :items="data" :loading="loading" />
+                            <TimePanel :date="searchDate" :items="data" />
 
                             <!-- PRODUCCIÓN DIARIA -->
                             <ProductionPanel :items="data" />
@@ -153,7 +153,6 @@ export default {
             // modales
             showEmailModal: false,
             // general
-            loading: false,
             data: [],
             ccoList: [],
             activeTab: '1',
@@ -218,7 +217,6 @@ export default {
             console.log('generar reporte');
         },
         async getDataByDateRange() {
-            this.loading = true;
             try {
                 const response = await axios.post(route('robag.get-data-by-date-range'), {date: this.searchDate} );
                 if ( response.status === 200 ) {
@@ -228,8 +226,6 @@ export default {
 
             } catch (error) {
                 console.log(error)
-            } finally {
-                this.loading = false;
             }
         }
     },
