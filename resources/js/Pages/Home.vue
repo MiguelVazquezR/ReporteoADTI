@@ -50,7 +50,10 @@
                     </div>
 
                     <!-- graficas en rectangulo negro -->
-                    <OEEPanel :date="searchDate" :data="data" :loading="loading" :teoricProduction="bpm" :bpmUpdated="bpmUpdated" @finished-bpm-updated="bpmUpdated = false"  />
+                    <OEEPanel :date="searchDate" :data="data" :loading="loading" 
+                            :teoricProduction="bpm" :bpmUpdated="bpmUpdated" 
+                            @finished-bpm-updated="bpmUpdated = false"  
+                    />
 
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
@@ -58,28 +61,28 @@
                         <!-- primer fila -->
                         <div class="flex space-x-4">
                             <!-- Tiempos -->
-                            <TimePanel :date="searchDate" :items="data" />
+                            <TimePanel :date="searchDate" :items="data" :loading="loading" />
 
                             <!-- PRODUCCIÓN DIARIA -->
-                            <ProductionPanel :items="data" />
+                            <ProductionPanel :items="data" :loading="loading" />
                         </div>
 
                         <!-- Segunda fila -->
                         <div class="flex space-x-4">
                             <!-- Velocidad -->
-                            <VelocityPanel :items="data" />
+                            <VelocityPanel :items="data" :loading="loading" />
 
                             <!-- HISTOGRAMA -->
-                            <DesviacionPanel :items="data" />
+                            <DesviacionPanel :items="data" :loading="loading" />
                         </div>
 
                         <!-- Tercera fila -->
                         <div class="flex space-x-4">
                             <!-- PELICULA -->
-                            <FilmPanel :items="data" />
+                            <FilmPanel :items="data" :loading="loading" />
 
                             <!-- BASCULA -->
-                            <ScalePanel :items="data" />
+                            <ScalePanel :items="data" :loading="loading" />
                         </div>
                     </div>
                 </article>

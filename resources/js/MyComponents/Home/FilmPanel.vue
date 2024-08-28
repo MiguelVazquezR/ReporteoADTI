@@ -1,7 +1,13 @@
 <template>
-    <main class="rounded-[20px] border border-grayD9 p-4 w-1/2">
-        <p class="text-[#6D6E72] font-bold text-sm">USO DE PELÍCULA</p>
-        <SimpleDonut width="400" :series="Object.values(getFilmChartSeries)" :chartOptions="chartOptions" />
+    <main class="rounded-[20px] border border-grayD9 p-4 w-1/2 h-60">
+        <div v-if="loading" class="text-xs my-4 text-center">
+            Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
+        </div>
+
+        <div v-else>
+            <p class="text-[#6D6E72] font-bold text-sm">USO DE PELÍCULA</p>
+            <SimpleDonut width="400" :series="Object.values(getFilmChartSeries)" :chartOptions="chartOptions" />
+        </div>
     </main>
 </template>
 
@@ -53,6 +59,7 @@ export default {
             required: true,
             type: Array,
         },
+        loading: Boolean, //estado de carga al obtener las datos
     },
     computed: {
         getFilmChartSeries() {
