@@ -111,6 +111,8 @@ export default {
             let totalRunTime = 0;
             let totalPausedTime = 0;
             let totalFaultTime = 0;
+            let totalOutOfFilmTime = 0;
+            let totalInterlockTime = 0;
 
             // Recorremos las fechas únicas
             this.uniqueFormattedDates.forEach(date => {
@@ -120,15 +122,25 @@ export default {
                 const maxRunTime = Math.max(...filteredItems.map(item => parseFloat(item.run_time) || 0));
                 const maxPausedTime = Math.max(...filteredItems.map(item => parseFloat(item.paused_time) || 0));
                 const maxFaultTime = Math.max(...filteredItems.map(item => parseFloat(item.fault_time) || 0));
+                const maxOutOfFilmTime = Math.max(...filteredItems.map(item => parseFloat(item.out_of_film_time) || 0));
+                const maxInterlockTime = Math.max(...filteredItems.map(item => parseFloat(item.interlock_time) || 0));
 
                 // Sumamos los valores máximos al total correspondiente
                 totalRunTime += maxRunTime;
                 totalPausedTime += maxPausedTime;
                 totalFaultTime += maxFaultTime;
+                totalOutOfFilmTime += maxOutOfFilmTime;
+                totalInterlockTime += maxInterlockTime;
             });
 
             // Devolvemos un array con los totales
-            return [(totalRunTime / this.totalTime).toFixed(1), (totalPausedTime / this.totalTime).toFixed(1), (totalFaultTime / this.totalTime).toFixed(1)];
+            return [
+                (totalRunTime / this.totalTime).toFixed(1),
+                (totalPausedTime / this.totalTime).toFixed(1),
+                (totalFaultTime / this.totalTime).toFixed(1),
+                (totalOutOfFilmTime / this.totalTime).toFixed(1),
+                (totalInterlockTime / this.totalTime).toFixed(1),
+            ];
         }
     },
     methods: {

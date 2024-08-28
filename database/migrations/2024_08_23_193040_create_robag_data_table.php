@@ -11,45 +11,55 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('robag_data', function (Blueprint $table) {
+        $variables = [
+            'status',
+            'scale_low_product',
+            'reset_counters',
+            'scale_internal_status',
+            'robag_up_time',
+            'reason_for_stop_status',
+            'run_time',
+            'paused_time',
+            'interlock_time',
+            'out_of_film_time',
+            'fault_time',
+            'last_metal_detect_time',
+            'bags_this_roll',
+            'bags_last_roll',
+            'PISD_reject_count',
+            'scale_good_bags',
+            'scale_overweight_bags',
+            'scale_underweight_bags',
+            'scale_overscale_count',
+            'scale_warnings',
+            'full_bags',
+            'empty_bags',
+            'setup_bags',
+            'jogged_bags',
+            'efficiency_percentage',
+            'target_weight',
+            'total_dump_weight',
+            'bags_per_minute',
+            'total_giveaway',
+            'giveaway_percentage',
+            'total_waste',
+            'total_bags',
+            'mean_weight',
+            'standard_deviation',
+            'total_dumps',
+            'gas_total',
+            'scale_bpm',
+            'heads_per_dump',
+            'average_weight_in_ready_heads',
+            'average_weight',
+            'short_term_scale_efficiency_percentage',
+        ];
+
+        Schema::create('robag_data', function (Blueprint $table) use ($variables) {
             $table->id();
-            $table->string('status')->nullable();
-            $table->string('scale_low_product')->nullable();
-            $table->string('reset_counters')->nullable();
-            $table->string('scale_internal_status')->nullable();
-            $table->string('robag_up_time')->nullable();
-            $table->string('reason_for_stop_status')->nullable();
-            $table->string('run_time')->nullable();
-            $table->string('paused_time')->nullable();
-            $table->string('fault_time')->nullable();
-            $table->string('out_on_film_time')->nullable();
-            $table->string('last_metal_detect_time')->nullable();
-            $table->string('bags_this_roll')->nullable();
-            $table->string('bags_last_roll')->nullable();
-            $table->string('PISD_reject_count')->nullable();
-            $table->string('scale_good_bags')->nullable();
-            $table->string('scale_overweight_bags')->nullable();
-            $table->string('scale_underweight_bags')->nullable();
-            $table->string('scale_overscale_count')->nullable();
-            $table->string('scale_warnings')->nullable();
-            $table->string('full_bags')->nullable();
-            $table->string('empty_bags')->nullable();
-            $table->string('efficiency_percentage')->nullable();
-            $table->string('target_weight')->nullable();
-            $table->string('total_dump_weight')->nullable();
-            $table->string('bags_per_minute')->nullable();
-            $table->string('total_giveaway')->nullable();
-            $table->string('giveaway_percentage')->nullable();
-            $table->string('total_waste')->nullable();
-            $table->string('total_bags')->nullable();
-            $table->string('mean_weight')->nullable();
-            $table->string('standard_deviation')->nullable();
-            $table->string('total_dumps')->nullable();
-            $table->string('gas_total')->nullable();
-            $table->string('scale_bpm')->nullable();
-            $table->string('heads_per_dump')->nullable();
-            $table->string('average_weight_in_ready_heads')->nullable();
-            $table->string('short_term_scale_efficiency_percentage')->nullable();
+            foreach ($variables as $val) {
+                $table->string($val)->nullable();
+            }
             $table->timestamps();
         });
     }
