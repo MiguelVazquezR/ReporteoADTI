@@ -83,7 +83,7 @@ export default {
                     { offset: 100, color: '#00FF00' } // Verde más claro en la parte inferior
                 ];
             }
-        }
+        },
     },
     watch: {
         // Actualiza los colores del gradiente cuando cambie el valor de 'series'
@@ -92,8 +92,8 @@ export default {
         }
     },
     mounted() {
-        // Asigna el gradiente inicial al montarse el componente
+        // Asigna el gradiente inicial al montarse el componente 
         this.chartOptions.fill.gradient.colorStops = this.gradientColors;
-    }
+    },
 }
 </script>

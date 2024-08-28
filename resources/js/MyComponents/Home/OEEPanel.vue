@@ -3,7 +3,7 @@
 
         <!-- chart 1 -->
         <div class="border-r border-grayD9">
-            <div v-if="loading" class="text-xs my-4 text-center">
+            <div v-if="loading1" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
             <div v-else>
@@ -14,46 +14,53 @@
 
         <!-- chart 2 -->
         <div class="border-r border-grayD9 px-2">
-            <div v-if="loading" class="text-xs my-4 text-center">
+            <div v-if="loading2" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
 
-            <section class="flex space-x-3 items-center" v-else>
-                <div class="text-center text-sm">
-                    <p class="text-gray9A">Disponible</p>
-                    <p class="text-black">{{ formatNumber(totalTime) }} min</p>
-                    <p class="text-gray9A mt-2">Producción</p>
-                    <p class="text-black">{{ formatNumber(productionTime) }} min</p>
+            <section v-else>
+                <p class="text-black font-bold">Disponibilidad</p>
+                <div class="flex space-x-3 items-center justify-between">
+                    <div class="text-center text-sm">
+                        <p class="text-gray9A">Disponible</p>
+                        <p class="text-black">{{ formatNumber(totalTime) }} min</p>
+                        <p class="text-gray9A mt-2">Producción</p>
+                        <p class="text-black">{{ formatNumber(productionTime) }} min</p>
+                    </div>
+                    <Basic :series="availabilityPercentage" />
                 </div>
-                <Basic :series="availabilityPercentage" />
             </section>
         </div>
 
         <!-- chart 3 -->
         <div class="border-r border-grayD9 px-2">
-            <div v-if="loading" class="text-xs my-4 text-center">
+            <div v-if="loading3" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
 
-            <section class="flex space-x-3 items-center" v-else>
-                <div class="text-center text-sm">
-                    <p class="text-gray9A">Teórica</p>
-                    <p class="text-black">{{ formatNumber(productionTime) }} min</p>
-                    <p class="text-gray9A">Real</p>
-                    <p class="text-black">{{ formatNumber(productionTime) }} min</p>
+            <section v-else>
+                <p class="text-black font-bold">Rendimiento</p>
+                <div class="flex space-x-3 items-center justify-between">
+                    <div class="text-center text-sm">
+                        <p class="text-gray9A w-24">Prod. Teórica</p>
+                        <p class="text-black">{{ formatNumber(teoricProduction) }} bpm</p>
+                        <p class="text-gray9A w-24 mt-2">Prod. Real</p>
+                        <p class="text-black">{{ formatNumber(realProduction) }} bpm</p>
+                    </div>
+                    <Basic :series="performancePercentage" />
                 </div>
-                <Basic :series="productionPercentage" />
             </section>
         </div>
 
         <!-- chart 4 -->
         <div class="px-2">
-            <div v-if="loading" class="text-xs my-4 text-center">
+            <div v-if="loading4" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
             
-            <section v-else class="flex space-x-1 items-center">
-                <div class="text-center">
+            <section v-else>
+                <p class="text-black font-bold">Calidad</p>
+                <div class="text-center flex space-x-3 items-center justify-between">
                     <div class="text-left text-sm">
                         <div class="flex items-center space-x-1">
                             <p class="text-gray9A w-24">Bolsas totales:</p>
@@ -68,9 +75,8 @@
                             <p class="text-black ml-2">{{ formatNumber(totalWasteBags) }}</p>
                         </div>
                     </div>
-                    <!-- <p class="text-gray9A">Calidad</p> -->
+                    <Basic :series="quality" />
                 </div>
-                <Basic :series="quality" />
             </section>
         </div>
     </main>
@@ -85,13 +91,19 @@ data () {
     return {
         oee: [0], //OEE
         availabilityPercentage: [0], //Disponibilidad
-        productionPercentage: [0], //porcentaje de Tiempo de producción
+        performancePercentage: [0], //porcentaje de Tiempo de producción
         quality: [0], //calidad
         totalTime: null, //tiempo en minutos tomado del intervalo seleccionado en filtro
         productionTime: null, //tiempo en minutos de el tiempo de produccion.
+        teoricProduction: 120, //bolsas por minuto a maxima capacidad de la maquina
+        realProduction: null, //bolsas por minuto reales en que trabaja la maquina
         totalBags: null, //total de bolsas producidas/empacadas
         totalWasteBags: null, //total de bolsas malas producidas/empacadas
         totalGoodBags: null, //total de bolsas buenas producidas/empacadas
+        loading1: true, //carga de chart 1 OEE
+        loading2: true, //carga de chart 2 Disponibilidad
+        loading3: true, //carga de chart 3 Rendimiento
+        loading4: true, //carga de chart 4 Calidad
     }
 },
 components:{
@@ -101,10 +113,6 @@ components:{
 props:{
     data: Array, //registros recuperados
     date: Array, //Intervalo de fechas buscadas
-    loading: {
-        type: Boolean,
-        default: false
-    }
 },
 
 methods:{
@@ -112,57 +120,80 @@ methods:{
         return new Intl.NumberFormat().format(number);
     },
     calculateAvailability() {
-        const totalDowntime = this.data.reduce((total, item) => {
-            return total + parseFloat(item.paused_time) + parseFloat(item.fault_time) + parseFloat(item.out_on_film_time);
-        }, 0);
+        //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
+        const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString();
         
-        //porcentaje de disponibilidad (tiempo total - paros no planificados)
-        this.availabilityPercentage = [(((this.totalTime - (totalDowntime / 60)) / this.totalTime) * 100).toFixed(1)];
+        if (sameDay) {
+            //si es el mismo dia toma el ultimo valor run_time de los registros obtenidos de ese dia.
+            this.productionTime = parseFloat(this.data[this.data.length - 1].run_time) / 60;
+        } else {
+            //si son dias distintos en el intervalo de fechas se suman todos los run_time de esos dias para calcular el tiempo de produccion efectivo.
+            this.productionTime = this.data.reduce((total, item) => total + parseFloat(item.run_time), 0) / 60;
+        }
+
+        this.availabilityPercentage = [((this.productionTime * 100) / this.totalTime).toFixed(1)];
+        this.loading2 = false;
     },
     calculateProductionTime() {
-        const totalDowntime = this.data.reduce((total, item) => {
-            return total + parseFloat(item.paused_time) + parseFloat(item.fault_time) + parseFloat(item.out_on_film_time);
-        }, 0);
+        //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
+        const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString();
+        
+        if (sameDay) {
+            //si es el mismo dia toma el ultimo valor bags_per_minute (bolsas) de los registros obtenidos de ese dia.
+            this.realProduction = parseFloat(this.data[this.data.length - 1].bags_per_minute);
+        } else {
+            //si son dias distintos en el intervalo de fechas se suman todos los bags_per_minute de esos dias para calcular el promedio de bolsas por minuto.
+            this.realProduction = this.data.reduce((total, item) => total + parseFloat(item.bags_per_minute), 0) / this.data.length;
+        }
 
-        const productionTime = this.totalTime - (totalDowntime / 60); //se divide por 60 para convertir los segundos en minutos
-        this.productionTime = productionTime;
-
-        //calcular el porcentage de producción
-        this.productionPercentage = [((this.productionTime / this.totalTime) * 100).toFixed(1)];
+        this.performancePercentage = [((this.realProduction * 100) / this.teoricProduction).toFixed(1)];
+        this.loading3 = false;
     },
     calculateTotalBags() {
-        this.totalBags = this.data.reduce((total, item) => total + parseInt(item.total_bags), 0);
-        this.totalWasteBags = this.data.reduce((total, item) => total + parseInt(item.total_waste), 0);
-        this.totalGoodBags = this.totalBags - this.totalWasteBags;
+        //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
+        const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString();
+        
+        if (sameDay) {
+            //si es el mismo dia toma el ultimo valor total_bags (bolsas totales) y total_waste (desperdicio total) de los registros obtenidos de ese dia.
+            this.totalBags = parseFloat(this.data[this.data.length - 1].total_bags);
+            this.totalWasteBags = parseFloat(this.data[this.data.length - 1].total_waste);
+            this.totalGoodBags = parseFloat(this.data[this.data.length - 1].total_bags) - parseFloat(this.data[this.data.length - 1].total_waste);
+        } else {
+            //si son dias distintos en el intervalo de fechas se suman todos los total_bags y total_waste de esos dias para calcular el total de bolsas buenas
+            this.totalBags = this.data.reduce((total, item) => total + parseInt(item.total_bags), 0);
+            this.totalWasteBags = this.data.reduce((total, item) => total + parseInt(item.total_waste), 0);
+            this.totalGoodBags = parseInt(this.totalBags - this.totalWasteBags);
+        }
     },
     calculateQuality() {
-        // const quality = this.data.reduce((total, item) => {
-        //     return total + (parseFloat(item.scale_good_bags) - parseFloat(item.empty_bags)) 
-        //         / (parseFloat(item.full_bags) - parseFloat(item.empty_bags));
-        // }, 0) / this.data.length;
-        
-        // this.quality = [(quality / 60).toFixed(1)]; //se divide por 60 para convertir los segundos en minutos
-
-        this.quality = [((this.totalGoodBags / this.totalBags)*100).toFixed(1)] //porcentaje de piezas buenas
+        this.quality = [((this.totalGoodBags / this.totalBags) * 100).toFixed(1)] //porcentaje de piezas buenas
+        this.loading4 = false;
     },
     calculateOEE() {
         this.oee = [((this.availabilityPercentage * this.availabilityPercentage * this.quality) / 10000).toFixed(1)];
+        this.loading1 = false;
     },
     resetVariables() {
-        this.oee = [0]
-        this.availabilityPercentage = [0]
-        this.productionPercentage = [0]
-        this.quality = [0]
-        this.totalTime = null
-        this.productionTime = null
-        this.totalBags = null
-        this.totalWasteBags = null
-        this.totalGoodBags = null
+        console.log('reset');
+        this.loading1 = true;
+        this.loading2 = true;
+        this.loading3 = true;
+        this.loading4 = true;
+        this.oee = [0];
+        this.availabilityPercentage = [0];
+        this.performancePercentage = [0];
+        this.quality = [0];
+        this.totalTime = null;
+        this.productionTime = null;
+        this.totalBags = null;
+        this.totalWasteBags = null;
+        this.totalGoodBags = null;
+        this.realProduction = null;
     }
 },
 watch:{
     date(newVal) {
-        this.resetVariables();
+        // this.resetVariables();
 
         const start = new Date(newVal[0]);
         const end = new Date(newVal[1]);
@@ -171,7 +202,7 @@ watch:{
         const daysDifference = Math.floor((end - start) / (1000 * 60 * 60 * 24));
 
         // Minutos en días completos
-        const minutesInDays = daysDifference * 14 * 60; // 14 horas * 60 minutos
+        const minutesInDays = daysDifference * 24 * 60; // 24 horas * 60 minutos
 
         // Calcular la diferencia de tiempo en minutos en el mismo día
         const startMinutes = start.getUTCHours() * 60 + start.getUTCMinutes();
@@ -184,7 +215,7 @@ watch:{
 
         this.totalTime = totalMinutes; //tiempo en minutos tomado del intervalo seleccionado en filtro
         // console.log(`Total minutos: ${totalMinutes}`);
-
+        
         this.calculateAvailability(); //calcula el porcentaje del tiempo disponible
         this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
         this.calculateTotalBags(); //calcula las variables para la calidad
@@ -192,7 +223,7 @@ watch:{
         this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
     }
 },
-mounted() {
+created() {
     const start = new Date(this.date[0]);
     const end = new Date(this.date[1]);
 
