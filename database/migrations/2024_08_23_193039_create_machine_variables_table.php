@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('machine_name');
             $table->string('variable_name');
+            $table->string('variable_original_name');
             $table->text('variable_description')->nullable();
             $table->text('variable_address')->nullable();
             $table->timestamps();

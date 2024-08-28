@@ -26,8 +26,9 @@ class RobagDataFactory extends Factory
             'reason_for_stop_status' => (string) $this->faker->randomElement(['maintenance', 'fault', 'manual_stop']),
             'run_time' => (string) $this->faker->numberBetween(25000, 50000), //Tiempo en ejecución en segundos
             'paused_time' => (string) $this->faker->numberBetween(0, 3600), //Tiempo en pausa en segundos
+            'interlock_time' => (string) $this->faker->numberBetween(0, 600), //Tiempo en pausa en segundos
+            'out_of_film_time' => (string) $this->faker->numberBetween(0, 600), //Tiempo en pausa en segundos
             'fault_time' => (string) $this->faker->numberBetween(0, 3600), //Tiempo de falla en segundos
-            'out_on_film_time' => (string) $this->faker->numberBetween(0, 3600), //Tiempo en estado sin película en segundos
             'last_metal_detect_time' => (string) $this->faker->time(),
             'bags_this_roll' => (string) $this->faker->numberBetween(0, 10000),
             'bags_last_roll' => (string) $this->faker->numberBetween(0, 10000),
@@ -39,6 +40,8 @@ class RobagDataFactory extends Factory
             'scale_warnings' => (string) $this->faker->numberBetween(0, 500),
             'full_bags' => (string) $this->faker->numberBetween(0, 10000),
             'empty_bags' => (string) $this->faker->numberBetween(0, 500),
+            'setup_bags' => (string) $this->faker->numberBetween(0, 300),
+            'jogged_bags' => (string) $this->faker->numberBetween(0, 600),
             'efficiency_percentage' => (string) $this->faker->randomFloat(2, 70, 100),
             'target_weight' => (string) $this->faker->randomFloat(2, 10, 100),
             'total_dump_weight' => (string) $this->faker->randomFloat(2, 1000, 50000),
@@ -54,6 +57,7 @@ class RobagDataFactory extends Factory
             'scale_bpm' => (string) $this->faker->randomFloat(2, 50, 150),
             'heads_per_dump' => (string) $this->faker->numberBetween(1, 10),
             'average_weight_in_ready_heads' => (string) $this->faker->randomFloat(2, 10, 100),
+            'average_weight' => (string) $this->faker->randomFloat(2, 50, 100),
             'short_term_scale_efficiency_percentage' => (string) $this->faker->randomFloat(2, 70, 100),
             'created_at' => $this->randomDateTimeThisMonth(),
             'updated_at' => $this->randomDateTimeThisMonth(),
