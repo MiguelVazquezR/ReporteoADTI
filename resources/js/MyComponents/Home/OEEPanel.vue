@@ -1,9 +1,9 @@
 <template>
-    <main class="bg-[#F2F2F2] rounded-[20px] grid grid-cols-4 p-4 mt-5">
+    <main class="bg-[#F2F2F2] rounded-[20px] grid grid-cols-4 p-4 mt-5 h-44">
 
         <!-- chart 1 -->
         <div class="border-r border-grayD9">
-            <div v-if="loading1" class="text-xs my-4 text-center">
+            <div v-if="loading" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
             <div v-else>
@@ -14,7 +14,7 @@
 
         <!-- chart 2 -->
         <div class="border-r border-grayD9 px-2">
-            <div v-if="loading2" class="text-xs my-4 text-center">
+            <div v-if="loading" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
 
@@ -34,7 +34,7 @@
 
         <!-- chart 3 -->
         <div class="border-r border-grayD9 px-2">
-            <div v-if="loading3" class="text-xs my-4 text-center">
+            <div v-if="loading" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
 
@@ -54,7 +54,7 @@
 
         <!-- chart 4 -->
         <div class="px-2">
-            <div v-if="loading4" class="text-xs my-4 text-center">
+            <div v-if="loading" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
             
@@ -95,15 +95,11 @@ data () {
         quality: [0], //calidad
         totalTime: null, //tiempo en minutos tomado del intervalo seleccionado en filtro
         productionTime: null, //tiempo en minutos de el tiempo de produccion.
-        teoricProduction: 120, //bolsas por minuto a maxima capacidad de la maquina
+        // teoricProduction: 120, //bolsas por minuto a maxima capacidad de la maquina
         realProduction: null, //bolsas por minuto reales en que trabaja la maquina
         totalBags: null, //total de bolsas producidas/empacadas
         totalWasteBags: null, //total de bolsas malas producidas/empacadas
         totalGoodBags: null, //total de bolsas buenas producidas/empacadas
-        loading1: true, //carga de chart 1 OEE
-        loading2: true, //carga de chart 2 Disponibilidad
-        loading3: true, //carga de chart 3 Rendimiento
-        loading4: true, //carga de chart 4 Calidad
     }
 },
 components:{
@@ -113,6 +109,8 @@ components:{
 props:{
     data: Array, //registros recuperados
     date: Array, //Intervalo de fechas buscadas
+    loading: Boolean,
+    teoricProduction: Number //bolsas por minuto a m{axima capacidad de la maquina (valor ajustable desde home)
 },
 
 methods:{
@@ -132,7 +130,6 @@ methods:{
         }
 
         this.availabilityPercentage = [((this.productionTime * 100) / this.totalTime).toFixed(1)];
-        this.loading2 = false;
     },
     calculateProductionTime() {
         //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
@@ -147,7 +144,6 @@ methods:{
         }
 
         this.performancePercentage = [((this.realProduction * 100) / this.teoricProduction).toFixed(1)];
-        this.loading3 = false;
     },
     calculateTotalBags() {
         //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
@@ -159,63 +155,76 @@ methods:{
             this.totalWasteBags = parseFloat(this.data[this.data.length - 1].total_waste);
             this.totalGoodBags = parseFloat(this.data[this.data.length - 1].total_bags) - parseFloat(this.data[this.data.length - 1].total_waste);
         } else {
-            //si son dias distintos en el intervalo de fechas se suman todos los total_bags y total_waste de esos dias para calcular el total de bolsas buenas
-            this.totalBags = this.data.reduce((total, item) => total + parseInt(item.total_bags), 0);
-            this.totalWasteBags = this.data.reduce((total, item) => total + parseInt(item.total_waste), 0);
+            //si son dias distintos en el intervalo de fechas se suman todos los total_bags y total_waste del valor maximo de esos dias para calcular el total de bolsas buenas
+            const uniqueDays = [...new Set(this.data.map(item => new Date(item.created_at).toDateString()))];
+
+            this.totalBags = uniqueDays.reduce((total, day) => {
+                const maxBags = Math.max(...this.data
+                    .filter(item => new Date(item.created_at).toDateString() === day)
+                    .map(item => parseInt(item.total_bags))
+                );
+                return total + maxBags;
+            }, 0);
+
+            this.totalWasteBags = uniqueDays.reduce((total, day) => {
+                const maxBags = Math.max(...this.data
+                    .filter(item => new Date(item.created_at).toDateString() === day)
+                    .map(item => parseInt(item.total_waste))
+                );
+                return total + maxBags;
+            }, 0);
+
             this.totalGoodBags = parseInt(this.totalBags - this.totalWasteBags);
         }
     },
     calculateQuality() {
         this.quality = [((this.totalGoodBags / this.totalBags) * 100).toFixed(1)] //porcentaje de piezas buenas
-        this.loading4 = false;
     },
     calculateOEE() {
-        this.oee = [((this.availabilityPercentage * this.availabilityPercentage * this.quality) / 10000).toFixed(1)];
-        this.loading1 = false;
+        this.oee = [((this.availabilityPercentage * this.performancePercentage * this.quality) / 10000).toFixed(1)];
     },
-    resetVariables() {
-        console.log('reset');
-        this.loading1 = true;
-        this.loading2 = true;
-        this.loading3 = true;
-        this.loading4 = true;
-        this.oee = [0];
-        this.availabilityPercentage = [0];
-        this.performancePercentage = [0];
-        this.quality = [0];
-        this.totalTime = null;
-        this.productionTime = null;
-        this.totalBags = null;
-        this.totalWasteBags = null;
-        this.totalGoodBags = null;
-        this.realProduction = null;
-    }
 },
 watch:{
-    date(newVal) {
-        // this.resetVariables();
+    data() {
 
-        const start = new Date(newVal[0]);
-        const end = new Date(newVal[1]);
+        //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
+        const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString()
 
-        // Calcular la diferencia en días
-        const daysDifference = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+        if ( sameDay ) {
+            const start = new Date(this.date[0]);
+            const end = new Date(this.date[1]);
 
-        // Minutos en días completos
-        const minutesInDays = daysDifference * 24 * 60; // 24 horas * 60 minutos
+            // Calcular la diferencia en milisegundos
+            const differenceInMilliseconds = end - start;
 
-        // Calcular la diferencia de tiempo en minutos en el mismo día
-        const startMinutes = start.getUTCHours() * 60 + start.getUTCMinutes();
-        const endMinutes = end.getUTCHours() * 60 + end.getUTCMinutes();
+            // Convertir la diferencia de milisegundos a minutos
+            const differenceInMinutes = Math.floor(differenceInMilliseconds / (1000 * 60));
 
-        const sameDayMinutesDifference = endMinutes - startMinutes;
+            // Guardar el resultado en el componente
+            this.totalTime = differenceInMinutes;
+        } else {
+            const start = new Date(this.date[0]);
+            const end = new Date(this.date[1]);
 
-        // Sumar ambos resultados para obtener la diferencia total en minutos
-        const totalMinutes = minutesInDays + sameDayMinutesDifference;
+            // Calcular la diferencia en días
+            const daysDifference = Math.floor((end - start) / (1000 * 60 * 60 * 24));
 
-        this.totalTime = totalMinutes; //tiempo en minutos tomado del intervalo seleccionado en filtro
-        // console.log(`Total minutos: ${totalMinutes}`);
-        
+            // Minutos en días completos
+            const minutesInDays = daysDifference * 24 * 60; // 24 horas * 60 minutos
+
+            // Calcular la diferencia de tiempo en minutos en el mismo día
+            const startMinutes = start.getUTCHours() * 60 + start.getUTCMinutes();
+            const endMinutes = end.getUTCHours() * 60 + end.getUTCMinutes();
+
+            const sameDayMinutesDifference = endMinutes - startMinutes;
+
+            // Sumar ambos resultados para obtener la diferencia total en minutos
+            const totalMinutes = minutesInDays + sameDayMinutesDifference;
+
+            this.totalTime = totalMinutes; //tiempo en minutos tomado del intervalo seleccionado en filtro
+            // console.log(`Total minutos: ${totalMinutes}`);
+            }
+
         this.calculateAvailability(); //calcula el porcentaje del tiempo disponible
         this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
         this.calculateTotalBags(); //calcula las variables para la calidad
@@ -223,27 +232,5 @@ watch:{
         this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
     }
 },
-created() {
-    const start = new Date(this.date[0]);
-    const end = new Date(this.date[1]);
-
-    // Calcular la diferencia en milisegundos
-    const differenceInMilliseconds = end - start;
-
-    // Convertir la diferencia de milisegundos a minutos
-    const differenceInMinutes = Math.floor(differenceInMilliseconds / (1000 * 60));
-
-    // Guardar el resultado en el componente
-    this.totalTime = differenceInMinutes;
-
-    setTimeout(() => {
-        this.calculateAvailability(); //calcula el porcentaje del tiempo disponible
-        this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
-        this.calculateTotalBags(); //calcula las variables para la calidad
-        this.calculateQuality(); //calcula las variables para la calidad
-        this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
-    }, 500);
-}
-
-}
+};
 </script>
