@@ -12,9 +12,7 @@ export default {
     data() {
         return {
             chartOptions: {
-                // labels: ["Bolsas llenas", "Bolsas vacias", "Bolsas movidas", "Bolsas desperdiciadas", "Bolsas de prueba"],
-                labels: ["Bolsas llenas", "Bolsas vacias"],
-                // colors: ["#17A281", "#F48B0F", "#F5B91F", "#A24917", "#373737"],
+                labels: ["Bolsas llenas", "Bolsas desperdiciadas"],
                 colors: ["#17A281", "#F48B0F"],
                 chart: {
                     type: 'donut',
@@ -38,7 +36,7 @@ export default {
                                 total: {
                                     showAlways: true,
                                     show: true
-                                }
+                                },
                             }
                         }
                     }

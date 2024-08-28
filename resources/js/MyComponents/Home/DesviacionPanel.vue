@@ -1,7 +1,7 @@
 <template>
     <main class="rounded-[20px] border border-grayD9 p-4 w-2/5">
         <p class="text-[#6D6E72] font-bold text-sm">HISTOGRAMA</p>
-        <WithRotatedLabels :series="deviacionData" :chartOptions="chartOptions" />
+        <WithRotatedLabels :series="updatedSeries" :chartOptions="updatedChartOptions" />
     </main>
 </template>
 
@@ -11,10 +11,6 @@ import WithRotatedLabels from '@/MyComponents/Chart/Column/WithRotatedLabels.vue
 export default {
     data() {
         return {
-            deviacionData: [{
-                name: 'Bolsas',
-                data: [300, 0, 0, 1000, 6000, 3000, 2000, 3, 500]
-            }],
             chartOptions: {
                 annotations: {
                     points: [{
@@ -27,7 +23,7 @@ export default {
                                 color: '#fff',
                                 background: '#775DD0',
                             },
-                            text: 'Bolsas buenas',
+                            text: 'Muestras',
                         }
                     }]
                 },
@@ -52,19 +48,19 @@ export default {
                         colors: ['#fff', '#f2f2f2']
                     }
                 },
-                xaxis: {
-                    title: {
-                        text: 'Desviación',
-                    },
-                    labels: {
-                        rotate: -45
-                    },
-                    categories: [-4, -3, -2, -1, 0, 1, 2, 3, 4],
-                    tickPlacement: 'on'
-                },
+                // xaxis: {
+                //     title: {
+                //         text: 'Desviación',
+                //     },
+                //     labels: {
+                //         rotate: -45
+                //     },
+                //     // categories: [-4, -3, -2, -1, 0, 1, 2, 3, 4],
+                //     tickPlacement: 'on'
+                // },
                 yaxis: {
                     title: {
-                        text: 'Bolsas',
+                        text: 'Núm de muestras',
                     },
                 },
                 fill: {
@@ -105,12 +101,57 @@ export default {
         },
     },
     computed: {
-        getChartSeries() {
-            return this.items.reduce((acc, item) => {
-                acc.full_bags += parseInt(item.full_bags) || 0;
-                acc.total_waste += parseInt(item.total_waste) || 0;
-                return acc;
-            }, { full_bags: 0, total_waste: 0 });
+        getDeviationCounts() {
+            // Inicializar un objeto para contar las desviaciones
+            const deviationCounts = {};
+
+            // Recorrer todos los elementos
+            this.items.forEach(item => {
+                // Redondear la desviación estándar
+                const roundedDeviation = Math.round(item.standard_deviation);
+
+                // Si la desviación redondeada ya existe en deviationCounts, aumentar el conteo
+                // Si no, inicializar el conteo en 1
+                if (deviationCounts[roundedDeviation]) {
+                    deviationCounts[roundedDeviation] += 1;
+                } else {
+                    deviationCounts[roundedDeviation] = 1;
+                }
+            });
+
+            // Ordenar las desviaciones por clave
+            const sortedDeviations = Object.keys(deviationCounts)
+                .map(key => parseInt(key))
+                .sort((a, b) => a - b);
+
+            // Crear el objeto final con las desviaciones y los conteos
+            const result = {
+                deviations: sortedDeviations,
+                counts: sortedDeviations.map(deviation => deviationCounts[deviation])
+            };
+
+            return result;
+        },
+        updatedChartOptions() {
+            return {
+                ...this.chartOptions,
+                xaxis: {
+                    title: {
+                        text: 'Desviación',
+                    },
+                    labels: {
+                        rotate: -45
+                    },
+                    categories: this.getDeviationCounts.deviations,
+                    tickPlacement: 'on'
+                },
+            };
+        },
+        updatedSeries() {
+            return [{
+                name: 'Muestras',
+                data: this.getDeviationCounts.counts
+            }];
         }
     },
 }

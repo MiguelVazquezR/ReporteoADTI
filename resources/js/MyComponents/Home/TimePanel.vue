@@ -6,9 +6,8 @@
 
         <div v-else>
             <p class="text-[#6D6E72] font-bold text-sm">TIEMPOS</p>
-            <CircleCustomAngle :series="maxTimeTotals" :chartOptions="chartOptions" />
+            <CircleCustomAngle :series="maxTimeTotals.percentage" :chartOptions="chartOptions" />
         </div>
-        <!-- {{ maxTimeTotals }} -->
     </main>
 </template>
 
@@ -64,13 +63,13 @@ export default {
                             fontSize: '12px',
                             formatter: function (seriesName, opts) {
                                 // Usar la función formatTime desde el contexto del componente
-                                return seriesName + ":  " + this.formatTime(opts.w.globals.series[opts.seriesIndex] * this.totalTime);
+                                return seriesName + ":  " + this.formatTime(opts.seriesIndex);
                             }.bind(this) // Asegura que `this` dentro de `formatter` se refiere al componente Vue
                         },
                     }
                 },
-                colors: ['#1AA217', '#17A281', '#A24917'],
-                labels: ['Ejecución', 'Pausado', 'Falla'],
+                colors: ['#1AA217', '#17A281', '#A24917', '#A24917', '#A24917'],
+                labels: ['Ejecución', 'Pausado', 'Falla', 'Sin película', 'Interlock'],
                 responsive: [{
                     breakpoint: 480,
                     options: {
@@ -134,17 +133,27 @@ export default {
             });
 
             // Devolvemos un array con los totales
-            return [
-                (totalRunTime / this.totalTime).toFixed(1),
-                (totalPausedTime / this.totalTime).toFixed(1),
-                (totalFaultTime / this.totalTime).toFixed(1),
-                (totalOutOfFilmTime / this.totalTime).toFixed(1),
-                (totalInterlockTime / this.totalTime).toFixed(1),
-            ];
+            return {
+                percentage: [
+                    (totalRunTime * 100 / totalRunTime).toFixed(1),
+                    (totalPausedTime * 100 / totalRunTime).toFixed(1),
+                    (totalFaultTime * 100 / totalRunTime).toFixed(1),
+                    (totalOutOfFilmTime * 100 / totalRunTime).toFixed(1),
+                    (totalInterlockTime * 100 / totalRunTime).toFixed(1),
+                ],
+                seconds: [
+                    (totalRunTime).toFixed(1),
+                    (totalPausedTime).toFixed(1),
+                    (totalFaultTime).toFixed(1),
+                    (totalOutOfFilmTime).toFixed(1),
+                    (totalInterlockTime).toFixed(1),
+                ],
+            };
         }
     },
     methods: {
-        formatTime(seconds) {
+        formatTime(index) {
+            const seconds = this.maxTimeTotals.seconds[index];
             const days = Math.floor(seconds / (24 * 3600)); // Un día tiene 86400 segundos
             const hours = Math.floor((seconds % (24 * 3600)) / 3600); // Horas restantes
             const minutes = Math.floor((seconds % 3600) / 60); // Minutos restantes
@@ -171,12 +180,12 @@ export default {
             if (this.date.length) {
                 const start = new Date(this.date[0]);
                 const end = new Date(this.date[1]);
-    
+
                 // Calcular la diferencia en segundos
                 const differenceInSecondss = differenceInSeconds(end, start);
-    
+
                 // Guardar el resultado en el componente
-                this.totalTime = differenceInSecondss/60;
+                this.totalTime = differenceInSecondss;
             }
         }
     },
