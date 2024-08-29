@@ -5,6 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\RobagData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+// use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+// use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
+// use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
+// use PhpOffice\PhpSpreadsheet\Chart\Legend;
+// use PhpOffice\PhpSpreadsheet\Chart\Chart;
+// use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
+// use PhpOffice\PhpSpreadsheet\Chart\Title;
+// use PhpOffice\PhpSpreadsheet\Chart\Layout;
+// use PhpOffice\PhpSpreadsheet\Chart\ChartColor;
+use PhpOffice\PhpSpreadsheet\Chart\Chart;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
+use PhpOffice\PhpSpreadsheet\Chart\Legend as ChartLegend;
+use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
+use PhpOffice\PhpSpreadsheet\Chart\Title;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class RobagDataController extends Controller
 {
@@ -63,188 +80,443 @@ class RobagDataController extends Controller
         return response()->json(compact('data'));
     }
 
-    public function exportReport()
+    public function generateReport()
     {
-        // // Obtener la subcategoría seleccionada y sus relaciones
-        // $subcategory = Subcategory::with('category', 'category.subcategories')->findOrFail($subcategoryId);
+        $spreadsheet = new Spreadsheet();
 
-        // // Crear una nueva hoja de cálculo
-        // $spreadsheet = new Spreadsheet();
-        // $sheet = $spreadsheet->getActiveSheet();
+        // Crear nueva hoja para gráfico de pastel
+        $worksheetTimes = $spreadsheet->getActiveSheet();
+        $worksheetTimes->setTitle('Tiempos');
+        $this->generateTimesSheet($worksheetTimes);
 
-        // // Variables de encabezados y valores
-        // $currentSubcategory = $subcategory;
-        // $headers = [];
-        // $values = [];
-        // $preFilledColumns = [];
+        // Crear nueva hoja para gráfico de barras de producción
+        $worksheetProduction = $spreadsheet->createSheet();
+        $worksheetProduction->setTitle('Producción');
+        $this->generateProductionSheet($worksheetProduction);
 
-        // // Instrucciones en la fila 1
-        // $sheet->mergeCells('A1:E1');
-        // $sheet->setCellValue('A1', 'Instrucciones: Llena los campos en blanco y duplica los campos prellenados para cada producto que agregues');
-        // $sheet->getStyle('A1:E1')->applyFromArray([
-        //     'fill' => [
-        //         'fillType' => Fill::FILL_SOLID,
-        //         'startColor' => ['argb' => 'FF808080'], // Fondo gris
-        //     ],
-        //     'font' => [
-        //         'bold' => true,
-        //         'color' => ['argb' => 'FFFFFFFF'], // Texto blanco
-        //     ],
-        //     'alignment' => [
-        //         'horizontal' => Alignment::HORIZONTAL_CENTER,
-        //     ],
-        // ]);
+        // Crear nueva hoja para gráfico de área
+        $worksheetSpeed = $spreadsheet->createSheet();
+        $worksheetSpeed->setTitle('Velocidad');
+        $this->generateSpeedSheet($worksheetSpeed);
 
-        // // Crear una pila para almacenar las subcategorías en el orden correcto
-        // $subcategoryStack = [];
+        // Crear nueva hoja para gráfico de barras
+        $worksheetDeviation = $spreadsheet->createSheet();
+        $worksheetDeviation->setTitle('Desviación');
+        $this->generateDeviationSheet($worksheetDeviation);
 
-        // // Primero, recorre hasta llegar al nivel más alto (primer nivel de subcategoría)
-        // while ($currentSubcategory !== null) {
-        //     array_unshift($subcategoryStack, $currentSubcategory);
-        //     $currentSubcategory = Subcategory::find($currentSubcategory->prev_subcategory_id);
-        // }
+        // Generar hoja para gráfico de pastel
+        $worksheetFilm = $spreadsheet->createSheet();
+        $worksheetFilm->setTitle('Pelicula');
+        $this->generateFilmSheet($worksheetFilm);
 
-        // // Ahora que tenemos las subcategorías en la pila, generamos los encabezados
-        // $sufix = '';
-        // foreach ($subcategoryStack as $level => $subcat) {
-        //     $sufix = ($sufix === '') ? $subcat->key : $sufix . '.' . $subcat->key;
-        //     $headers[] = 'Subcategoría ' . $sufix;
-        //     $values[] = $subcat->name;
-        //     $preFilledColumns[] = 'Campo prellenado';
-        // }
+        // Crear nueva hoja para tabla de escala
+        $worksheetScale = $spreadsheet->createSheet();
+        $worksheetScale->setTitle('Báscula');
+        $this->generateScaleSheet($worksheetScale);
 
-        // // Agregar la categoría principal
-        // array_unshift($headers, 'Categoría principal');
-        // array_unshift($values, $subcategory->category->name);
-        // array_unshift($preFilledColumns, 'Campo prellenado');
+        // Write the Excel file and save it
+        $writer = new Xlsx($spreadsheet);
+        $writer->setIncludeCharts(true); // Include charts
+        $fileName = 'reporte_robag_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
 
-        // // Añadir columnas fijas
-        // $headers = array_merge($headers, ['Número de parte de fabricante', 'Descripción', 'Ubicación en almacén']);
-        // $values = array_merge($values, ['', '', '']);
-        // $preFilledColumns = array_merge($preFilledColumns, ['', '', '']);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
+        $writer->save('php://output');
+    }
 
-        // // Añadir columnas de características (features) de la subcategoría seleccionada
-        // foreach ($subcategory->features as $feature) {
-        //     $headers[] = $feature['name'];
-        //     $headers[] = 'Unidad de medida';
-        //     $values[] = '';
-        //     $values[] = $feature['measure_unit'];
-        //     $preFilledColumns[] = '';
-        //     $preFilledColumns[] = 'Campo prellenado';
-        // }
+    public function generateTimesSheet($worksheet)
+    {
+        // Insert data into the worksheet
+        $worksheet->fromArray(
+            [
+                ['Categoría', 'Valor'],
+                ['En pausa', 1.2],
+                ['En falla', 0.5],
+                ['Sin película', 0.6],
+                ['En interlock', 0.2],
+            ]
+        );
 
-        // // Llenar las celdas del encabezado de la fila 2 (campos prellenados y obligatorios)
-        // foreach ($preFilledColumns as $col => $header) {
-        //     $cell = Coordinate::stringFromColumnIndex($col + 1) . '2';
-        //     $sheet->setCellValue($cell, $header);
-        // }
+        // Ajustar el ancho de las columnas
+        $worksheet->getColumnDimension('A')->setWidth(25);
+        $worksheet->getColumnDimension('B')->setWidth(15);
 
-        // // Aplicar estilos a la fila 2 (fondo blanco y texto #808080)
-        // $row2Style = [
-        //     'fill' => [
-        //         'fillType' => Fill::FILL_SOLID,
-        //         'startColor' => ['argb' => 'FFFFFFFF'], // Fondo blanco
-        //     ],
-        //     'font' => [
-        //         'color' => ['argb' => 'FF808080'], // Texto gris (#808080)
-        //     ],
-        //     'alignment' => [
-        //         'horizontal' => Alignment::HORIZONTAL_CENTER,
-        //     ],
-        //     'borders' => [
-        //         'allBorders' => [
-        //             'borderStyle' => Border::BORDER_THIN,
-        //             'color' => ['argb' => 'FF000000'],
-        //         ],
-        //     ],
-        // ];
-        // $sheet->getStyle('A2:' . $sheet->getHighestColumn() . '2')->applyFromArray($row2Style);
+        // Create data series
+        $dataSeriesLabels = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Tiempos!$B$1', null, 1), // Valor
+        ];
 
-        // // Llenar las celdas del encabezado de la fila 3 (columnas finales)
-        // foreach ($headers as $col => $header) {
-        //     $cell = Coordinate::stringFromColumnIndex($col + 1) . '3';
-        //     $sheet->setCellValue($cell, $header);
-        // }
+        $xAxisTickValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Tiempos!$A$2:$A$5', null, 4), // Categorías
+        ];
 
-        // // Llenar las celdas de valores en la fila 4
-        // if (!request('withProducts')) {
-        //     foreach ($values as $col => $value) {
-        //         $cell = Coordinate::stringFromColumnIndex($col + 1) . '4';
-        //         $sheet->setCellValue($cell, $value);
-        //     }
-        // }
+        $dataSeriesValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Tiempos!$B$2:$B$5', null, 4), // Valores
+        ];
 
-        // // Aplicar estilos a las celdas del encabezado (fila 3)
-        // $headerStyle = [
-        //     'fill' => [
-        //         'fillType' => Fill::FILL_SOLID,
-        //         'startColor' => ['argb' => 'FFDDEBF7'], // Color de fondo
-        //     ],
-        //     'font' => [
-        //         'bold' => true,
-        //         'color' => ['argb' => 'FF1676A2'], // Color de texto
-        //     ],
-        //     'alignment' => [
-        //         'horizontal' => Alignment::HORIZONTAL_CENTER,
-        //     ],
-        //     'borders' => [
-        //         'allBorders' => [
-        //             'borderStyle' => Border::BORDER_THIN,
-        //             'color' => ['argb' => 'FF000000'],
-        //         ],
-        //     ],
-        // ];
+        // Build the dataseries
+        $series = new DataSeries(
+            DataSeries::TYPE_PIECHART_3D, // plotType
+            null, // plotGrouping (not used for radar chart)
+            range(0, count($dataSeriesValues) - 1), // plotOrder
+            $dataSeriesLabels, // plotLabel
+            $xAxisTickValues, // plotCategory
+            $dataSeriesValues        // plotValues
+        );
 
-        // $sheet->getStyle('A3:' . $sheet->getHighestColumn() . '3')->applyFromArray($headerStyle);
+        // Set the series in the plot area
+        $plotArea = new PlotArea(null, [$series]);
 
-        // // Ajustar el tamaño de las columnas
-        // $highestColumn = $sheet->getHighestColumn(); // Obtener la columna más alta
-        // $highestColumnIndex = Coordinate::columnIndexFromString($highestColumn); // Convertir la letra de la columna a índice
-        // foreach (range(1, $highestColumnIndex) as $colIndex) {
-        //     $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($colIndex))->setAutoSize(true);
-        // }
+        // Set the chart legend
+        $legend = new ChartLegend(ChartLegend::POSITION_RIGHT, null, false);
 
-        // // agregar productos
-        // if (request('withProducts')) {
-        //     // Obtener todos los productos de la subcategoría
-        //     $products = Product::where('subcategory_id', $subcategoryId)->get();
+        // Define chart title and labels
+        $title = new Title('Distribución de Tiempos (HRS)');
+        $yAxisLabel = null; // No se utiliza en gráfico de radar
 
-        //     // Rellenar los datos de los productos en las filas siguientes
-        //     $rowIndex = 4; // Empezar en la fila 4 después de los encabezados y valores prellenados
-        //     foreach ($products as $product) {
-        //         // Inicializar el array con los valores prellenados
-        //         $productData = [...$values];
+        // Create the chart
+        $chart = new Chart(
+            'chart9', // name
+            $title, // title
+            $legend, // legend
+            $plotArea, // plotArea
+            true, // plotVisibleOnly
+            DataSeries::EMPTY_AS_GAP, // displayBlanksAs
+            null, // xAxisLabel
+            $yAxisLabel  // yAxisLabel (not used in radar chart)
+        );
 
-        //         // Reemplazar los valores correspondientes con los datos del producto
-        //         // $productData[array_search('Nombre del producto', $headers)] = $product->name;
-        //         $productData[array_search('Número de parte de fabricante', $headers)] = $product->part_number_supplier;
-        //         $productData[array_search('Descripción', $headers)] = $product->description;
-        //         $productData[array_search('Ubicación en almacén', $headers)] = $product->location;
+        // Set the position where the chart should appear in the worksheet
+        $chart->setTopLeftPosition('D1');
+        $chart->setBottomRightPosition('L10');
 
-        //         // Añadir valores de las características (features)
-        //         foreach ($subcategory->features as $key => $feature) {
-        //             $featureIndex = array_search($feature['name'], $headers);
-        //             $unitIndex = $featureIndex + 1; // La unidad de medida siempre sigue a la característica en el orden de las columnas
-        //             $productData[$featureIndex] = $product->features[$key]['value'] ?? '';
-        //             $productData[$unitIndex] = $feature['measure_unit'];
-        //         }
+        // Add the chart to the worksheet
+        $worksheet->addChart($chart);
+    }
 
-        //         // Llenar las celdas de la fila actual
-        //         foreach ($productData as $col => $value) {
-        //             $cell = Coordinate::stringFromColumnIndex($col + 1) . $rowIndex;
-        //             $sheet->setCellValue($cell, $value);
-        //         }
+    public function generateProductionSheet($worksheet)
+    {
+        // Insert data into the worksheet
+        $worksheet->fromArray(
+            [
+                ['Fecha', 'Número de bolsas', 'Meta'],
+                ['22 Ago 24', 21000, 36000],
+                ['23 Ago 24', 12000, 36000],
+                ['24 Ago 24', 33000, 33000],
+                ['25 Ago 24', 49000, 40000],
+                ['26 Ago 24', 18000, 36000],
+                ['27 Ago 24', 11000, 15000],
+                ['28 Ago 24', 9000, 15000],
+            ]
+        );
 
-        //         $rowIndex++;
-        //     }
-        // }
+        // Ajustar el ancho de las columnas
+        $worksheet->getColumnDimension('A')->setWidth(15);
+        $worksheet->getColumnDimension('B')->setWidth(15);
+        $worksheet->getColumnDimension('C')->setWidth(15);
 
-        // // Descargar el archivo Excel en lugar de guardarlo en el servidor
-        // $writer = new Xlsx($spreadsheet);
-        // $filename = 'plantilla_productos_' . $subcategory->category->name . '.xlsx';
+        // Create data series
+        $dataSeriesLabels = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Producción!$B$1', null, 1), // Número de bolsas
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Producción!$C$1', null, 1), // Meta
+        ];
 
-        // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        // header('Content-Disposition: attachment; filename="' . urlencode($filename) . '"');
-        // $writer->save('php://output');
+        $xAxisTickValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Producción!$A$2:$A$8', null, 7), // Fechas
+        ];
+
+        $dataSeriesValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Producción!$B$2:$B$8', null, 7), // Número de bolsas
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Producción!$C$2:$C$8', null, 7), // Meta
+        ];
+
+        // Build the dataseries
+        $series = new DataSeries(
+            DataSeries::TYPE_BARCHART_3D, // plotType
+            DataSeries::GROUPING_CLUSTERED, // plotGrouping
+            range(0, count($dataSeriesValues) - 1), // plotOrder
+            $dataSeriesLabels, // plotLabel
+            $xAxisTickValues, // plotCategory
+            $dataSeriesValues        // plotValues
+        );
+
+        // Set additional dataseries parameters
+        $series->setPlotDirection(DataSeries::DIRECTION_COL);
+
+        // Set the series in the plot area
+        $plotArea = new PlotArea(null, [$series]);
+
+        // Set the chart legend
+        $legend = new ChartLegend(ChartLegend::POSITION_RIGHT, null, false);
+
+        // Define chart title and labels
+        $title = new Title('Producción vs Meta');
+        $yAxisLabel = new Title('Número de bolsas');
+
+        // Create the chart
+        $chart = new Chart(
+            'chart8', // name
+            $title, // title
+            $legend, // legend
+            $plotArea, // plotArea
+            true, // plotVisibleOnly
+            DataSeries::EMPTY_AS_GAP, // displayBlanksAs
+            null, // xAxisLabel
+            $yAxisLabel  // yAxisLabel
+        );
+
+        // Set the position where the chart should appear in the worksheet
+        $chart->setTopLeftPosition('E1');
+        $chart->setBottomRightPosition('M10');
+
+        // Add the chart to the worksheet
+        $worksheet->addChart($chart);
+    }
+
+    public function generateSpeedSheet($worksheet)
+    {
+        // Insert data into the worksheet
+        $worksheet->fromArray(
+            [
+                ['Fecha', 'Bolsas por minuto'],
+                ['22 Ago', 150],
+                ['23 Ago', 125],
+                ['24 Ago', 120],
+                ['25 Ago', 115],
+                ['26 Ago', 100],
+                ['27 Ago', 130],
+                ['28 Ago', 145],
+            ]
+        );
+
+        // Ajustar el ancho de las columnas
+        $worksheet->getColumnDimension('A')->setWidth(20);
+        $worksheet->getColumnDimension('B')->setWidth(20);
+
+        // Create data series
+        $dataSeriesLabels = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Velocidad!$B$1', null, 1), // Bolsas por minuto
+        ];
+
+        $xAxisTickValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Velocidad!$A$2:$A$8', null, 7), // Fechas
+        ];
+
+        $dataSeriesValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Velocidad!$B$2:$B$8', null, 7), // Bolsas por minuto
+        ];
+
+        // Build the dataseries
+        $series = new DataSeries(
+            DataSeries::TYPE_AREACHART_3D, // plotType
+            null, // plotGrouping (not used for area chart)
+            range(0, count($dataSeriesValues) - 1), // plotOrder
+            $dataSeriesLabels, // plotLabel
+            $xAxisTickValues, // plotCategory
+            $dataSeriesValues        // plotValues
+        );
+
+        // Set additional dataseries parameters
+        $series->setPlotDirection(DataSeries::DIRECTION_COL);
+
+        // Set the series in the plot area
+        $plotArea = new PlotArea(null, [$series]);
+
+        // Set the chart legend
+        $legend = new ChartLegend(ChartLegend::POSITION_RIGHT, null, false);
+
+        // Define chart title and labels
+        $title = new Title('Velocidad de Producción');
+        $yAxisLabel = new Title('Bolsas por minuto');
+
+        // Create the chart
+        $chart = new Chart(
+            'chart7', // name
+            $title, // title
+            $legend, // legend
+            $plotArea, // plotArea
+            true, // plotVisibleOnly
+            DataSeries::EMPTY_AS_GAP, // displayBlanksAs
+            null, // xAxisLabel
+            $yAxisLabel  // yAxisLabel
+        );
+
+        // Set the position where the chart should appear in the worksheet
+        $chart->setTopLeftPosition('D1');
+        $chart->setBottomRightPosition('L10');
+
+        // Add the chart to the worksheet
+        $worksheet->addChart($chart);
+    }
+
+    public function generateDeviationSheet($worksheet)
+    {
+        // Insert data into the worksheet
+        $worksheet->fromArray(
+            [
+                ['Desviación', 'Número de muestras'],
+                [-3, 21],
+                [-2, 12],
+                [-1, 33],
+                [0, 49],
+                [2, 18],
+                [3, 11],
+                [5, 5],
+            ]
+        );
+
+        // Ajustar el ancho de las columnas
+        $worksheet->getColumnDimension('A')->setWidth(20);
+        $worksheet->getColumnDimension('B')->setWidth(20);
+
+        // Create data series
+        $dataSeriesLabels = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Desviación!$B$1', null, 1), // Número de muestras
+        ];
+
+        $xAxisTickValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Desviación!$A$2:$A$8', null, 7), // Desviación
+        ];
+
+        $dataSeriesValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Desviación!$B$2:$B$8', null, 7), // Número de muestras
+        ];
+
+        // Build the dataseries
+        $series = new DataSeries(
+            DataSeries::TYPE_BARCHART_3D, // plotType
+            DataSeries::GROUPING_CLUSTERED, // plotGrouping
+            range(0, count($dataSeriesValues) - 1), // plotOrder
+            $dataSeriesLabels, // plotLabel
+            $xAxisTickValues, // plotCategory
+            $dataSeriesValues        // plotValues
+        );
+
+        // Set additional dataseries parameters
+        $series->setPlotDirection(DataSeries::DIRECTION_COL);
+
+        // Set the series in the plot area
+        $plotArea = new PlotArea(null, [$series]);
+
+        // Set the chart legend
+        $legend = new ChartLegend(ChartLegend::POSITION_RIGHT, null, false);
+
+        // Define chart title and labels
+        $title = new Title('Distribución de Desviaciones');
+        $yAxisLabel = new Title('Número de muestras');
+
+        // Create the chart
+        $chart = new Chart(
+            'chart6', // name
+            $title, // title
+            $legend, // legend
+            $plotArea, // plotArea
+            true, // plotVisibleOnly
+            DataSeries::EMPTY_AS_GAP, // displayBlanksAs
+            null, // xAxisLabel
+            $yAxisLabel  // yAxisLabel
+        );
+
+        // Set the position where the chart should appear in the worksheet
+        $chart->setTopLeftPosition('D1');
+        $chart->setBottomRightPosition('L10');
+
+        // Add the chart to the worksheet
+        $worksheet->addChart($chart);
+    }
+
+    public function generateFilmSheet($worksheet)
+    {
+        // Insert data into the worksheet
+        $worksheet->fromArray(
+            [
+                ['Categoría', 'Cantidad'],
+                ['Bolsas llenas', 500],
+                ['Bolsas desperdiciadas', 100],
+            ]
+        );
+
+        // Ajustar el ancho de las columnas
+        $worksheet->getColumnDimension('A')->setWidth(20);
+        $worksheet->getColumnDimension('B')->setWidth(20);
+
+        // Create data series
+        $dataSeriesLabels = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Pelicula!$B$1', null, 1), // Cantidad
+        ];
+
+        $xAxisTickValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Pelicula!$A$2:$A$3', null, 2), // Categorías
+        ];
+
+        $dataSeriesValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Pelicula!$B$2:$B$3', null, 2), // Cantidades
+        ];
+
+        // Build the dataseries
+        $series = new DataSeries(
+            DataSeries::TYPE_DONUTCHART, // plotType
+            null, // plotGrouping (not used for pie chart)
+            range(0, count($dataSeriesValues) - 1), // plotOrder
+            $dataSeriesLabels, // plotLabel
+            $xAxisTickValues, // plotCategory
+            $dataSeriesValues        // plotValues
+        );
+
+        // Set the series in the plot area
+        $plotArea = new PlotArea(null, [$series]);
+
+        // Set the chart legend
+        $legend = new ChartLegend(ChartLegend::POSITION_RIGHT, null, false);
+
+        // Define chart title and labels
+        $title = new Title('USO DE PELICULA');
+        $yAxisLabel = null; // No se utiliza en gráfico de pastel
+
+        // Create the chart
+        $chart = new Chart(
+            'chart5', // name
+            $title, // title
+            $legend, // legend
+            $plotArea, // plotArea
+            true, // plotVisibleOnly
+            DataSeries::EMPTY_AS_GAP, // displayBlanksAs
+            null, // xAxisLabel
+            $yAxisLabel  // yAxisLabel (not used in pie chart)
+        );
+
+        // Set the position where the chart should appear in the worksheet
+        $chart->setTopLeftPosition('D1');
+        $chart->setBottomRightPosition('L10');
+
+        // Add the chart to the worksheet
+        $worksheet->addChart($chart);
+    }
+
+    public function generateScaleSheet($worksheet)
+    {
+        // Insert data into the worksheet
+        $worksheet->fromArray(
+            [
+                ['Variable', 'Valor promedio'],
+                ['Peso medio', '54.50 g'],
+                ['Desviación estándar', '1.6 '],
+                ['Peso total de descarga', '33,495.8 Kg'],
+                ['Total regalado', '698.85 g'],
+                ['Porcentaje regalado', '3.97%'],
+            ],
+            null, // No style
+            'A1'  // Start cell
+        );
+
+        // Ajustar el ancho de las columnas
+        $worksheet->getColumnDimension('A')->setWidth(20);
+        $worksheet->getColumnDimension('B')->setWidth(20);
+
+        // Establecer estilo de la fila de encabezado
+        $headerRow = $worksheet->getStyle('A1:B1');
+        $headerRow->getFont()->setBold(true);
+        $headerRow->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $headerRow->getFill()->getStartColor()->setARGB('FFFF00'); // Color de fondo amarillo
     }
 }

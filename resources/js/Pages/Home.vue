@@ -32,12 +32,13 @@
                         <div class="flex items-center space-x-3 w-96">
                             <InputLabel value="Producción teórica (BPM)" />
                             <!-- <el-input v-model="bpm" min="1" max="200" type="number" /> -->
-                            <el-slider @change="bpmUpdated = true" v-model="bpm" :min="50" :max="150" :step="5" show-stops />
+                            <el-slider @change="bpmUpdated = true" v-model="bpm" :min="50" :max="150" :step="5"
+                                show-stops />
                         </div>
 
                         <!-- Boton para generar reporte -->
                         <div>
-                            <el-dropdown split-button type="primary" @click="handleClick"
+                            <el-dropdown split-button type="primary" @click="exportReport"
                                 @command="handleDropdownCommand">
                                 Generar reporte
                                 <template #dropdown>
@@ -50,10 +51,8 @@
                     </div>
 
                     <!-- graficas en rectangulo negro -->
-                    <OEEPanel :date="searchDate" :data="data" :loading="loading" 
-                            :teoricProduction="bpm" :bpmUpdated="bpmUpdated" 
-                            @finished-bpm-updated="bpmUpdated = false"  
-                    />
+                    <!-- <OEEPanel :date="searchDate" :data="data" :loading="loading" :teoricProduction="bpm"
+                        :bpmUpdated="bpmUpdated" @finished-bpm-updated="bpmUpdated = false" /> -->
 
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
@@ -225,14 +224,15 @@ export default {
                 this.showEmailModal = true;
             }
         },
-        handleClick() {
-            console.log('generar reporte');
+        exportReport() {
+            const url = route('robag.export-report', { dates: this.searchDate });
+            window.open(url, '_blank');
         },
         async getDataByDateRange() {
             this.loading = true;
             try {
-                const response = await axios.post(route('robag.get-data-by-date-range'), {date: this.searchDate} );
-                if ( response.status === 200 ) {
+                const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.searchDate });
+                if (response.status === 200) {
                     this.data = response.data.data;
                     // console.log(this.data);
                 }
