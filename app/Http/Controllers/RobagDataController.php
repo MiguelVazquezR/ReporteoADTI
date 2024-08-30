@@ -5,16 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RobagData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-// use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-// use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
-// use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
-// use PhpOffice\PhpSpreadsheet\Chart\Legend;
-// use PhpOffice\PhpSpreadsheet\Chart\Chart;
-// use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
-// use PhpOffice\PhpSpreadsheet\Chart\Title;
-// use PhpOffice\PhpSpreadsheet\Chart\Layout;
-// use PhpOffice\PhpSpreadsheet\Chart\ChartColor;
 use PhpOffice\PhpSpreadsheet\Chart\Chart;
 use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
 use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
@@ -22,6 +13,10 @@ use PhpOffice\PhpSpreadsheet\Chart\Legend as ChartLegend;
 use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Title;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use App\Mail\ReportEmail;
+use Illuminate\Support\Facades\Mail;
+
+use function PHPUnit\Framework\isNull;
 
 class RobagDataController extends Controller
 {
@@ -75,54 +70,66 @@ class RobagDataController extends Controller
         return response()->json(compact('data'));
     }
 
-    public function generateReport()
+    public function generateReport($saveToStorage = false, $dates = null)
     {
-        $dates = request('dates');
+        if (isNull($dates)) {
+            $dates = request('dates');
+        }
+
         $items = $this->getItemsByDateRange($dates);
 
         $spreadsheet = new Spreadsheet();
 
-        // Crear nueva hoja para gráfico de pastel
+        // Crear y configurar las hojas de cálculo
         $worksheetTimes = $spreadsheet->getActiveSheet();
         $worksheetTimes->setTitle('Tiempos');
-        $this->generateTimesSheet($worksheetTimes, $items);
+        $this->generateTimesSheet($worksheetTimes, $items, $dates);
 
-        // Crear nueva hoja para gráfico de barras de producción
         $worksheetProduction = $spreadsheet->createSheet();
         $worksheetProduction->setTitle('Producción');
-        $this->generateProductionSheet($worksheetProduction, $items);
+        $this->generateProductionSheet($worksheetProduction, $items, $dates);
 
-        // Crear nueva hoja para gráfico de área
         $worksheetSpeed = $spreadsheet->createSheet();
         $worksheetSpeed->setTitle('Velocidad');
-        $this->generateSpeedSheet($worksheetSpeed, $items);
+        $this->generateSpeedSheet($worksheetSpeed, $items, $dates);
 
-        // Crear nueva hoja para gráfico de barras
         $worksheetDeviation = $spreadsheet->createSheet();
         $worksheetDeviation->setTitle('Desviación');
-        $this->generateDeviationSheet($worksheetDeviation, $items);
+        $this->generateDeviationSheet($worksheetDeviation, $items, $dates);
 
-        // Generar hoja para gráfico de pastel
         $worksheetFilm = $spreadsheet->createSheet();
         $worksheetFilm->setTitle('Pelicula');
-        $this->generateFilmSheet($worksheetFilm, $items);
+        $this->generateFilmSheet($worksheetFilm, $items, $dates);
 
-        // Crear nueva hoja para tabla de escala
         $worksheetScale = $spreadsheet->createSheet();
         $worksheetScale->setTitle('Báscula');
-        $this->generateScaleSheet($worksheetScale, $items);
+        $this->generateScaleSheet($worksheetScale, $items, $dates);
 
-        // Write the Excel file and save it
         $writer = new Xlsx($spreadsheet);
         $writer->setIncludeCharts(true); // Include charts
         $fileName = 'reporte_robag_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
 
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
-        $writer->save('php://output');
+        if ($saveToStorage) {
+            // Crear la carpeta si no existe
+            $directoryPath = storage_path('app/reports');
+            if (!file_exists($directoryPath)) {
+                mkdir($directoryPath, 0755, true);
+            }
+
+            // Guardar el archivo en la carpeta storage/app/reports
+            $filePath = $directoryPath . '/' . $fileName;
+            $writer->save($filePath);
+
+            return $filePath; // Devolver la ruta del archivo
+        } else {
+            // Descargar el archivo
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
+            $writer->save('php://output');
+        }
     }
 
-    public function generateTimesSheet($worksheet, $items)
+    public function generateTimesSheet($worksheet, $items, $dates)
     {
         // Paso 1: Ordenar los items por la propiedad created_at y agrupar por fecha
         $groupedItems = $items->sortBy('created_at')->groupBy(fn($item) => $item->created_at->format('Y-m-d'));
@@ -151,8 +158,8 @@ class RobagDataController extends Controller
         ];
 
         // Paso 5: Obtener la fecha y hora mínima y máxima de los registros
-        $startDateTime = $items->min('created_at')->format('d M, Y • h:iA');
-        $endDateTime = $items->max('created_at')->format('d M, Y • h:iA');
+        $startDateTime = Carbon::parse($dates[0])->subHours(6)->format('d M, Y • h:iA');
+        $endDateTime = Carbon::parse($dates[1])->subHours(6)->format('d M, Y • h:iA');
 
         // Paso 6: Insertar el rango de fechas en la primera fila
         $dateRange = "Del $startDateTime a $endDateTime";
@@ -233,11 +240,12 @@ class RobagDataController extends Controller
         $worksheet->addChart($chart);
     }
 
-    public function generateProductionSheet($worksheet, $items)
+    public function generateProductionSheet($worksheet, $items, $dates)
     {
-        // obtencion de datos para la grafica y tabla
-        // Paso 1: Ordenar los items por fecha y agrupar por día
-        $groupedItems = $items->groupBy(function ($item) {
+        // Paso 1: Ordenar los items por fecha ascendente y agrupar por día
+        $groupedItems = $items->sortBy(function ($item) {
+            return $item->created_at;
+        })->groupBy(function ($item) {
             return $item->created_at->format('Y-m-d');
         });
 
@@ -259,33 +267,49 @@ class RobagDataController extends Controller
             $result[] = [$formattedDate, $maxFullBags, $metaValue];
         }
 
-        // Insert data into the worksheet
-        $worksheet->fromArray($result);
+        // Obtener la fecha y hora de rango seleccionado
+        $startDateTime = Carbon::parse($dates[0])->subHours(6)->format('d M, Y • h:iA');
+        $endDateTime = Carbon::parse($dates[1])->subHours(6)->format('d M, Y • h:iA');
+
+        // Insertar el rango de fechas en la primera fila
+        $dateRange = "Del $startDateTime a $endDateTime";
+        $worksheet->setCellValue('A1', $dateRange);
+
+        // Unir celdas de A1 a C1
+        $worksheet->mergeCells('A1:C1');
+
+        // Establecer estilo para la primera fila
+        $headerDateRange = $worksheet->getStyle('A1:C1');
+        $headerDateRange->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $headerDateRange->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
+
+        // Insertar los datos de $result en el worksheet empezando desde A2
+        $worksheet->fromArray($result, null, 'A2');
 
         // Ajustar el ancho de las columnas
         $worksheet->getColumnDimension('A')->setWidth(15);
-        $worksheet->getColumnDimension('B')->setWidth(15);
+        $worksheet->getColumnDimension('B')->setWidth(20);
         $worksheet->getColumnDimension('C')->setWidth(15);
 
         // Establecer estilo de la fila de encabezado
-        $headerRow = $worksheet->getStyle('A1:C1');
+        $headerRow = $worksheet->getStyle('A2:C2');
         $headerRow->getFont()->setBold(true);
         $headerRow->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $headerRow->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
 
         // Create data series
         $dataSeriesLabels = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Producción!$B$1', null, 1), // Número de bolsas
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Producción!$C$1', null, 1), // Meta
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Producción!$B$2', null, 1), // Número de bolsas
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Producción!$C$2', null, 1), // Meta
         ];
 
         $xAxisTickValues = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Producción!$A$2:$A$8', null, 7), // Fechas
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Producción!$A$3:$A$' . $groupedItems->count() + 2, null, $groupedItems->count()), // Fechas
         ];
 
         $dataSeriesValues = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Producción!$B$2:$B$8', null, 7), // Número de bolsas
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Producción!$C$2:$C$8', null, 7), // Meta
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Producción!$B$3:$B$' . $groupedItems->count() + 2, null, $groupedItems->count()), // Número de bolsas
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Producción!$C$3:$C$' . $groupedItems->count() + 2, null, $groupedItems->count()), // Meta
         ];
 
         // Build the dataseries
@@ -331,10 +355,12 @@ class RobagDataController extends Controller
         $worksheet->addChart($chart);
     }
 
-    public function generateSpeedSheet($worksheet, $items)
+    public function generateSpeedSheet($worksheet, $items, $dates)
     {
-        // Paso 1: Ordenar los items por fecha y agrupar por día
-        $groupedItems = $items->groupBy(function ($item) {
+        // Paso 1: Ordenar los items por fecha ascendente y agrupar por día
+        $groupedItems = $items->sortBy(function ($item) {
+            return $item->created_at;
+        })->groupBy(function ($item) {
             return $item->created_at->format('Y-m-d');
         });
 
@@ -355,30 +381,46 @@ class RobagDataController extends Controller
             $result[] = [$formattedDate, $averageBagsPerMinute];
         }
 
-        // Insert data into the worksheet
-        $worksheet->fromArray($result);
+        // Obtener la fecha y hora de rango seleccionado
+        $startDateTime = Carbon::parse($dates[0])->subHours(6)->format('d M, Y • h:iA');
+        $endDateTime = Carbon::parse($dates[1])->subHours(6)->format('d M, Y • h:iA');
+
+        // Insertar el rango de fechas en la primera fila
+        $dateRange = "Del $startDateTime a $endDateTime";
+        $worksheet->setCellValue('A1', $dateRange);
+
+        // Unir celdas de A1 a C1
+        $worksheet->mergeCells('A1:C1');
+
+        // Establecer estilo para la primera fila
+        $headerDateRange = $worksheet->getStyle('A1:C1');
+        $headerDateRange->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $headerDateRange->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
+
+        // Insertar los datos de $result en el worksheet empezando desde A2
+        $worksheet->fromArray($result, null, 'A2');
 
         // Ajustar el ancho de las columnas
         $worksheet->getColumnDimension('A')->setWidth(20);
         $worksheet->getColumnDimension('B')->setWidth(20);
 
         // Establecer estilo de la fila de encabezado
-        $headerRow = $worksheet->getStyle('A1:B1');
+        $headerRow = $worksheet->getStyle('A2:B2');
         $headerRow->getFont()->setBold(true);
         $headerRow->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $headerRow->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
 
         // Create data series
         $dataSeriesLabels = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Velocidad!$B$1', null, 1), // Bolsas por minuto
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Velocidad!$B$2', null, 1), // Bolsas por minuto
         ];
 
         $xAxisTickValues = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Velocidad!$A$2:$A$8', null, 7), // Fechas
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Velocidad!$A$3:$A$' . $groupedItems->count() + 2, null, $groupedItems->count()), // Fechas
         ];
 
         $dataSeriesValues = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Velocidad!$B$2:$B$8', null, 7), // Bolsas por minuto
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Velocidad!$B$3:$B$' . $groupedItems->count() + 2, null, $groupedItems->count()), // Bolsas por minuto
         ];
 
         // Build the dataseries
@@ -424,7 +466,7 @@ class RobagDataController extends Controller
         $worksheet->addChart($chart);
     }
 
-    public function generateDeviationSheet($worksheet, $items)
+    public function generateDeviationSheet($worksheet, $items, $dates)
     {
         // Paso 1: Redondear la desviación estándar hacia el entero más próximo
         $roundedItems = $items->map(function ($item) {
@@ -446,30 +488,46 @@ class RobagDataController extends Controller
             $result[] = [$deviation, $sampleCount];
         }
 
-        // Insert data into the worksheet
-        $worksheet->fromArray($result);
+        // Obtener la fecha y hora de rango seleccionado
+        $startDateTime = Carbon::parse($dates[0])->subHours(6)->format('d M, Y • h:iA');
+        $endDateTime = Carbon::parse($dates[1])->subHours(6)->format('d M, Y • h:iA');
+
+        // Insertar el rango de fechas en la primera fila
+        $dateRange = "Del $startDateTime a $endDateTime";
+        $worksheet->setCellValue('A1', $dateRange);
+
+        // Unir celdas de A1 a C1
+        $worksheet->mergeCells('A1:C1');
+
+        // Establecer estilo para la primera fila
+        $headerDateRange = $worksheet->getStyle('A1:C1');
+        $headerDateRange->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $headerDateRange->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
+
+        // Insertar los datos de $result en el worksheet empezando desde A2
+        $worksheet->fromArray($result, null, 'A2');
 
         // Ajustar el ancho de las columnas
         $worksheet->getColumnDimension('A')->setWidth(20);
         $worksheet->getColumnDimension('B')->setWidth(20);
 
         // Establecer estilo de la fila de encabezado
-        $headerRow = $worksheet->getStyle('A1:B1');
+        $headerRow = $worksheet->getStyle('A2:B2');
         $headerRow->getFont()->setBold(true);
         $headerRow->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $headerRow->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
 
         // Create data series
         $dataSeriesLabels = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Desviación!$B$1', null, 1), // Número de muestras
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Desviación!$B$2', null, 1), // Número de muestras
         ];
 
         $xAxisTickValues = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Desviación!$A$2:$A$8', null, 7), // Desviación
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Desviación!$A$3:$A$' . $groupedItems->count() + 2, null, $groupedItems->count()), // Desviación
         ];
 
         $dataSeriesValues = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Desviación!$B$2:$B$8', null, 7), // Número de muestras
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Desviación!$B$3:$B$' . $groupedItems->count() + 2, null, $groupedItems->count()), // Número de muestras
         ];
 
         // Build the dataseries
@@ -515,7 +573,7 @@ class RobagDataController extends Controller
         $worksheet->addChart($chart);
     }
 
-    public function generateFilmSheet($worksheet, $items)
+    public function generateFilmSheet($worksheet, $items, $dates)
     {
         // obtencion de datos para la grafica y tabla
         // Paso 1: Ordenar los items por la propiedad created_at y agrupar por fecha
@@ -543,30 +601,46 @@ class RobagDataController extends Controller
             ['Total', $totalWaste + $totalFullBags],
         ];
 
-        // Insert data into the worksheet
-        $worksheet->fromArray($result);
+        // Obtener la fecha y hora de rango seleccionado
+        $startDateTime = Carbon::parse($dates[0])->subHours(6)->format('d M, Y • h:iA');
+        $endDateTime = Carbon::parse($dates[1])->subHours(6)->format('d M, Y • h:iA');
+
+        // Insertar el rango de fechas en la primera fila
+        $dateRange = "Del $startDateTime a $endDateTime";
+        $worksheet->setCellValue('A1', $dateRange);
+
+        // Unir celdas de A1 a C1
+        $worksheet->mergeCells('A1:C1');
+
+        // Establecer estilo para la primera fila
+        $headerDateRange = $worksheet->getStyle('A1:C1');
+        $headerDateRange->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $headerDateRange->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
+
+        // Insertar los datos de $result en el worksheet empezando desde A2
+        $worksheet->fromArray($result, null, 'A2');
 
         // Ajustar el ancho de las columnas
         $worksheet->getColumnDimension('A')->setWidth(20);
         $worksheet->getColumnDimension('B')->setWidth(20);
 
         // Establecer estilo de la fila de encabezado
-        $headerRow = $worksheet->getStyle('A1:B1');
+        $headerRow = $worksheet->getStyle('A2:B2');
         $headerRow->getFont()->setBold(true);
         $headerRow->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $headerRow->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
 
         // Create data series
         $dataSeriesLabels = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Pelicula!$B$1', null, 1), // Cantidad
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Pelicula!$B$2', null, 1), // Cantidad
         ];
 
         $xAxisTickValues = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Pelicula!$A$2:$A$3', null, 2), // Categorías
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Pelicula!$A$3:$A$4', null, 2), // Categorías
         ];
 
         $dataSeriesValues = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Pelicula!$B$2:$B$3', null, 2), // Cantidades
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Pelicula!$B$3:$B$4', null, 2), // Cantidades
         ];
 
         // Build the dataseries
@@ -609,7 +683,7 @@ class RobagDataController extends Controller
         $worksheet->addChart($chart);
     }
 
-    public function generateScaleSheet($worksheet, $items)
+    public function generateScaleSheet($worksheet, $items, $dates)
     {
         // Paso 1: Ordenar los items por la propiedad created_at y agrupar por fecha
         $groupedItems = $items->sortBy('created_at')->groupBy(function ($item) {
@@ -648,24 +722,62 @@ class RobagDataController extends Controller
             ['Porcentaje regalado', $overallAverages['giveaway_percentage'] . '%'],
         ];
 
-        // Insert data into the worksheet
-        $worksheet->fromArray(
-            $result,
-            null, // No style
-            'A1'  // Start cell
-        );
+        // Obtener la fecha y hora de rango seleccionado
+        $startDateTime = Carbon::parse($dates[0])->subHours(6)->format('d M, Y • h:iA');
+        $endDateTime = Carbon::parse($dates[1])->subHours(6)->format('d M, Y • h:iA');
+
+        // Insertar el rango de fechas en la primera fila
+        $dateRange = "Del $startDateTime a $endDateTime";
+        $worksheet->setCellValue('A1', $dateRange);
+
+        // Unir celdas de A1 a C1
+        $worksheet->mergeCells('A1:C1');
+
+        // Establecer estilo para la primera fila
+        $headerDateRange = $worksheet->getStyle('A1:C1');
+        $headerDateRange->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $headerDateRange->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
+
+        // Insertar los datos de $result en el worksheet empezando desde A2
+        $worksheet->fromArray($result, null, 'A2');
 
         // Ajustar el ancho de las columnas
         $worksheet->getColumnDimension('A')->setWidth(20);
         $worksheet->getColumnDimension('B')->setWidth(20);
 
         // Establecer estilo de la fila de encabezado
-        $headerRow = $worksheet->getStyle('A1:B1');
+        $headerRow = $worksheet->getStyle('A2:B2');
         $headerRow->getFont()->setBold(true);
         $headerRow->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $headerRow->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
     }
 
+    public function emailReport(Request $request)
+    {
+        $validatedData = $request->validate([
+            'main_email' => 'required|email',
+            'cco' => 'nullable|array',
+            'cco.*' => 'nullable|email', // Cada CCO debe ser un correo válido
+            'subject' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        // Recoger los datos validados
+        $mainEmail = $validatedData['main_email'];
+        $cco = $validatedData['cco'] ?? [];
+        $subject = $validatedData['subject'];
+        $description = $validatedData['description'] ?? '';
+
+        // Generar el reporte y guardar en storage
+        $filePath = $this->generateReport(true, $request->dates); // Guardar el archivo y obtener la ruta
+
+        // Enviar el correo con el archivo adjunto
+        Mail::to($mainEmail)
+            ->cc($cco)
+            ->send(new ReportEmail($subject, $description, $filePath));
+    }
+
+    // funciones privadas
     private function getItemsByDateRange($dates)
     {
         $start = Carbon::parse($dates[0])->subHours(6)->toDateTimeString();

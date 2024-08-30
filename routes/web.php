@@ -34,5 +34,6 @@ Route::resource('machine-variables', MachineVariableController::class);
 
 
 //--------------- robag data routes ------------------
-Route::post('robag-get-data-by-date-range', [RobagDataController::class, 'getDataByDateRange'])->name('robag.get-data-by-date-range');
 Route::get('robag-export-report', [RobagDataController::class, 'generateReport'])->name('robag.export-report');
+Route::post('robag-get-data-by-date-range', [RobagDataController::class, 'getDataByDateRange'])->name('robag.get-data-by-date-range');
+Route::post('robag-email-report', [RobagDataController::class, 'emailReport'])->name('robag.email-report');
