@@ -50,7 +50,7 @@
                         </div>
                     </div>
 
-                    <h1 v-if="!data.length" class="text-red-600 font-bold text-sm text-center py-1 bg-red-100">*No hay datos para este intervalo de tiempo</h1>
+                    <h1 v-if="!data.length" class="text-blue-600 font-bold text-sm text-center py-1 mt-2 bg-blue-100">*No hay datos para este intervalo de tiempo</h1>
  
                     <!-- graficas en rectangulo negro -->
                     <OEEPanel :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm"
