@@ -7,7 +7,7 @@
 
                 <!-- Imagen de la maquina (parte izquierda) -->
                 <figure class="w-1/4">
-                    <h1 class="font-bold text-xl mb-6 ml-4">Empacadora TNA</h1>
+                    <h1 class="font-bold text-xl mb-6 ml-4">ROBAG</h1>
                     <img class="rounded-[20px] border border-grayD9 p-4 w-full"
                         src="@/../../public/images/machine_1.png" alt="">
                 </figure>
@@ -18,9 +18,9 @@
                         <div class="flex items-center space-x-4 lg:-left-40 z-10">
                             <div v-if="isMobile" class="flex items-center space-x-2">
                                 <el-date-picker @change="handleStartDateChange" :disabled-date="disabledPrevDays"
-                                    v-model="startDate" type="date" class="!w-1/2" placeholder="Inicio" size="small" />
+                                    v-model="startDate" type="date" class="!w-1/2" placeholder="Inicio" format="DD MMM, YY h:mmA" size="small" />
                                 <el-date-picker @change="handleFinishDateChange" :disabled-date="disabledNextDays"
-                                    v-model="finishDate" type="date" class="!w-1/2" placeholder="Final" size="small" />
+                                    v-model="finishDate" type="date" class="!w-1/2" placeholder="Final" format="DD MMM, YY h:mmA" size="small" />
                             </div>
                             <div v-else>
                                 <el-date-picker @change="getDataByDateRange" v-model="searchDate" type="datetimerange"
@@ -29,8 +29,10 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center space-x-3 w-96">
-                            <InputLabel value="Producción teórica (BPM)" />
+                        <div class="flex flex-col items-center space-x-3 w-1/4">
+                            <InputLabel>
+                                Producción teórica ({{ bpm }} BPM)
+                            </InputLabel>
                             <!-- <el-input v-model="bpm" min="1" max="200" type="number" /> -->
                             <el-slider @change="bpmUpdated = true" v-model="bpm" :min="50" :max="150" :step="5"
                                 show-stops :disabled="!data.length" />
@@ -105,7 +107,7 @@
                     <div class="mt-3">
                         <InputLabel value="CCO" />
                         <el-select v-model="emailForm.cco" multiple filterable allow-create default-first-option
-                            :reserve-keyword="false" placeholder="Agrega cualquier correo">
+                            :reserve-keyword="false" placeholder="Agrega cualquier correo y presiona enter">
                             <el-option v-for="item in ccoList" :key="item.value" :label="item.label"
                                 :value="item.value" />
                         </el-select>
