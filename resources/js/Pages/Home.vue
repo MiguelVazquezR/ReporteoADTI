@@ -25,7 +25,7 @@
                             <div v-else>
                                 <el-date-picker @change="getDataByDateRange" v-model="searchDate" type="datetimerange"
                                     range-separator="A" start-placeholder="Fecha de inicio"
-                                    end-placeholder="Fecha de fin" class="!w-full" />
+                                    end-placeholder="Fecha de fin" class="!w-full" format="DD MMM, YY h:mmA" />
                             </div>
                         </div>
 
@@ -33,7 +33,7 @@
                             <InputLabel value="Producción teórica (BPM)" />
                             <!-- <el-input v-model="bpm" min="1" max="200" type="number" /> -->
                             <el-slider @change="bpmUpdated = true" v-model="bpm" :min="50" :max="150" :step="5"
-                                show-stops />
+                                show-stops :disabled="!data.length" />
                         </div>
 
                         <!-- Boton para generar reporte -->
@@ -50,8 +50,10 @@
                         </div>
                     </div>
 
-                    <h1 v-if="!data.length" class="text-blue-600 font-bold text-sm text-center py-1 mt-2 bg-blue-100">*No hay datos para este intervalo de tiempo</h1>
- 
+                    <h1 v-if="!data.length" class="text-blue-600 font-bold text-sm text-center py-1 mt-2 bg-blue-100">
+                        *No hay datos para
+                        este intervalo de tiempo</h1>
+
                     <!-- graficas en rectangulo negro -->
                     <OEEPanel :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm"
                         :bpmUpdated="bpmUpdated" @finished-bpm-updated="bpmUpdated = false" />
@@ -122,7 +124,22 @@
                     </div>
                     <div class="mt-3">
                         <InputLabel value="Adjunto" />
-                        <p class="text-secondary text-xs">{{ getFileName() }}</p>
+                        <p class="text-xs flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 22 22" class="text-green-700"
+                                id="Microsoft-Excel-Logo--Streamline-Ultimate" height="16" width="16">
+                                <desc>Microsoft Excel Logo Streamline Icon: https://streamlinehq.com</desc>
+                                <g id="Microsoft-Excel-Logo--Streamline-Ultimate.svg">
+                                    <path
+                                        d="M20.125 1.75H7.4375a0.875 0.875 0 0 0 -0.875 0.875v1.3125h1.75V3.5h4.375v2.9575h-0.875l0 0.105v1.58375h0.875v2.9575h-0.875v1.68875h0.875V15.75h-1.2425a2.625 2.625 0 0 1 -2.2575000000000003 1.3125h-2.625V18.375a0.875 0.875 0 0 0 0.875 0.875H20.125a0.875 0.875 0 0 0 0.875 -0.875V2.625a0.875 0.875 0 0 0 -0.875 -0.875Zm-0.875 14h-4.375v-2.9575h4.375Zm0 -4.646249999999999h-4.375V8.14625h4.375Zm0 -4.646249999999999h-4.375V3.5h4.375Z"
+                                        fill="currentColor" stroke-width="1"></path>
+                                    <path
+                                        d="M8.3125 15.75h0.875a1.3125 1.3125 0 0 0 1.3125 -1.3125v-7.875A1.3125 1.3125 0 0 0 9.1875 5.25h-7.875A1.3125 1.3125 0 0 0 0 6.5625v7.875A1.3125 1.3125 0 0 0 1.3125 15.75ZM4.1125 7.4375 5.25 9.2575 6.3875 7.4375h1.54875L6.02 10.5l1.91625 3.0625H6.3875L5.25 11.7425 4.1125 13.5625H2.56375L4.48 10.5 2.56375 7.4375Z"
+                                        fill="currentColor" stroke-width="1"></path>
+                                </g>
+                            </svg>
+                            <span class="text-secondary">Reporte Robag</span>
+                        </p>
+                        <!-- <p class="text-secondary text-xs">{{ getFileName() }}</p> -->
                     </div>
                 </form>
             </template>
