@@ -51,8 +51,8 @@
                     </div>
 
                     <!-- graficas en rectangulo negro -->
-                    <!-- <OEEPanel :date="searchDate" :data="data" :loading="loading" :teoricProduction="bpm"
-                        :bpmUpdated="bpmUpdated" @finished-bpm-updated="bpmUpdated = false" /> -->
+                    <OEEPanel :date="searchDate" :data="data" :loading="loading" :teoricProduction="bpm"
+                        :bpmUpdated="bpmUpdated" @finished-bpm-updated="bpmUpdated = false" />
 
                     <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
                     <div class="mt-4 space-y-4">
@@ -234,7 +234,6 @@ export default {
                 const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.searchDate });
                 if (response.status === 200) {
                     this.data = response.data.data;
-                    // console.log(this.data);
                 }
 
             } catch (error) {

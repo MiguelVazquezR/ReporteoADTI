@@ -33,7 +33,7 @@ export default {
                         columnWidth: '40%'
                     },
                 },
-                colors: ['#1A1A1A'],
+                colors: ['#D9D9D9'],
                 dataLabels: {
                     enabled: false
                 },
@@ -42,7 +42,7 @@ export default {
                     showForSingleSeries: true,
                     customLegendItems: ['Real', 'Esperado'],
                     markers: {
-                        fillColors: ['#373737', '#077B27']
+                        fillColors: ['#D9D9D9', '#077B27']
                     }
                 }
             },
