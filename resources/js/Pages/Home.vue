@@ -236,7 +236,6 @@ export default {
                 const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.searchDate });
                 if (response.status === 200) {
                     this.data = response.data.data;
-                    // console.log(this.data);
                 }
 
             } catch (error) {
