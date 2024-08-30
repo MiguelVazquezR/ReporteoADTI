@@ -5,16 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RobagData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-// use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-// use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
-// use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
-// use PhpOffice\PhpSpreadsheet\Chart\Legend;
-// use PhpOffice\PhpSpreadsheet\Chart\Chart;
-// use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
-// use PhpOffice\PhpSpreadsheet\Chart\Title;
-// use PhpOffice\PhpSpreadsheet\Chart\Layout;
-// use PhpOffice\PhpSpreadsheet\Chart\ChartColor;
 use PhpOffice\PhpSpreadsheet\Chart\Chart;
 use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
 use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
@@ -22,6 +13,10 @@ use PhpOffice\PhpSpreadsheet\Chart\Legend as ChartLegend;
 use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Title;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use App\Mail\ReportEmail;
+use Illuminate\Support\Facades\Mail;
+
+use function PHPUnit\Framework\isNull;
 
 class RobagDataController extends Controller
 {
@@ -75,51 +70,63 @@ class RobagDataController extends Controller
         return response()->json(compact('data'));
     }
 
-    public function generateReport()
+    public function generateReport($saveToStorage = false, $dates = null)
     {
-        $dates = request('dates');
+        if (isNull($dates)) {
+            $dates = request('dates');
+        }
+
         $items = $this->getItemsByDateRange($dates);
 
         $spreadsheet = new Spreadsheet();
 
-        // Crear nueva hoja para gráfico de pastel
+        // Crear y configurar las hojas de cálculo
         $worksheetTimes = $spreadsheet->getActiveSheet();
         $worksheetTimes->setTitle('Tiempos');
         $this->generateTimesSheet($worksheetTimes, $items);
 
-        // Crear nueva hoja para gráfico de barras de producción
         $worksheetProduction = $spreadsheet->createSheet();
         $worksheetProduction->setTitle('Producción');
         $this->generateProductionSheet($worksheetProduction, $items);
 
-        // Crear nueva hoja para gráfico de área
         $worksheetSpeed = $spreadsheet->createSheet();
         $worksheetSpeed->setTitle('Velocidad');
         $this->generateSpeedSheet($worksheetSpeed, $items);
 
-        // Crear nueva hoja para gráfico de barras
         $worksheetDeviation = $spreadsheet->createSheet();
         $worksheetDeviation->setTitle('Desviación');
         $this->generateDeviationSheet($worksheetDeviation, $items);
 
-        // Generar hoja para gráfico de pastel
         $worksheetFilm = $spreadsheet->createSheet();
         $worksheetFilm->setTitle('Pelicula');
         $this->generateFilmSheet($worksheetFilm, $items);
 
-        // Crear nueva hoja para tabla de escala
         $worksheetScale = $spreadsheet->createSheet();
         $worksheetScale->setTitle('Báscula');
         $this->generateScaleSheet($worksheetScale, $items);
 
-        // Write the Excel file and save it
         $writer = new Xlsx($spreadsheet);
         $writer->setIncludeCharts(true); // Include charts
         $fileName = 'reporte_robag_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
 
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
-        $writer->save('php://output');
+        if ($saveToStorage) {
+            // Crear la carpeta si no existe
+            $directoryPath = storage_path('app/reports');
+            if (!file_exists($directoryPath)) {
+                mkdir($directoryPath, 0755, true);
+            }
+
+            // Guardar el archivo en la carpeta storage/app/reports
+            $filePath = $directoryPath . '/' . $fileName;
+            $writer->save($filePath);
+
+            return $filePath; // Devolver la ruta del archivo
+        } else {
+            // Descargar el archivo
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
+            $writer->save('php://output');
+        }
     }
 
     public function generateTimesSheet($worksheet, $items)
@@ -666,6 +673,32 @@ class RobagDataController extends Controller
         $headerRow->getFill()->getStartColor()->setARGB('F2F2F2'); // Color de fondo gris
     }
 
+    public function emailReport(Request $request)
+    {
+        $validatedData = $request->validate([
+            'main_email' => 'required|email',
+            'cco' => 'nullable|array',
+            'cco.*' => 'nullable|email', // Cada CCO debe ser un correo válido
+            'subject' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        // Recoger los datos validados
+        $mainEmail = $validatedData['main_email'];
+        $cco = $validatedData['cco'] ?? [];
+        $subject = $validatedData['subject'];
+        $description = $validatedData['description'] ?? '';
+
+        // Generar el reporte y guardar en storage
+        $filePath = $this->generateReport(true, $request->dates); // Guardar el archivo y obtener la ruta
+
+        // Enviar el correo con el archivo adjunto
+        Mail::to($mainEmail)
+            ->cc($cco)
+            ->send(new ReportEmail($subject, $description, $filePath));
+    }
+
+    // funciones privadas
     private function getItemsByDateRange($dates)
     {
         $start = Carbon::parse($dates[0])->subHours(6)->toDateTimeString();

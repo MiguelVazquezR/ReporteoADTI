@@ -120,12 +120,15 @@
                     </div>
                     <div class="mt-3">
                         <InputLabel value="Adjunto" />
-                        <p class="text-secondary text-xs">Reporte Robag 03_ago_2024 a 23_ago_2024.xls</p>
+                        <p class="text-secondary text-xs">{{ getFileName() }}</p>
                     </div>
                 </form>
             </template>
             <template #footer>
-                <PrimaryButton @click="sendEmail">Enviar correo</PrimaryButton>
+                <PrimaryButton @click="sendEmail" :disabled="emailForm.processing">
+                    <i v-if="emailForm.processing" class="fa-solid fa-circle-notch fa-spin mr-2"></i>
+                    Enviar correo
+                </PrimaryButton>
             </template>
         </DialogModal>
     </PublicLayout>
@@ -190,8 +193,28 @@ export default {
 
     },
     methods: {
+        getFileName() {
+            const now = new Date();
+            return `reporte_robag_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}.xlsx`;
+        },
         sendEmail() {
-
+            this.emailForm.transform(data => ({
+                ...data,
+                dates: this.searchDate,
+            })).post(route('robag.email-report'), {
+                onSuccess: () => {
+                    this.showEmailModal = false;
+                    this.emailForm.reset();
+                    this.$notify({
+                        title: 'Correo enviado',
+                        message: '',
+                        type: 'success'
+                    })
+                },
+                onError: (error) => {
+                    console.log(error);
+                },
+            });
         },
         handleStartDateChange(value) {
             this.startDate = value;
