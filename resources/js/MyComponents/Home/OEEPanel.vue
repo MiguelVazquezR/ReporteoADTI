@@ -259,6 +259,11 @@ watch:{
             this.availabilityPercentage = [0]; //Disponibilidad
             this.performancePercentage = [0]; //porcentaje de Tiempo de producción
             this.quality = [0]; //calidad
+            this.productionTime = null; //tiempo en minutos de el tiempo de produccion.
+            this.realProduction = null; //bolsas por minuto reales en que trabaja la maquina
+            this.totalBags = null; //total de bolsas producidas/empacadas
+            this.totalWasteBags = null; //total de bolsas malas producidas/empacadas
+            this.totalGoodBags = null; //total de bolsas buenas producidas/empacadas
         }
     }
 },
