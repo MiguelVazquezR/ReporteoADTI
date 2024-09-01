@@ -149,5 +149,7 @@ return [
         'subject' => 'asunto',
         'description' => 'descripción',
         'main_email' => 'correo destinatario',
+        'date' => 'fecha',
+        'time' => 'hora',
     ],
 ];

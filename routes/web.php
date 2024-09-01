@@ -2,15 +2,18 @@
 
 use App\Http\Controllers\MachineVariableController;
 use App\Http\Controllers\RobagDataController;
+use App\Http\Controllers\ScheduleEmailController;
 use App\Models\RobagData;
+use App\Models\ScheduleEmail;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    // $today_data = RobagData::whereDate('created_at', today())->get();
+    $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag');
 
     return Inertia::render('Home', [
+        'schedule_settings' => $schedule_settings
         // 'canLogin' => Route::has('login'),
         // 'canRegister' => Route::has('register'),
         // 'laravelVersion' => Application::VERSION,
@@ -37,3 +40,6 @@ Route::resource('machine-variables', MachineVariableController::class);
 Route::get('robag-export-report', [RobagDataController::class, 'generateReport'])->name('robag.export-report');
 Route::post('robag-get-data-by-date-range', [RobagDataController::class, 'getDataByDateRange'])->name('robag.get-data-by-date-range');
 Route::post('robag-email-report', [RobagDataController::class, 'emailReport'])->name('robag.email-report');
+
+// --------------- rutas de configuraciones de programacion de correo -------------------------
+Route::resource('schedule-email-settings', ScheduleEmailController::class);
