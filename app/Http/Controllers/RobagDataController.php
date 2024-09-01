@@ -14,9 +14,8 @@ use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Title;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use App\Mail\ReportEmail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-
-use function PHPUnit\Framework\isNull;
 
 class RobagDataController extends Controller
 {
@@ -72,11 +71,20 @@ class RobagDataController extends Controller
 
     public function generateReport($saveToStorage = false, $dates = null)
     {
-        if (isNull($dates)) {
+        if (is_null($dates) && request('dates')) {
             $dates = request('dates');
+        } else {
+            // rango de fechas por defecto para evitar errores
+            $dates = [
+                today()->startOfDay()->addHours(6)->toDateTimeString(), // Fecha de hoy a las 00:00
+                now()->addHours(6)->toDateTimeString(),                 // Fecha de hoy con la hora actual
+            ];
         }
 
         $items = $this->getItemsByDateRange($dates);
+
+        // si no hay elementos para generar reporte salgo del metodo
+        if (!$items->count()) return null;
 
         $spreadsheet = new Spreadsheet();
 
