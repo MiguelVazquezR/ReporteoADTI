@@ -85,6 +85,7 @@
                                                 <div class="flex flex-col">
                                                     <h4 class="font-bold text-gray37">CCO</h4>
                                                     <span v-for="(item, index) in schedule_settings.cco" :key="index">{{ item }}</span>
+                                                    <span v-if="!schedule_settings.cco.length">No hay cuentas copiadas al correo</span>
                                                 </div>
                                                 <hr class="border border-grayD9 my-3">
                                                 <div>
