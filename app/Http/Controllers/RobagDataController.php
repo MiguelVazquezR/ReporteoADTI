@@ -116,7 +116,7 @@ class RobagDataController extends Controller
                 mkdir($directoryPath, 0755, true);
             }
 
-            // Guardar el archivo en la carpeta storage/app/reports
+            // Guardar el archivo en la carpeta storage/app/reports para poder adjuntarlo en correo
             $filePath = $directoryPath . '/' . $fileName;
             $writer->save($filePath);
 

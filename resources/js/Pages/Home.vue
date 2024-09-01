@@ -18,9 +18,11 @@
                         <div class="flex items-center space-x-4 lg:-left-40 z-10">
                             <div v-if="isMobile" class="flex items-center space-x-2">
                                 <el-date-picker @change="handleStartDateChange" :disabled-date="disabledPrevDays"
-                                    v-model="startDate" type="date" class="!w-1/2" placeholder="Inicio" format="DD MMM, YY h:mmA" size="small" />
+                                    v-model="startDate" type="date" class="!w-1/2" placeholder="Inicio"
+                                    format="DD MMM, YY h:mmA" size="small" />
                                 <el-date-picker @change="handleFinishDateChange" :disabled-date="disabledNextDays"
-                                    v-model="finishDate" type="date" class="!w-1/2" placeholder="Final" format="DD MMM, YY h:mmA" size="small" />
+                                    v-model="finishDate" type="date" class="!w-1/2" placeholder="Final"
+                                    format="DD MMM, YY h:mmA" size="small" />
                             </div>
                             <div v-else>
                                 <el-date-picker @change="getDataByDateRange" v-model="searchDate" type="datetimerange"
@@ -29,23 +31,78 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-col items-center space-x-3 w-1/4">
-                            <InputLabel>
-                                Producción teórica ({{ bpm }} BPM)
-                            </InputLabel>
-                            <!-- <el-input v-model="bpm" min="1" max="200" type="number" /> -->
-                            <el-slider @change="bpmUpdated = true" v-model="bpm" :min="50" :max="150" :step="5"
-                                show-stops :disabled="!data.length" />
-                        </div>
-
-                        <!-- Boton para generar reporte -->
-                        <div>
+                        <!-- Botones -->
+                        <div class="flex items-center justify-end space-x-2">
                             <el-dropdown split-button type="primary" @click="exportReport"
-                                @command="handleDropdownCommand">
+                                @command="handleDropdownCommand" :disabled="!data.length">
                                 Generar reporte
                                 <template #dropdown>
                                     <el-dropdown-menu>
                                         <el-dropdown-item command="email">Enviar por correo</el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
+                            <el-dropdown trigger="click">
+                                <button
+                                    class="flex items-center justify-center text-secondary rounded-full bg-grayED size-8 focus:border-0 focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+                                </button>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <h2 class="flex items-center space-x-1 font-bold text-secondary mx-4 mt-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                            </svg>
+                                            <span>Configuraciones</span>
+                                        </h2>
+                                        <div class="mx-3 mt-4">
+                                            <h3 class="font-bold mx-3">
+                                                Producción teórica ({{ bpm }} BPM)
+                                            </h3>
+                                            <el-slider @change="bpmUpdated = true" v-model="bpm" :min="50" :max="150"
+                                                :step="5" show-stops :disabled="!data.length" />
+                                        </div>
+                                        <h2 class="flex items-center space-x-2 font-bold mt-2 mx-6">
+                                            Envio de reporte automático
+                                        </h2>
+                                        <section @click="openScheduleSettings"
+                                            class="group w-96 rounded-[10px] bg-[#E5F4FB] px-4 py-2 mx-3 mb-2 grid grid-cols-10 cursor-pointer hover:bg-[#daeef8]">
+                                            <article v-if="schedule_settings" class="col-span-9">
+                                                <div>
+                                                    <h4 class="font-bold text-gray37">Correo electrónico</h4>
+                                                    <span>{{ schedule_settings.main_email }}</span>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <h4 class="font-bold text-gray37">CCO</h4>
+                                                    <span v-for="(item, index) in schedule_settings.cco" :key="index">{{ item }}</span>
+                                                </div>
+                                                <hr class="border border-grayD9 my-3">
+                                                <div>
+                                                    <h4 class="font-bold text-gray37">Frecuencia de envío</h4>
+                                                    <span>{{ schedule_settings.frecuency }}</span>
+                                                </div>
+                                            </article>
+                                            <article v-else class="col-span-9">
+                                                <p class="text-center">
+                                                    No hay programación de correos aún. <br>
+                                                    Da Clic para crear una
+                                                </p>
+                                            </article>
+                                            <article
+                                                class="text-center flex items-center justify-end transform transition-transform group-hover:scale-110 group-hover:translate-x-1">
+                                                <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
+                                            </article>
+                                        </section>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -108,8 +165,6 @@
                         <InputLabel value="CCO" />
                         <el-select v-model="emailForm.cco" multiple filterable allow-create default-first-option
                             :reserve-keyword="false" placeholder="Agrega cualquier correo y presiona enter">
-                            <el-option v-for="item in ccoList" :key="item.value" :label="item.label"
-                                :value="item.value" />
                         </el-select>
                         <InputError :message="emailForm.errors.cco" />
                     </div>
@@ -121,7 +176,7 @@
                     <div class="mt-3">
                         <InputLabel value="Descripción del correo" />
                         <el-input v-model="emailForm.description" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
-                            placeholder="Escribe una descripción del producto si es necesario" clearable />
+                            placeholder="Escribe una descripción si es necesario" clearable />
                         <InputError :message="emailForm.errors.description" />
                     </div>
                     <div class="mt-3">
@@ -188,7 +243,6 @@ export default {
             loading: false,
             bpm: 120, //bpm a maxima velocidad ajustable
             data: [],
-            ccoList: [],
             activeTab: '1',
             searchDate: null,
             startDate: null, //vista movil
@@ -211,9 +265,19 @@ export default {
         InputLabel,
     },
     props: {
-
+        schedule_settings: {
+            type: Object,
+            default: null,
+        }
     },
     methods: {
+        openScheduleSettings() {
+            if (this.schedule_settings === null) {
+                this.$inertia.get(route('schedule-email-settings.create'));
+            } else {
+                this.$inertia.get(route('schedule-email-settings.edit', this.schedule_settings));
+            }
+        },
         getFileName() {
             const now = new Date();
             return `reporte_robag_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}.xlsx`;
