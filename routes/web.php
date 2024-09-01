@@ -1,15 +1,24 @@
 <?php
 
+use App\Http\Controllers\MachineVariableController;
+use App\Http\Controllers\RobagDataController;
+use App\Http\Controllers\ScheduleEmailController;
+use App\Models\RobagData;
+use App\Models\ScheduleEmail;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag');
+
     return Inertia::render('Home', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'schedule_settings' => $schedule_settings
+        // 'canLogin' => Route::has('login'),
+        // 'canRegister' => Route::has('register'),
+        // 'laravelVersion' => Application::VERSION,
+        // 'phpVersion' => PHP_VERSION,
+        // 'today_data' => $today_data,
     ]);
 })->name('home');
 
@@ -22,3 +31,15 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 });
+
+// ------- maquinas y sus variables rutas --------
+Route::resource('machine-variables', MachineVariableController::class);
+
+
+//--------------- robag data routes ------------------
+Route::get('robag-export-report', [RobagDataController::class, 'generateReport'])->name('robag.export-report');
+Route::post('robag-get-data-by-date-range', [RobagDataController::class, 'getDataByDateRange'])->name('robag.get-data-by-date-range');
+Route::post('robag-email-report', [RobagDataController::class, 'emailReport'])->name('robag.email-report');
+
+// --------------- rutas de configuraciones de programacion de correo -------------------------
+Route::resource('schedule-email-settings', ScheduleEmailController::class);
