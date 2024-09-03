@@ -1,7 +1,14 @@
 <?php
 
+use App\Models\RobagData;
+use App\Services\ModbusService;
 use Illuminate\Support\Facades\Schedule;
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
 
 Schedule::command('reports:send-scheduled-emails')->everyTwoMinutes();
+
+// leer datos de maquina 'Robag' cada 5 minutos y guardar en BDD local
+Schedule::call(function () {
+    $modbuService = new ModbusService('Robag');
+    $data = $modbuService->getMachineData();
+    RobagData::create($data);
+})->everyFiveMinutes();

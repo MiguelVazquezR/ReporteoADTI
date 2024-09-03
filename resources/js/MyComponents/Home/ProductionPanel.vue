@@ -77,7 +77,7 @@ export default {
                     goals: [
                         {
                             name: 'Esperado',
-                            value: 8000,  // Aquí puedes personalizar o calcular el valor esperado
+                            value: 120 * 60 * 8,  // Aquí puedes personalizar o calcular el valor esperado
                             strokeHeight: 5,
                             strokeColor: '#077B27'
                         }

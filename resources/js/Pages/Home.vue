@@ -84,8 +84,10 @@
                                                 </div>
                                                 <div class="flex flex-col">
                                                     <h4 class="font-bold text-gray37">CCO</h4>
-                                                    <span v-for="(item, index) in schedule_settings.cco" :key="index">{{ item }}</span>
-                                                    <span v-if="!schedule_settings.cco.length">No hay cuentas copiadas al correo</span>
+                                                    <span v-for="(item, index) in schedule_settings.cco" :key="index">{{
+                                                        item }}</span>
+                                                    <span v-if="!schedule_settings.cco.length">No hay cuentas copiadas
+                                                        al correo</span>
                                                 </div>
                                                 <hr class="border border-grayD9 my-3">
                                                 <div>
@@ -102,6 +104,51 @@
                                             <article
                                                 class="text-center flex items-center justify-end transform transition-transform group-hover:scale-110 group-hover:translate-x-1">
                                                 <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
+                                            </article>
+                                        </section>
+                                        <h2 class="flex items-center justify-between mt-2 mx-6">
+                                            <span class="font-bold">Configuración de Modbus</span>
+                                            <div v-if="editModbusConfig" class="flex items-center space-x-1">
+                                                <PrimaryButton @click="calncelEditingModbusConf"
+                                                    class="!text-[10px] !py-px !px-2 !bg-grayED !text-secondary"
+                                                    :disabled="modbusForm.processing">Cancelar</PrimaryButton>
+                                                <PrimaryButton @click="updateModbusConf"
+                                                    class="!text-[10px] !py-px !px-2" :disabled="modbusForm.processing || !modbusForm.port || !modbusForm.host">
+                                                    Guardar</PrimaryButton>
+                                            </div>
+                                            <button v-else @click="editModbusConfig = true"
+                                                class="size-5 flex items-center justify-center rounded-full bg-grayED text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="1.5" stroke="currentColor" class="size-3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                                </svg>
+                                            </button>
+                                        </h2>
+                                        <section v-if="editModbusConfig" class=" mx-3 mb-2 px-4">
+                                            <article class="*:grid *:grid-cols-3 *:mb-1 mt-2">
+                                                <div>
+                                                    <span>IP</span>
+                                                    <el-input v-model="modbusForm.host" placeholder="Ej. 127.0.0.1"
+                                                        class="col-span-2" />
+                                                </div>
+                                                <div>
+                                                    <span>Puerto</span>
+                                                    <el-input v-model="modbusForm.port" placeholder="Ej. 502"
+                                                        class="col-span-2" />
+                                                </div>
+                                            </article>
+                                        </section>
+                                        <section v-else class=" mx-3 mb-2 px-4">
+                                            <article class="*:grid *:grid-cols-3 *:mb-1 mt-2">
+                                                <div>
+                                                    <span>IP</span>
+                                                    <span>{{ modbusForm.host }}</span>
+                                                </div>
+                                                <div>
+                                                    <span>Puerto</span>
+                                                    <span>{{ modbusForm.port }}</span>
+                                                </div>
                                             </article>
                                         </section>
                                     </el-dropdown-menu>
@@ -197,7 +244,6 @@
                             </svg>
                             <span class="text-secondary">Reporte Robag</span>
                         </p>
-                        <!-- <p class="text-secondary text-xs">{{ getFileName() }}</p> -->
                     </div>
                 </form>
             </template>
@@ -235,13 +281,22 @@ export default {
             description: null,
         });
 
+        const modbusForm = useForm({
+            host: this.modbus_configurations.host,
+            port: this.modbus_configurations.port,
+            machine: 'Robag',
+        });
+
         return {
             // formularios
             emailForm,
+            modbusForm,
             // modales
             showEmailModal: false,
-            // general
+            // cargas
             loading: false,
+            // general
+            editModbusConfig: false,
             bpm: 120, //bpm a maxima velocidad ajustable
             data: [],
             activeTab: '1',
@@ -269,9 +324,28 @@ export default {
         schedule_settings: {
             type: Object,
             default: null,
-        }
+        },
+        modbus_configurations: Object,
     },
     methods: {
+        calncelEditingModbusConf() {
+            this.editModbusConfig = false;
+            this.modbusForm.reset();
+        },
+        updateModbusConf() {
+            this.modbusForm.put(route('modbus-configuration.update', this.modbus_configurations), {
+                onSuccess: () => {
+                    this.$notify({
+                        title: "Configuraciones de modbus actualizadas",
+                        message: "",
+                        type: "success"
+                    })
+                },
+                onFinish: () => {
+                    this.editModbusConfig = false;
+                }
+            });
+        },
         openScheduleSettings() {
             if (this.schedule_settings === null) {
                 this.$inertia.get(route('schedule-email-settings.create'));
