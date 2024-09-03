@@ -1,19 +1,21 @@
 <?php
 
 use App\Http\Controllers\MachineVariableController;
+use App\Http\Controllers\ModbusConfigurationController;
 use App\Http\Controllers\RobagDataController;
 use App\Http\Controllers\ScheduleEmailController;
-use App\Models\RobagData;
+use App\Models\ModbusConfiguration;
 use App\Models\ScheduleEmail;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag');
+    $modbus_configurations = ModbusConfiguration::firstWhere('machine', 'Robag');
 
     return Inertia::render('Home', [
-        'schedule_settings' => $schedule_settings
+        'schedule_settings' => $schedule_settings,
+        'modbus_configurations' => $modbus_configurations,
         // 'canLogin' => Route::has('login'),
         // 'canRegister' => Route::has('register'),
         // 'laravelVersion' => Application::VERSION,
@@ -41,5 +43,10 @@ Route::get('robag-export-report', [RobagDataController::class, 'generateReport']
 Route::post('robag-get-data-by-date-range', [RobagDataController::class, 'getDataByDateRange'])->name('robag.get-data-by-date-range');
 Route::post('robag-email-report', [RobagDataController::class, 'emailReport'])->name('robag.email-report');
 
+
 // --------------- rutas de configuraciones de programacion de correo -------------------------
 Route::resource('schedule-email-settings', ScheduleEmailController::class);
+
+
+//--------------- rutas configuracon de modbus ----------------------
+Route::resource('/modbus-configuration', ModbusConfigurationController::class);

@@ -41,7 +41,7 @@ class RobagDataController extends Controller
         // Responder con un mensaje de éxito
         return response()->json(['message' => 'Datos guardados correctamente'], 200);
     }
-
+    
     public function show(RobagData $robagData)
     {
         //
@@ -268,8 +268,8 @@ class RobagDataController extends Controller
             $formattedDate = Carbon::parse($date)->format('d M, y');
 
             // Obtener la meta para este día
-            // Asume que $metaValues tiene las metas en el mismo orden de las fechas en los registros
-            $metaValue = 36000;
+            // bpm * 60min * hrs laborles de maquina
+            $metaValue = 120 * 60 * 8;
 
             // Agregar la fila al resultado
             $result[] = [$formattedDate, $maxFullBags, $metaValue];
