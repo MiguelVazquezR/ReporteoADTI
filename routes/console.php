@@ -10,5 +10,7 @@ Schedule::command('reports:send-scheduled-emails')->everyTwoMinutes();
 Schedule::call(function () {
     $modbuService = new ModbusService('Robag');
     $data = $modbuService->getMachineData();
-    RobagData::create($data);
-})->everyFiveMinutes();
+    if ($data) {
+        RobagData::create($data);
+    }
+})->everyTwoMinutes();

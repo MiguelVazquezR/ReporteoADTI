@@ -49,6 +49,7 @@ class ModbusService
 
             return $data;
         } catch (ModbusException $e) {
+            return null;
             // datos de prueba
             return [
                 "status" => "running",
@@ -89,7 +90,6 @@ class ModbusService
                 "average_weight_in_ready_heads" => 50.1,
                 "short_term_scale_efficiency_percentage" => 93.0
             ];
-            // return null;
             // return ['error' => $e->getMessage()];
         } finally {
             $this->connection->close();
