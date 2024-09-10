@@ -15,5 +15,7 @@ class MachineVariable extends Model
         'variable_original_name',
         'variable_description',
         'variable_address',
+        'type',
+        'words',
     ];
 }
