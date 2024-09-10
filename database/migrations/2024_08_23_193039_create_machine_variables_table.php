@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('variable_original_name');
             $table->text('variable_description')->nullable();
             $table->text('variable_address')->nullable();
+            $table->unsignedTinyInteger('words')->default(2);
+            $table->string('type')->default('float');
             $table->timestamps();
         });
     }
