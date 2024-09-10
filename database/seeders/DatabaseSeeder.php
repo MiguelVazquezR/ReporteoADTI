@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             MachineVariableSeeder::class,
         ]);
 
-        // RobagData::factory()->count(500)->create();
+        //RobagData::factory()->count(500)->create();
 
     }
     
