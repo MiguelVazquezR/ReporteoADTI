@@ -50,3 +50,4 @@ Route::resource('schedule-email-settings', ScheduleEmailController::class);
 
 //--------------- rutas configuracon de modbus ----------------------
 Route::resource('/modbus-configuration', ModbusConfigurationController::class);
+Route::get('/modbus-configuration-test', [ModbusConfigurationController::class, 'readModbusData']);

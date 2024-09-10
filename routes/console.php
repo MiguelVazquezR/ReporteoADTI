@@ -13,4 +13,4 @@ Schedule::call(function () {
     if ($data) {
         RobagData::create($data);
     }
-})->everyTwoMinutes();
+})->everyFiveMinutes();
