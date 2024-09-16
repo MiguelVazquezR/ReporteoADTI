@@ -36,6 +36,7 @@ Route::middleware([
 
 // ------- maquinas y sus variables rutas --------
 Route::resource('machine-variables', MachineVariableController::class);
+Route::post('machine-variables/massive-delete', [MachineVariableController::class, 'massiveDelete'])->name('machine-variables.massive-delete');
 
 
 //--------------- robag data routes ------------------

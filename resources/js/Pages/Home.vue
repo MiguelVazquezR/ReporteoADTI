@@ -139,7 +139,7 @@
                                                 </div>
                                             </article>
                                         </section>
-                                        <section v-else class=" mx-3 mb-2 px-4">
+                                        <section v-else class="mx-3 mb-2 px-4">
                                             <article class="*:grid *:grid-cols-3 *:mb-1 mt-2">
                                                 <div>
                                                     <span>IP</span>
@@ -151,6 +151,12 @@
                                                 </div>
                                             </article>
                                         </section>
+                                        <p class="grid grid-cols-3 mx-3 mb-2 px-4">
+                                            <span>Variables</span>
+                                            <Link :href="route('machine-variables.index')" class="text-primary">
+                                                Ir a configurar
+                                            </Link>
+                                        </p>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -267,7 +273,7 @@ import VelocityPanel from '@/MyComponents/Home/VelocityPanel.vue';
 import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
 import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
 import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
-import { useForm } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 import DialogModal from '@/Components/DialogModal.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -319,6 +325,7 @@ export default {
         DialogModal,
         InputError,
         InputLabel,
+        Link,
     },
     props: {
         schedule_settings: {

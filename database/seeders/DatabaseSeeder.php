@@ -29,7 +29,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         //RobagData::factory()->count(500)->create();
-
     }
     
 }

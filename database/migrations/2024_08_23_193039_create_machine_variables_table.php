@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('machine_name');
             $table->string('variable_name');
-            $table->string('variable_original_name');
+            $table->string('variable_original_name')->nullable();
             $table->text('variable_description')->nullable();
-            $table->text('variable_address')->nullable();
+            $table->string('variable_address')->nullable();
             $table->unsignedTinyInteger('words')->default(2);
             $table->string('type')->default('float');
             $table->timestamps();
