@@ -3,7 +3,7 @@
         <!-- Botones -->
         <section class="flex items-center justify-end space-x-2 mt-6 lg:px-14">
             <el-dropdown split-button type="primary" @click="exportReport" @command="handleDropdownCommand"
-                :disabled="!data.length">
+                :disabled="!searchDate.length">
                 Generar reporte
                 <template #dropdown>
                     <el-dropdown-menu>
@@ -37,8 +37,8 @@
                             <h3 class="font-bold mx-3">
                                 Producción teórica ({{ bpm }} BPM)
                             </h3>
-                            <el-slider @change="bpmUpdated = true" v-model="bpm" :min="50" :max="150" :step="5"
-                                show-stops :disabled="!data.length" />
+                            <el-slider v-model="bpm" :min="50" :max="150" :step="5" show-stops
+                                :disabled="!searchDate.length" />
                         </div>
                         <h2 class="flex items-center space-x-2 font-bold mt-2 mx-6">
                             Envio de reporte automático
@@ -128,13 +128,14 @@
                 </template>
             </el-dropdown>
         </section>
+        <!-- pestañas -->
         <main class="lg:px-14">
             <el-tabs v-model="activeTab" @tab-click="handleClick">
                 <el-tab-pane name="1">
                     <template #label>
                         <span>Reporte general</span>
                     </template>
-                    <General :bpm="bpm" />
+                    <General @updated-dates="searchDate = $event" :bpm="bpm" />
                 </el-tab-pane>
                 <el-tab-pane name="2">
                     <template #label>
@@ -206,18 +207,10 @@
 <script>
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import OEEPanel from '@/MyComponents/Home/OEEPanel.vue';
-import TimePanel from '@/MyComponents/Home/TimePanel.vue';
-import ProductionPanel from '@/MyComponents/Home/ProductionPanel.vue';
-import VelocityPanel from '@/MyComponents/Home/VelocityPanel.vue';
-import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
-import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
-import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import DialogModal from '@/Components/DialogModal.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-
 import General from './Tabs/General.vue';
 import Variables from './Tabs/Variables.vue';
 
@@ -247,29 +240,17 @@ export default {
             loading: false,
             // general
             editModbusConfig: false,
-            data: [],
+            searchDate: [],
             activeTab: '1',
-            searchDate: null,
-            startDate: null, //vista movil
-            finishDate: null, //vista movil
-            bpmUpdated: false, //bandera que dispara evento de calculo de OEE cuando se cambia el bpm
         }
     },
     components: {
         PublicLayout,
         PrimaryButton,
-        ProductionPanel,
-        DesviacionPanel,
-        VelocityPanel,
-        ScalePanel,
-        TimePanel,
-        FilmPanel,
-        OEEPanel,
         DialogModal,
         InputError,
         InputLabel,
         Link,
-
         General,
         Variables,
     },
@@ -313,10 +294,6 @@ export default {
                 this.$inertia.get(route('schedule-email-settings.edit', this.schedule_settings));
             }
         },
-        // getFileName() {
-        //     const now = new Date();
-        //     return `reporte_robag_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}.xlsx`;
-        // },
         sendEmail() {
             this.emailForm.transform(data => ({
                 ...data,
@@ -336,32 +313,6 @@ export default {
                 },
             });
         },
-        // handleStartDateChange(value) {
-        //     this.startDate = value;
-        //     // Si finishDate es nulo, aplica la regla de deshabilitación
-        //     if (!this.finishDate) {
-        //         this.disabledPrevDays();
-        //     }
-        // },
-        // handleFinishDateChange(value) {
-        //     this.finishDate = value;
-        //     // Si startDate es nulo, aplica la regla de deshabilitación
-        //     if (!this.startDate) {
-        //         this.disabledNextDays();
-        //     }
-        // },
-        // disabledPrevDays(date) {
-        //     if (this.finishDate) {
-        //         return date.getTime() > new Date(this.finishDate).getTime();
-        //     }
-        //     return false;
-        // },
-        // disabledNextDays(date) {
-        //     if (this.startDate) {
-        //         return date.getTime() < new Date(this.startDate).getTime();
-        //     }
-        //     return false;
-        // },
         handleDropdownCommand(command) {
             if (command == 'email') {
                 this.showEmailModal = true;
@@ -371,20 +322,6 @@ export default {
             const url = route('robag.export-report', { dates: this.searchDate });
             window.open(url, '_blank');
         },
-        async getDataByDateRange() {
-            this.loading = true;
-            try {
-                const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.searchDate });
-                if (response.status === 200) {
-                    this.data = response.data.data;
-                }
-
-            } catch (error) {
-                console.log(error)
-            } finally {
-                this.loading = false;
-            }
-        }
     },
     computed: {
         isMobile() {
@@ -401,21 +338,5 @@ export default {
             this.activeTab = currentTabFromURL;
         }
     },
-    created() {
-        const today = new Date(); // Obtiene la fecha y hora actuales
-
-        // Crear la primera fecha con la hora 6:00 AM
-        const startDate = new Date(today);
-        startDate.setHours(6, 0, 0, 0); // Establecer hora a 6:00 AM
-
-        // Crear la segunda fecha con la hora actual
-        const endDate = new Date(today);
-        endDate.setHours(today.getHours(), today.getMinutes(), today.getSeconds(), today.getMilliseconds()); // Establecer la hora actual
-
-        // Inicializar searchDate con las dos fechas
-        this.searchDate = [startDate, endDate];
-
-        this.getDataByDateRange(); // Recupera los registros del día de hoy
-    }
 }
 </script>

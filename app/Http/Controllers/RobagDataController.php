@@ -62,6 +62,21 @@ class RobagDataController extends Controller
         //
     }
 
+    public function getVariableData()
+    {
+        $date = request('date');
+        $time_range = request('timeRange');
+
+        $startDate = Carbon::parse($date . ' ' . $time_range[0])->addHours(6);
+        $endDate = Carbon::parse($date . ' ' . $time_range[1])->addHours(6);
+
+        $dates = array($startDate, $endDate);
+
+        $items = $this->getItemsByDateRange($dates);
+
+        return response()->json(compact('items'));
+    }
+
     public function getDataByDateRange(Request $request)
     {
         $data = $this->getItemsByDateRange($request->date);

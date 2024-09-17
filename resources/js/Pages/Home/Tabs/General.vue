@@ -28,16 +28,14 @@
             </div>
 
             <h1 v-if="!data.length" class="text-blue-600 font-bold text-sm text-center py-1 mt-2 bg-blue-100">
-                *No hay datos para
-                este intervalo de tiempo</h1>
+                *No hay datos para este intervalo de tiempo
+            </h1>
 
             <!-- graficas en rectangulo negro -->
-            <OEEPanel :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm"
-                :bpmUpdated="bpmUpdated" @finished-bpm-updated="bpmUpdated = false" />
+            <OEEPanel ref="oeePanel" :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm" />
 
             <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
             <div class="mt-4 space-y-4">
-
                 <!-- primer fila -->
                 <div class="flex space-x-4">
                     <!-- Tiempos -->
@@ -69,7 +67,6 @@
     </section>
 </template>
 <script>
-import PrimaryButton from '@/Components/PrimaryButton.vue';
 import OEEPanel from '@/MyComponents/Home/OEEPanel.vue';
 import TimePanel from '@/MyComponents/Home/TimePanel.vue';
 import ProductionPanel from '@/MyComponents/Home/ProductionPanel.vue';
@@ -77,10 +74,6 @@ import VelocityPanel from '@/MyComponents/Home/VelocityPanel.vue';
 import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
 import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
 import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
-import { Link, useForm } from '@inertiajs/vue3';
-import DialogModal from '@/Components/DialogModal.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
 
 export default {
     data() {
@@ -91,17 +84,13 @@ export default {
             loading: false,
             // general
             editModbusConfig: false,
-            // bpm: 120, //bpm a maxima velocidad ajustable
             data: [],
-            activeTab: '1',
             searchDate: null,
             startDate: null, //vista movil
             finishDate: null, //vista movil
-            bpmUpdated: false, //bandera que dispara evento de calculo de OEE cuando se cambia el bpm
         }
     },
     components: {
-        PrimaryButton,
         ProductionPanel,
         DesviacionPanel,
         VelocityPanel,
@@ -109,68 +98,17 @@ export default {
         TimePanel,
         FilmPanel,
         OEEPanel,
-        DialogModal,
-        InputError,
-        InputLabel,
-        Link,
     },
+    emits: ['updated-dates'],
     props: {
         bpm: Number,
-        // schedule_settings: {
-        //     type: Object,
-        //     default: null,
-        // },
-        // modbus_configurations: Object,
+    },
+    watch: {
+        bpm() {
+            this.$refs.oeePanel.updateOEEData();
+        }
     },
     methods: {
-        // calncelEditingModbusConf() {
-        //     this.editModbusConfig = false;
-        //     this.modbusForm.reset();
-        // },
-        // updateModbusConf() {
-        //     this.modbusForm.put(route('modbus-configuration.update', this.modbus_configurations), {
-        //         onSuccess: () => {
-        //             this.$notify({
-        //                 title: "Configuraciones de modbus actualizadas",
-        //                 message: "",
-        //                 type: "success"
-        //             })
-        //         },
-        //         onFinish: () => {
-        //             this.editModbusConfig = false;
-        //         }
-        //     });
-        // },
-        // openScheduleSettings() {
-        //     if (this.schedule_settings === null) {
-        //         this.$inertia.get(route('schedule-email-settings.create'));
-        //     } else {
-        //         this.$inertia.get(route('schedule-email-settings.edit', this.schedule_settings));
-        //     }
-        // },
-        // getFileName() {
-        //     const now = new Date();
-        //     return `reporte_robag_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}.xlsx`;
-        // },
-        // sendEmail() {
-        //     this.emailForm.transform(data => ({
-        //         ...data,
-        //         dates: this.searchDate,
-        //     })).post(route('robag.email-report'), {
-        //         onSuccess: () => {
-        //             this.showEmailModal = false;
-        //             this.emailForm.reset();
-        //             this.$notify({
-        //                 title: 'Correo enviado',
-        //                 message: '',
-        //                 type: 'success'
-        //             })
-        //         },
-        //         onError: (error) => {
-        //             console.log(error);
-        //         },
-        //     });
-        // },
         handleStartDateChange(value) {
             this.startDate = value;
             // Si finishDate es nulo, aplica la regla de deshabilitación
@@ -197,21 +135,16 @@ export default {
             }
             return false;
         },
-        // handleDropdownCommand(command) {
-        //     if (command == 'email') {
-        //         this.showEmailModal = true;
-        //     }
-        // },
-        // exportReport() {
-        //     const url = route('robag.export-report', { dates: this.searchDate });
-        //     window.open(url, '_blank');
-        // },
         async getDataByDateRange() {
             this.loading = true;
             try {
                 const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.searchDate });
                 if (response.status === 200) {
                     this.data = response.data.data;
+                    this.$emit(
+                        'updated-dates',
+                        this.data.length ? this.searchDate : []
+                    );
                 }
 
             } catch (error) {
