@@ -13,7 +13,7 @@ Route::get('/', function () {
     $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag');
     $modbus_configurations = ModbusConfiguration::firstWhere('machine', 'Robag');
 
-    return Inertia::render('Home', [
+    return Inertia::render('Home/Home', [
         'schedule_settings' => $schedule_settings,
         'modbus_configurations' => $modbus_configurations,
         // 'canLogin' => Route::has('login'),
@@ -37,6 +37,7 @@ Route::middleware([
 // ------- maquinas y sus variables rutas --------
 Route::resource('machine-variables', MachineVariableController::class);
 Route::post('machine-variables/massive-delete', [MachineVariableController::class, 'massiveDelete'])->name('machine-variables.massive-delete');
+Route::get('machine-variables-get-variables/{machine}', [MachineVariableController::class, 'getVariables'])->name('machine-variables.get-variables');
 
 
 //--------------- robag data routes ------------------

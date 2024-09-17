@@ -78,4 +78,11 @@ class MachineVariableController extends Controller
             }
         }
     }
+
+    public function getVariables($machine)
+    {
+        $items = MachineVariable::where('machine_name', $machine)->get();
+
+        return response()->json(compact('items'));
+    }
 }
