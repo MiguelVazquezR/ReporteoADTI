@@ -62,24 +62,25 @@ class RobagDataController extends Controller
         //
     }
 
-    public function getVariableData()
-    {
-        $date = request('date');
-        $time_range = request('timeRange');
+    // public function getVariableData()
+    // {
+    //     $date = request('date');
+    //     $time_range = request('timeRange');
 
-        $startDate = Carbon::parse($date . ' ' . $time_range[0])->addHours(6);
-        $endDate = Carbon::parse($date . ' ' . $time_range[1])->addHours(6);
+    //     $startDate = Carbon::parse($date . ' ' . $time_range[0])->addHours(6);
+    //     $endDate = Carbon::parse($date . ' ' . $time_range[1])->addHours(6);
 
-        $dates = array($startDate, $endDate);
+    //     $dates = array($startDate, $endDate);
 
-        $items = $this->getItemsByDateRange($dates);
+    //     $items = $this->getItemsByDateRange($dates);
 
-        return response()->json(compact('items'));
-    }
+    //     return response()->json(compact('items'));
+    // }
 
     public function getDataByDateRange(Request $request)
     {
-        $data = $this->getItemsByDateRange($request->date);
+        $subHours = request('subHours');
+        $data = $this->getItemsByDateRange($request->date, $subHours);
 
         return response()->json(compact('data'));
     }
@@ -801,10 +802,10 @@ class RobagDataController extends Controller
     }
 
     // funciones privadas
-    private function getItemsByDateRange($dates)
+    private function getItemsByDateRange($dates, $subHours = 6)
     {
-        $start = Carbon::parse($dates[0])->subHours(6)->toDateTimeString();
-        $end = Carbon::parse($dates[1])->subHours(6)->toDateTimeString();
+        $start = Carbon::parse($dates[0])->subHours($subHours)->toDateTimeString();
+        $end = Carbon::parse($dates[1])->subHours($subHours)->toDateTimeString();
 
         // Ventas y gastos de la semana seleccionada
         $items = RobagData::whereBetween('created_at', [$start, $end])

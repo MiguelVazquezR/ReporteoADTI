@@ -18,9 +18,15 @@
                             Configurar variables
                         </button>
                     </h1>
-                    <div class="flex flex-col">
-                        <el-checkbox v-for="variable in variables" :key="variable.id" v-model="selectedVariables"
-                            :label="variable.variable_name" size="small" />
+                    <div class="flex flex-col ml-1">
+                        <label v-for="variable in variables" :key="variable.id"
+                            class="flex items-center text-sm cursor-pointer mt-px">
+                            <input type="checkbox" v-model="selectedVariables" name="var"
+                                :value="variable.variable_name" class="rounded-[3px] text-primary focus:ring-primary cursor-pointer" />
+                            <span class="ms-2 text-sm text-secondary">{{ variable.variable_name }}</span>
+                        </label>
+                        <!-- <el-checkbox v-for="variable in variables" :key="variable.id" v-model="selectedVariables"
+                            :label="variable.variable_name" size="small" /> -->
                     </div>
                 </div>
 
@@ -68,8 +74,8 @@
                         </div>
                         <div v-else class="mt-6 grid grid-cols-2 gap-3">
                             <div v-for="(variable, index) in selectedVariables" :key="index">
-                                <VariablePanel :ref="'varPan' + index" :variableName="variable" :date="date"
-                                    :timeLabels="timeSlots" />
+                                <VariablePanel :variableName="variable"
+                                    :data="mapItemsToTimeSlots(variables.find(v => v.variable_name == variable).variable_original_name)" />
                             </div>
                             <div v-if="!selectedVariables.length" class="col-span-full mt-20">
                                 <p class="flex flex-col space-y-2 items-center justify-center text-gray-400">
@@ -84,7 +90,6 @@
             </article>
         </section>
     </main>
-    {{ mapItemsToTimeSlots('status') }}
 </template>
 <script>
 import InputLabel from '@/Components/InputLabel.vue';
@@ -131,7 +136,7 @@ export default {
             // filtros
             date: format(new Date(), "yyyy-MM-dd"), // Establece la fecha de hoy por defecto
             startTime: "6:00",
-            endTime: "8:00",
+            endTime: "8:30",
             resolution: 30,
             timeSlots: [], // Aquí se almacenarán las horas generadas
         }
@@ -166,7 +171,7 @@ export default {
 
     },
     methods: {
-        mapItemsToTimeSlots() {
+        mapItemsToTimeSlots(variable) {
             const usedItems = new Set(); // Para almacenar los IDs de los items ya utilizados
 
             const mappedData = this.timeSlots.map(slot => {
@@ -176,7 +181,6 @@ export default {
 
                 this.items.forEach(item => {
                     const itemDate = parseISO(item.created_at);
-
                     const difference = differenceInMinutes(slotTime, itemDate);
 
                     // Considerar solo los items dentro del rango de 5 minutos hacia arriba y hacia abajo
@@ -194,10 +198,15 @@ export default {
                     usedItems.add(closestItem.id); // Marcar el item como usado
                 }
 
-                return { [slot]: closestItem ? closestItem[this.variable] : 0 };
+                return { [slot]: closestItem ? parseFloat(closestItem[variable]) : 0 };
             });
 
-            return mappedData;
+            // Combinar el array de objetos en un solo objeto
+            const mergedData = mappedData.reduce((acc, curr) => {
+                return { ...acc, ...curr };
+            }, {});
+
+            return mergedData;
         },
         generateTimeSlots() {
             // Verifica que todos los valores estén definidos
@@ -238,6 +247,7 @@ export default {
 
                 const response = await axios.post(route('robag.get-data-by-date-range', {
                     date: [`${this.date} ${this.timeSlots[0]}`, `${this.date} ${this.timeSlots[this.timeSlots.length - 1]}`],
+                    subHours: 0,
                 }));
 
                 if (response.status === 200) {

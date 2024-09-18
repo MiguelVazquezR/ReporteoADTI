@@ -1,10 +1,6 @@
 <template>
     <main class="rounded-[20px] border border-grayD9 p-4 h-[350px]">
-        <div v-if="loading" class="text-xs my-4 text-center">
-            Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
-        </div>
-        <div v-else>
-            {{ items.map(i => i.created_at) }}
+        <div>
             <p class="text-[#6D6E72] font-bold text-sm">{{ variableName }}</p>
             <BasicArea :series="series" :chartOptions="chartOptions" />
         </div>
@@ -13,8 +9,6 @@
 
 <script>
 import BasicArea from '@/MyComponents/Chart/Area/BasicArea.vue';
-import axios from 'axios';
-import { format } from 'date-fns';
 
 export default {
     data() {
@@ -22,12 +16,12 @@ export default {
             items: [],
             series: [{
                 name: "Lectura",
-                data: [34, 44, 54, 21, 12, 43, 33, 23] // Datos de ejemplo
+                data: [] // Datos dinámicos
             }],
             chartOptions: {
                 stroke: {
                     curve: 'straight',
-                    colors: ['#A24917'] // Cambia el color de la línea (en este caso, rojo)
+                    colors: ['#1EAAA2'] // Cambia el color de la línea (en este caso, rojo)
                 },
                 fill: {
                     type: 'gradient', // También puedes usar 'solid'
@@ -38,12 +32,12 @@ export default {
                         colorStops: [
                             {
                                 offset: 0,
-                                color: '#FF0000', // Color inicial del gradiente (rojo)
+                                color: '#5BBDB8', // Color fuerte de gradiente
                                 opacity: 0.5
                             },
                             {
                                 offset: 100,
-                                color: '#FFA500', // Color final del gradiente (naranja)
+                                color: '#E8F9F8', // Color bajito de gradiente
                                 opacity: 0.9
                             }
                         ]
@@ -59,7 +53,7 @@ export default {
                 dataLabels: {
                     enabled: false
                 },
-                labels: ['6:00', '6:15', '6:30', '6:45', '7:00', '7:15', '7:30', '8:00'],
+                labels: [], // Etiquetas dinámicas
                 xaxis: {
                     type: 'time',
                     title: {
@@ -76,7 +70,6 @@ export default {
                     horizontalAlign: 'left'
                 }
             },
-            loading: false, //estado de carga al obtener las datos
         }
     },
     components: {
@@ -84,34 +77,17 @@ export default {
     },
     props: {
         variableName: String,
-        date: String,
-        timeLabels: Array,
+        data: Object, // Se espera un objeto con pares clave-valor
     },
-    computed: {
-
-    },
-    methods: {
-        async fetchMachineData() {
-            try {
-                this.loading = true;
-
-                const response = await axios.get(route('robag.get-variable-data', {
-                     date: this.date,
-                    timeRange: [this.timeLabels[0], this.timeLabels[this.timeLabels.length - 1]]
-                }));
-
-                if (response.status === 200) {
-                    this.items = response.data.items;
-                }
-            } catch (error) {
-                console.log(error);
-            } finally {
-                this.loading = false;
+    watch: {
+        data: {
+            immediate: true, // Ejecutar también la primera vez que se monta el componente
+            handler(newData) {
+                // Actualizar 'series.data' y 'chartOptions.labels' dinámicamente
+                this.series[0].data = Object.values(newData);
+                this.chartOptions.labels = Object.keys(newData);
             }
         }
     },
-    // async mounted() {
-    //     await this.fetchMachineData();
-    // }
 }
 </script>
