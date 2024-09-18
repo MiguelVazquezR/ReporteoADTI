@@ -206,8 +206,8 @@ export default {
                     const itemDate = parseISO(item.created_at);
                     const difference = differenceInMinutes(slotTime, itemDate);
 
-                    // Considerar solo los items dentro del rango de 5 minutos hacia arriba y hacia abajo
-                    if (Math.abs(difference) <= 5 && !usedItems.has(item.id)) {
+                    // Considerar solo los items dentro del rango de 10 minutos hacia arriba y hacia abajo
+                    if (Math.abs(difference) <= 10 && !usedItems.has(item.id)) {
                         // Verificar si es el más cercano hasta ahora
                         if (Math.abs(difference) < Math.abs(minDifference)) {
                             minDifference = difference;

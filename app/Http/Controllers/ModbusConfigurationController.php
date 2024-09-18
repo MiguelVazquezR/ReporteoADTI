@@ -14,6 +14,7 @@ class ModbusConfigurationController extends Controller
         $request->validate([
             'host' => 'required|string|max:255',
             'port' => 'required|numeric|min:1|max:65535',
+            'sampling_minutes' => 'required|numeric|min:1',
             'machine' => 'required|string|min:1|max:255',
         ]);
 

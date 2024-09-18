@@ -104,6 +104,25 @@
                                     <span>Puerto</span>
                                     <el-input v-model="modbusForm.port" placeholder="Ej. 502" class="col-span-2" />
                                 </div>
+                                <div>
+                                    <p class="flex items-center space-x-1">
+                                        <span>Muestreo</span>
+                                        <el-tooltip
+                                            content="La resolución define la cantidad de registros en las gráficas"
+                                            placement="top">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="size-4 text-primary">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                                            </svg>
+                                        </el-tooltip>
+                                    </p>
+                                    <select v-model="modbusForm.sampling_minutes" placeholder="Selecciona"
+                                        class="col-span-2 border-grayD9 h-9 focus:ring-0 focus:border-primary rounded-[4px] text-secondary text-sm transition-all duration-200">
+                                        <option v-for="item in samplings" :key="item.value" :value="item.value">{{
+                                            item.label }}</option>
+                                    </select>
+                                </div>
                             </article>
                         </section>
                         <section v-else class="mx-3 mb-2 px-4">
@@ -116,17 +135,33 @@
                                     <span>Puerto</span>
                                     <span>{{ modbusForm.port }}</span>
                                 </div>
+                                <div>
+                                    <p class="flex items-center space-x-1">
+                                        <span>Muestreo</span>
+                                        <el-tooltip
+                                            content="Periodo para que el sistema guarde en base de datos los registros de la máquina"
+                                            placement="top">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="size-3 text-primary">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                                            </svg>
+                                        </el-tooltip>
+                                    </p>
+                                    <span>Cada {{ modbusForm.sampling_minutes }} minutos</span>
+                                </div>
                             </article>
                         </section>
-                        <p class="grid grid-cols-3 mx-3 mb-2 px-4">
+                        <div @click="$inertia.visit(route('machine-variables.index'))"
+                            class="flex items-center justify-between mx-3 mb-2 px-4 border-t border-grayD9 pt-1 cursor-pointer">
                             <span>Variables</span>
-                            <Link :href="route('machine-variables.index')" class="text-primary">
-                            Configurar
-                            </Link>
-                            <button @click="openModbusMonitor" type="button" class="text-primary">
-                                Lectura tiempo real
-                            </button>
-                        </p>
+                            <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
+                        </div>
+                        <div @click="openModbusMonitor"
+                            class="flex items-center justify-between mx-3 mb-2 px-4 border-t border-grayD9 pt-1 cursor-pointer">
+                            <span>Lectura tiempo real</span>
+                            <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
+                        </div>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -187,9 +222,6 @@
                 </div>
             </template>
             <template #footer>
-                <!-- <CancelButton @click="showRealTimeModbusMonitor = false">
-                    Cerrar
-                </CancelButton> -->
             </template>
         </DialogModal>
 
@@ -274,6 +306,7 @@ export default {
         const modbusForm = useForm({
             host: this.modbus_configurations.host,
             port: this.modbus_configurations.port,
+            sampling_minutes: this.modbus_configurations.sampling_minutes,
             machine: 'Robag',
         });
 
@@ -291,6 +324,24 @@ export default {
             editModbusConfig: false,
             searchDate: [],
             activeTab: '1',
+            samplings: [
+                {
+                    label: "Cada minuto",
+                    value: 1,
+                },
+                {
+                    label: "Cada 2 minutos",
+                    value: 2,
+                },
+                {
+                    label: "Cada 5 minutos",
+                    value: 5,
+                },
+                {
+                    label: "Cada 10 minutos",
+                    value: 10,
+                },
+            ],
             // monitor de modbus
             modbusData: null,
             intervalId: null,
