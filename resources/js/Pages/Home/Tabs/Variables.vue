@@ -22,7 +22,8 @@
                         <label v-for="variable in variables" :key="variable.id"
                             class="flex items-center text-sm cursor-pointer mt-px">
                             <input type="checkbox" v-model="selectedVariables" name="var"
-                                :value="variable.variable_name" class="rounded-[3px] text-primary focus:ring-primary cursor-pointer" />
+                                :value="variable.variable_name"
+                                class="rounded-[3px] text-primary focus:ring-primary cursor-pointer" />
                             <span class="ms-2 text-sm text-secondary">{{ variable.variable_name }}</span>
                         </label>
                         <!-- <el-checkbox v-for="variable in variables" :key="variable.id" v-model="selectedVariables"
@@ -84,6 +85,28 @@
                                         izquierdo.</span>
                                 </p>
                             </div>
+                        </div>
+                        <!-- tablas -->
+                        <div v-if="selectedVariables.length" class="my-10 overflow-x-auto col-span-full">
+                            <table class="w-full text-[13px] table-fixed">
+                                <thead class="*:border">
+                                    <tr class="*:px-2 *:py-1 *:text-start">
+                                        <th class="w-[15%]">Tiempo</th>
+                                        <th v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">{{
+                                            variable }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="*:border-x">
+                                    <tr v-for="(time, index) in timeSlots" :key="index"
+                                        class="*:px-2 *:py-1 *:text-start even:bg-gray-100 last:border-b">
+                                        <td class="w-[15%]">{{ time }}</td>
+                                        <td v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">
+                                            {{ mapItemsToTimeSlots(variables.find(v => v.variable_name ==
+                                            variable).variable_original_name)[time] }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
