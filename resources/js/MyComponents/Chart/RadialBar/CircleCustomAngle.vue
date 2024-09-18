@@ -1,6 +1,6 @@
 <template>
     <div id="chart">
-        <apexchart type="radialBar" height="280" :options="chartOptions" :series="series"></apexchart>
+        <apexchart type="radialBar" height="280" :options="chartOptions" :series="series" :width="width"></apexchart>
     </div>
 </template>
 <script>
@@ -75,6 +75,7 @@ export default {
             default: 0
         },
         chartOptions: Object,
+        width: String
     }
 }
 </script>

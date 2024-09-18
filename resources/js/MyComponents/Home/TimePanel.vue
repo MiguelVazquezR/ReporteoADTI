@@ -6,7 +6,7 @@
 
         <div v-else>
             <p class="text-[#6D6E72] font-bold text-sm">TIEMPOS</p>
-            <CircleCustomAngle :series="maxTimeTotals.percentage" :chartOptions="chartOptions" />
+            <CircleCustomAngle :series="maxTimeTotals.percentage" :chartOptions="chartOptions" :width="width" />
         </div>
     </main>
 </template>
@@ -94,7 +94,8 @@ export default {
         loading: {
             type: Boolean,
             default: false
-        }
+        },
+        width: String
     },
     computed: {
         uniqueFormattedDates() {

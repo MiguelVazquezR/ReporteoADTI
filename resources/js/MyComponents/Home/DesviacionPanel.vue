@@ -6,7 +6,7 @@
 
         <div v-else>
             <p class="text-[#6D6E72] font-bold text-sm">HISTOGRAMA</p>
-            <WithRotatedLabels :series="updatedSeries" :chartOptions="updatedChartOptions" />
+            <WithRotatedLabels :series="updatedSeries" :chartOptions="updatedChartOptions" :width="width" />
         </div>
     </main>
 </template>
@@ -106,6 +106,7 @@ export default {
             type: Array,
         },
         loading: Boolean, //estado de carga al obtener las datos
+        width: String,
     },
     computed: {
         getDeviationCounts() {
