@@ -146,12 +146,6 @@
                     </template>
                     <Variables />
                 </el-tab-pane>
-                <el-tab-pane name="3">
-                    <template #label>
-                        <span>Monitor en tiempo real</span>
-                    </template>
-                    <Monitor />
-                </el-tab-pane>
             </el-tabs>
         </main>
 
@@ -267,7 +261,6 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import General from './Tabs/General.vue';
 import Variables from './Tabs/Variables.vue';
-import Monitor from './Tabs/Monitor.vue';
 
 export default {
     data() {
@@ -313,7 +306,6 @@ export default {
         Link,
         General,
         Variables,
-        Monitor,
     },
     props: {
         schedule_settings: {
