@@ -6,37 +6,37 @@
         </p>
     </header>
     <main class="px-10 min-h-screen">
-        <section>
+        <section class="h-full">
             <!-- graficas en rectangulo negro -->
-            <OEEPanel ref="oeePanel" :date="dates" :items="data" :loading="loading" :teoricProduction="bpm" />
+            <OEEPanel ref="oeePanel" :date="dates" :items="data" :loading="loading" :teoricProduction="bpm" class="!h-1/2" />
 
             <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
-            <div class="mt-4 space-y-4">
+            <div class="mt-4 space-y-4 h-screen">
                 <!-- primer fila -->
-                <div class="flex space-x-4">
+                <div class="grid grid-cols-3 gap-x-4 !h-1/2 mb-10">
                     <!-- Tiempos -->
-                    <TimePanel :date="dates" :items="data" :loading="loading" />
+                    <TimePanel :date="dates" :items="data" :loading="loading" width="65%" />
 
                     <!-- PRODUCCIÓN DIARIA -->
-                    <ProductionPanel :items="data" :loading="loading" class="w-2/3" />
+                    <ProductionPanel :items="data" :loading="loading" width="65%" class="col-span-2" />
                 </div>
 
                 <!-- Segunda fila -->
                 <div class="flex space-x-4">
                     <!-- Velocidad -->
-                    <VelocityPanel :items="data" :loading="loading" />
+                    <VelocityPanel :items="data" :loading="loading" class="w-1/2" width="65%" />
 
                     <!-- HISTOGRAMA -->
-                    <DesviacionPanel :items="data" :loading="loading" />
+                    <DesviacionPanel :items="data" :loading="loading" class="w-1/2" width="65%" />
                 </div>
 
                 <!-- Tercera fila -->
                 <div class="flex space-x-4">
                     <!-- PELICULA -->
-                    <FilmPanel :items="data" :loading="loading" />
+                    <FilmPanel :items="data" :loading="loading" class="w-[45%]" />
 
                     <!-- BASCULA -->
-                    <ScalePanel :items="data" :loading="loading" />
+                    <ScalePanel :items="data" :loading="loading" class="w-[55%]" width="65%" />
                 </div>
             </div>
         </section>
@@ -51,7 +51,7 @@ import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
 import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
 import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
 import { Head } from '@inertiajs/vue3';
-import { format, addMinutes, isBefore, isEqual, parse, parseISO, differenceInMinutes } from "date-fns";
+import { format } from "date-fns";
 
 export default {
     data() {
@@ -148,21 +148,5 @@ export default {
     mounted() {
         this.getDataByDateRange(); // Recupera los registros del día de hoy
     }
-    // created() {
-    //     const today = new Date(); // Obtiene la fecha y hora actuales
-
-    //     // Crear la primera fecha con la hora 6:00 AM
-    //     const startDate = new Date(today);
-    //     startDate.setHours(6, 0, 0, 0); // Establecer hora a 6:00 AM
-
-    //     // Crear la segunda fecha con la hora actual
-    //     const endDate = new Date(today);
-    //     endDate.setHours(today.getHours(), today.getMinutes(), today.getSeconds(), today.getMilliseconds()); // Establecer la hora actual
-
-    //     // Inicializar dates con las dos fechas
-    //     this.dates = [startDate, endDate];
-
-    //     this.getDataByDateRange(); // Recupera los registros del día de hoy
-    // }
 }
 </script>

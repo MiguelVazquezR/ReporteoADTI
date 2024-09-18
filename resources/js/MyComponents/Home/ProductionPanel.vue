@@ -5,7 +5,7 @@
         </div>
         <div v-else>
             <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN POR DIA</p>
-            <ColumnWithMarkers :series="updatedSeries" :chartOptions="chartOptions" />
+            <ColumnWithMarkers :series="updatedSeries" :chartOptions="chartOptions" :width="width" />
         </div>
     </main>
 </template>
@@ -57,6 +57,7 @@ export default {
             required: true,
             type: Array,
         },
+        width: String,
         loading: Boolean, //estado de carga al obtener las datos
     },
     computed: {
