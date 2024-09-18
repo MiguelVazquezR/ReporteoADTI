@@ -304,9 +304,9 @@ export default {
         });
 
         const modbusForm = useForm({
-            host: this.modbus_configurations.host,
-            port: this.modbus_configurations.port,
-            sampling_minutes: this.modbus_configurations.sampling_minutes,
+            host: this.modbus_configurations?.host,
+            port: this.modbus_configurations?.port,
+            sampling_minutes: this.modbus_configurations?.sampling_minutes,
             machine: 'Robag',
         });
 

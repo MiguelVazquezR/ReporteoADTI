@@ -1,9 +1,10 @@
 <template>
     <Head title="Reporte Robag" />
-    <header class="p-10 text-center font-bold">
+    <header class="py-7 text-center font-bold">
         <p>
             Reporte de Robag: {{ formatDateTime(dates[0]) }} a {{ formatDateTime(dates[1]) }}
         </p>
+        <button @click="downloadPdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button>
     </header>
     <main class="px-10 min-h-screen">
         <section class="h-full">
@@ -92,6 +93,9 @@ export default {
         }
     },
     methods: {
+        downloadPdf() {
+            window.location.href = '/download-pdf'; // Redirige a la ruta para descargar el PDF
+        },
         formatDateTime(dateTime) {
             return format(dateTime, "dd MMM, yyyy - H:mm a");
         },
