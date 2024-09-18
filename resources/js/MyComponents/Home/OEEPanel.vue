@@ -30,7 +30,7 @@
                             <p class="text-gray9A mt-2">Producción</p>
                             <p class="text-black">{{ formatNumber(productionTime) }} min</p>
                         </div>
-                        <Basic :series="availabilityPercentage" class="w-1/2" />
+                        <Basic :series="availabilityPercentage" class="w-full" />
                     </div>
                 </article>
             </div>
@@ -53,7 +53,7 @@
                             <p class="text-gray9A mt-2">Prod. Real</p>
                             <p class="text-black">{{ formatNumber(realProduction) }} bpm</p>
                         </div>
-                        <Basic :series="performancePercentage" class="w-1/2" />
+                        <Basic :series="performancePercentage" class="w-full" />
                     </div>
                 </section>
             </div>
@@ -78,7 +78,7 @@
                             <p class="text-gray9A mt-1">Bolsas malas</p>
                             <p class="text-black ml-2">{{ formatNumber(totalWasteBags) }}</p>
                         </div>
-                        <Basic :series="quality" class="w-1/2" />
+                        <Basic :series="quality" class="w-full" />
                     </div>
                 </section>
             </div>
