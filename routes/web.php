@@ -68,3 +68,11 @@ Route::resource('schedule-email-settings', ScheduleEmailController::class);
 //--------------- rutas configuracon de modbus ----------------------
 Route::resource('/modbus-configuration', ModbusConfigurationController::class);
 // Route::get('/modbus-configuration-test', [ModbusConfigurationController::class, 'readModbusData']);//**// PRUEBAS DE LECTURA */
+
+
+Route::get('/pdf-template', function () {
+    $bpm = 120;
+    $dates = request('dates');
+
+    return inertia('Home/Template', compact('bpm', 'dates'));
+})->name('robag.pdf-template');

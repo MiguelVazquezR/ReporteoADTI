@@ -1,5 +1,5 @@
 <template>
-    <main class="bg-[#F2F2F2] rounded-[20px] grid grid-cols-4 p-4 mt-5 h-44">
+    <main class="bg-[#F2F2F2] rounded-[20px] grid grid-cols-4 p-4 mt-5">
 
         <!-- chart 1 -->
         <section class="border-r border-grayD9">
