@@ -143,7 +143,7 @@ export default {
                 ],
                 seconds: [
                     (totalRunTime).toFixed(1),
-                    (totalPausedTime).d(1),
+                    (totalPausedTime).toFixed(1),
                     (totalFaultTime).toFixed(1),
                     (totalOutOfFilmTime).toFixed(1),
                     (totalInterlockTime).toFixed(1),
