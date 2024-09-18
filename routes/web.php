@@ -67,10 +67,7 @@ Route::resource('schedule-email-settings', ScheduleEmailController::class);
 
 //--------------- rutas configuracon de modbus ----------------------
 Route::resource('/modbus-configuration', ModbusConfigurationController::class);
-<<<<<<< HEAD
 // Route::get('/modbus-configuration-test', [ModbusConfigurationController::class, 'readModbusData']);//**// PRUEBAS DE LECTURA */
-=======
-Route::get('/modbus-configuration-test', [ModbusConfigurationController::class, 'readModbusData']);//**// PRUEBAS DE LECTURA */
 
 
 Route::get('/get-npm-node-codes', function () {
@@ -81,4 +78,3 @@ Route::get('/get-npm-node-codes', function () {
     // Mostrar los resultados
    return ' node: ' . $nodePath . ' npm: ' . $npmPath;
 });
->>>>>>> origin/develop
