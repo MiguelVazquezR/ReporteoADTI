@@ -151,5 +151,10 @@ return [
         'main_email' => 'correo destinatario',
         'date' => 'fecha',
         'time' => 'hora',
+        'variable_name' => 'nombre de variable',
+        'variable_description' => 'descripción de variable',
+        'variable_address' => 'dirección de variable',
+        'words' => 'longitud',
+        'type' => 'tipo',
     ],
 ];

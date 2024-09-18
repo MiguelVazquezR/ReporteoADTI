@@ -18,12 +18,12 @@ class RobagDataFactory extends Factory
     public function definition(): array
     {
         return [
-            'status' => (string) $this->faker->randomElement(['running', 'stopped', 'paused']),
-            'scale_low_product' => (string) $this->faker->boolean(),
-            'reset_counters' => (string) $this->faker->boolean(),
-            'scale_internal_status' => (string) $this->faker->randomElement(['OK', 'error']),
+            'status' => (string) $this->faker->randomElement(['1', '5', '10']),
+            'scale_low_product' => (string) $this->faker->randomElement(['0', '1']),
+            'reset_counters' => (string) $this->faker->randomElement(['0', '1']),
+            'scale_internal_status' => (string) $this->faker->randomElement(['200', '404']),
             'robag_up_time' => (string) $this->faker->numberBetween(30000, 50000 ), //Tiempo en segundos desde que se encendió el Robag o se reinició el software
-            'reason_for_stop_status' => (string) $this->faker->randomElement(['maintenance', 'fault', 'manual_stop']),
+            'reason_for_stop_status' => (string) $this->faker->randomElement(['101', '202', '303']),
             'run_time' => (string) $this->faker->numberBetween(30000, 55000), //Tiempo total de ejecución (ya con pausas) en segundos
             'paused_time' => (string) $this->faker->numberBetween(700, 3600), //Tiempo en pausa en segundos
             'fault_time' => (string) $this->faker->numberBetween(700, 3600), //Tiempo de falla en segundos

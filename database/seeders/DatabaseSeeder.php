@@ -24,12 +24,11 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         // ejecutar seeders
-        $this->call([
-            MachineVariableSeeder::class,
-        ]);
+        // $this->call([
+        //     MachineVariableSeeder::class,
+        // ]);
 
-        //RobagData::factory()->count(500)->create();
-
+        RobagData::factory()->count(500)->create();
     }
     
 }

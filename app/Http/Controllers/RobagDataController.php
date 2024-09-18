@@ -14,8 +14,8 @@ use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Title;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use App\Mail\ReportEmail;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Services\ModbusService;
 
 class RobagDataController extends Controller
 {
@@ -64,7 +64,8 @@ class RobagDataController extends Controller
 
     public function getDataByDateRange(Request $request)
     {
-        $data = $this->getItemsByDateRange($request->date);
+        $subHours = request('subHours');
+        $data = $this->getItemsByDateRange($request->date, $subHours);
 
         return response()->json(compact('data'));
     }
@@ -785,11 +786,19 @@ class RobagDataController extends Controller
             ->send(new ReportEmail($subject, $description, $filePath));
     }
 
-    // funciones privadas
-    private function getItemsByDateRange($dates)
+    public function getModbusRegisters()
     {
-        $start = Carbon::parse($dates[0])->subHours(6)->toDateTimeString();
-        $end = Carbon::parse($dates[1])->subHours(6)->toDateTimeString();
+        $modbuService = new ModbusService('Robag');
+        $data = $modbuService->getMachineData();
+        
+        return response()->json(compact('data'));
+    }
+
+    // funciones privadas
+    private function getItemsByDateRange($dates, $subHours = 6)
+    {
+        $start = Carbon::parse($dates[0])->subHours($subHours)->toDateTimeString();
+        $end = Carbon::parse($dates[1])->subHours($subHours)->toDateTimeString();
 
         // Ventas y gastos de la semana seleccionada
         $items = RobagData::whereBetween('created_at', [$start, $end])

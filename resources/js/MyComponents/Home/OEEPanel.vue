@@ -119,11 +119,12 @@ export default {
         date: Array, //Intervalo de fechas buscadas
         loading: Boolean, //estado de carga al obtener las datos
         teoricProduction: Number, //bolsas por minuto a m{axima capacidad de la maquina (valor ajustable desde home)
-        bpmUpdated: Boolean //bandera que dispara evento de calculo de OEE cuando se cambia el bpm
     },
-    emits: ['finished-bpm-updated'],
-
     methods: {
+        updateOEEData() {
+            this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
+            this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
+        },
         formatNumber(number) {
             return new Intl.NumberFormat().format(number);
         },
@@ -195,13 +196,6 @@ export default {
         },
     },
     watch: {
-        bpmUpdated() {
-            if (this.bpmUpdated) {
-                this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
-                this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
-                this.$emit('finished-bpm-updated');
-            }
-        },
         items() {
             //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
             const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString()
