@@ -78,3 +78,10 @@ Route::get('/get-npm-node-codes', function () {
     // Mostrar los resultados
    return ' node: ' . $nodePath . ' npm: ' . $npmPath;
 });
+
+Route::get('/pdf-template', function () {
+    $bpm = 120;
+    $dates = request('dates');
+
+    return inertia('Home/Template', compact('bpm', 'dates'));
+})->name('robag.pdf-template');

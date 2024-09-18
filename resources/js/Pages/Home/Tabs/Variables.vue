@@ -122,7 +122,7 @@ import BasicArea from '@/MyComponents/Chart/Area/BasicArea.vue';
 import VariablePanel from '@/MyComponents/Home/VariablePanel.vue';
 import { Link } from '@inertiajs/vue3';
 import axios from 'axios';
-import { format, addMinutes, isBefore, isEqual, parse, parseISO, differenceInMinutes, isSameDay } from "date-fns";
+import { format, addMinutes, isBefore, isEqual, parse, parseISO, differenceInMinutes } from "date-fns";
 
 export default {
     data() {
