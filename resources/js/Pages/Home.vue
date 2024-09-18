@@ -1,19 +1,21 @@
 <template>
     <PublicLayout title="Inicio">
-        <main class="lg:py-10 lg:px-14">
+        <main class="lg:py-10 lg:px-7">
+            
+            <!-- <button @click="downloadPdf" class="bg-primary text-white font-bold p-1">Descargar PDF</button> -->
 
             <!-- Cuerpo del documento -->
             <section class="flex space-x-4 w-full">
 
                 <!-- Imagen de la maquina (parte izquierda) -->
-                <figure class="w-1/4">
+                <figure class="w-[20%]">
                     <h1 class="font-bold text-xl mb-6 ml-4">ROBAG</h1>
                     <img class="rounded-[20px] border border-grayD9 p-4 w-full"
                         src="@/../../public/images/machine_1.png" alt="">
                 </figure>
 
                 <!-- Infomracion de producción (parte derecha) -->
-                <article class="w-3/4">
+                <article class="w-[80%]">
                     <div class="flex items-center justify-between space-x-3">
                         <div class="flex items-center space-x-4 lg:-left-40 z-10">
                             <div v-if="isMobile" class="flex items-center space-x-2">
@@ -282,8 +284,8 @@ export default {
         });
 
         const modbusForm = useForm({
-            host: this.modbus_configurations.host,
-            port: this.modbus_configurations.port,
+            host: this.modbus_configurations?.host,
+            port: this.modbus_configurations?.port,
             machine: 'Robag',
         });
 
@@ -328,6 +330,9 @@ export default {
         modbus_configurations: Object,
     },
     methods: {
+        downloadPdf() {
+            window.location.href = '/download-pdf'; // Redirige a la ruta para descargar el PDF
+        },
         calncelEditingModbusConf() {
             this.editModbusConfig = false;
             this.modbusForm.reset();

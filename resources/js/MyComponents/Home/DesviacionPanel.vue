@@ -1,12 +1,12 @@
 <template>
-    <main class="rounded-[20px] border border-grayD9 p-4 w-2/5 h-[350px]">
+    <main class="rounded-[20px] border border-grayD9 p-4 h-[350px]">
         <div v-if="loading" class="text-xs my-4 text-center">
             Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
         </div>
 
         <div v-else>
             <p class="text-[#6D6E72] font-bold text-sm">HISTOGRAMA</p>
-            <WithRotatedLabels :series="updatedSeries" :chartOptions="updatedChartOptions" />
+            <WithRotatedLabels :series="updatedSeries" :chartOptions="updatedChartOptions" :width="width" />
         </div>
     </main>
 </template>
@@ -106,6 +106,7 @@ export default {
             type: Array,
         },
         loading: Boolean, //estado de carga al obtener las datos
+        width: String,
     },
     computed: {
         getDeviationCounts() {

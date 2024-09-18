@@ -1,5 +1,5 @@
 <template>
-    <main class="bg-[#F2F2F2] rounded-[20px] grid grid-cols-4 p-4 mt-5 h-44">
+    <main class="bg-[#F2F2F2] rounded-[20px] grid grid-cols-4 p-4 mt-5">
 
         <!-- chart 1 -->
         <section class="border-r border-grayD9">
@@ -30,7 +30,7 @@
                             <p class="text-gray9A mt-2">Producción</p>
                             <p class="text-black">{{ formatNumber(productionTime) }} min</p>
                         </div>
-                        <Basic :series="availabilityPercentage" class="w-1/2" />
+                        <Basic :series="availabilityPercentage" class="w-full" />
                     </div>
                 </article>
             </div>
@@ -53,7 +53,7 @@
                             <p class="text-gray9A mt-2">Prod. Real</p>
                             <p class="text-black">{{ formatNumber(realProduction) }} bpm</p>
                         </div>
-                        <Basic :series="performancePercentage" class="w-1/2" />
+                        <Basic :series="performancePercentage" class="w-full" />
                     </div>
                 </section>
             </div>
@@ -78,7 +78,7 @@
                             <p class="text-gray9A mt-1">Bolsas malas</p>
                             <p class="text-black ml-2">{{ formatNumber(totalWasteBags) }}</p>
                         </div>
-                        <Basic :series="quality" class="w-1/2" />
+                        <Basic :series="quality" class="w-full" />
                     </div>
                 </section>
             </div>
@@ -119,11 +119,12 @@ export default {
         date: Array, //Intervalo de fechas buscadas
         loading: Boolean, //estado de carga al obtener las datos
         teoricProduction: Number, //bolsas por minuto a m{axima capacidad de la maquina (valor ajustable desde home)
-        bpmUpdated: Boolean //bandera que dispara evento de calculo de OEE cuando se cambia el bpm
     },
-    emits: ['finished-bpm-updated'],
-
     methods: {
+        updateOEEData() {
+            this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
+            this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
+        },
         formatNumber(number) {
             return new Intl.NumberFormat().format(number);
         },
@@ -195,13 +196,6 @@ export default {
         },
     },
     watch: {
-        bpmUpdated() {
-            if (this.bpmUpdated) {
-                this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
-                this.calculateOEE(); //calcula la OEE que depende de las variables antes calculadas
-                this.$emit('finished-bpm-updated');
-            }
-        },
         items() {
             //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
             const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString()
