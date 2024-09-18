@@ -8,7 +8,14 @@ use Spatie\Browsershot\Browsershot;
 class PdfController extends Controller
 {
     public function downloadPdf()
-    {
+    {   
+        Browsershot::url('https://example.com')
+            ->setIncludePath('$PATH:/c/Program Files/nodejs')
+            ->save('example.pdf');
+        
+
+
+
         // $url = 'https://reporteo.dtw.com.mx/'; // Cambia esta URL por la que quieres convertir
 
         // // Generar PDF a partir de HTML
