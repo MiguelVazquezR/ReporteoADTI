@@ -4,13 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ModbusConfiguration;
 use App\Services\ModbusService;
-use Exception;
 use Illuminate\Http\Request;
-
-use ModbusTcpClient\Network\BinaryStreamConnection;
-use ModbusTcpClient\Packet\ModbusFunction\ReadHoldingRegistersRequest;
-use ModbusTcpClient\Packet\ResponseFactory;
-use ModbusTcpClient\Utils\Endian;
 
 class ModbusConfigurationController extends Controller
 {
@@ -33,10 +27,10 @@ class ModbusConfigurationController extends Controller
         return response()->json($config);
     }
 
-    public function readModbusData()
-    {
-        $modbuService = new ModbusService('Robag');
-        $data = $modbuService->getMachineData();
-        return $data;
-    }
+    // public function readModbusData()
+    // {
+    //     $modbuService = new ModbusService('Robag');
+    //     $data = $modbuService->getMachineData();
+    //     return $data;
+    // }
 }

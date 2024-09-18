@@ -14,8 +14,8 @@ use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Title;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use App\Mail\ReportEmail;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Services\ModbusService;
 
 class RobagDataController extends Controller
 {
@@ -61,21 +61,6 @@ class RobagDataController extends Controller
     {
         //
     }
-
-    // public function getVariableData()
-    // {
-    //     $date = request('date');
-    //     $time_range = request('timeRange');
-
-    //     $startDate = Carbon::parse($date . ' ' . $time_range[0])->addHours(6);
-    //     $endDate = Carbon::parse($date . ' ' . $time_range[1])->addHours(6);
-
-    //     $dates = array($startDate, $endDate);
-
-    //     $items = $this->getItemsByDateRange($dates);
-
-    //     return response()->json(compact('items'));
-    // }
 
     public function getDataByDateRange(Request $request)
     {
@@ -799,6 +784,14 @@ class RobagDataController extends Controller
         Mail::to($mainEmail)
             ->cc($cco)
             ->send(new ReportEmail($subject, $description, $filePath));
+    }
+
+    public function getModbusRegisters()
+    {
+        $modbuService = new ModbusService('Robag');
+        $data = $modbuService->getMachineData();
+        
+        return response()->json(compact('data'));
     }
 
     // funciones privadas

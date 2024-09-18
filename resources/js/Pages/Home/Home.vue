@@ -121,8 +121,11 @@
                         <p class="grid grid-cols-3 mx-3 mb-2 px-4">
                             <span>Variables</span>
                             <Link :href="route('machine-variables.index')" class="text-primary">
-                            Ir a configurar
+                            Configurar
                             </Link>
+                            <button @click="openModbusMonitor" type="button" class="text-primary">
+                                Lectura tiempo real
+                            </button>
                         </p>
                     </el-dropdown-menu>
                 </template>
@@ -143,8 +146,59 @@
                     </template>
                     <Variables />
                 </el-tab-pane>
+                <el-tab-pane name="3">
+                    <template #label>
+                        <span>Monitor en tiempo real</span>
+                    </template>
+                    <Monitor />
+                </el-tab-pane>
             </el-tabs>
         </main>
+
+        <DialogModal :show="showRealTimeModbusMonitor" @close="closeModbusMonitor">
+            <template #title>
+                <h1>Monitor de registros en tiempo real</h1>
+            </template>
+            <template #content>
+                <section v-if="modbusData !== null" class="mt-5">
+                    <div v-if="Object.keys(modbusData)[0] == 'error'"
+                        class="flex flex-col items-center justify-center space-y-3 py-10">
+                        <p class="text-center">
+                            Error al intentar establecer conexión con {{ this.modbus_configurations.host }}:{{
+                                this.modbus_configurations.port }}. <br>
+                            Revisa que la IP y el puerto sean correctos. También que la red no presente ninguna falla
+                        </p>
+                        <!-- <i class="fa-solid fa-network-wired text-4xl"></i> -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-10">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M13.181 8.68a4.503 4.503 0 0 1 1.903 6.405m-9.768-2.782L3.56 14.06a4.5 4.5 0 0 0 6.364 6.365l3.129-3.129m5.614-5.615 1.757-1.757a4.5 4.5 0 0 0-6.364-6.365l-4.5 4.5c-.258.26-.479.541-.661.84m1.903 6.405a4.495 4.495 0 0 1-1.242-.88 4.483 4.483 0 0 1-1.062-1.683m6.587 2.345 5.907 5.907m-5.907-5.907L8.898 8.898M2.991 2.99 8.898 8.9" />
+                        </svg>
+
+                    </div>
+                    <div v-else>
+                        <PrimaryButton @click="pausedMonitor = !pausedMonitor" class="mb-3"
+                            :class="pausedMonitor ? '!bg-green-600' : '!bg-blue-400'">
+                            {{ pausedMonitor ? 'Descongelar' : 'Congelar' }}
+                        </PrimaryButton>
+                        <article v-for="(item, index) in variables" :key="index"
+                            class="grid grid-cols-3 gap-x-6 gap-y-1">
+                            <span>{{ item.variable_name }}:</span>
+                            <span class="col-span-2">{{ modbusData[item.variable_original_name] }}</span>
+                        </article>
+                    </div>
+                </section>
+                <div v-else class="text-xs my-4 text-center mt-16">
+                    Obteniendo datos... <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
+                </div>
+            </template>
+            <template #footer>
+                <!-- <CancelButton @click="showRealTimeModbusMonitor = false">
+                    Cerrar
+                </CancelButton> -->
+            </template>
+        </DialogModal>
+
         <DialogModal :show="showEmailModal" @close="showEmailModal = false">
             <template #title>
                 <h1>Enviar reporte por correo</h1>
@@ -213,6 +267,7 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import General from './Tabs/General.vue';
 import Variables from './Tabs/Variables.vue';
+import Monitor from './Tabs/Monitor.vue';
 
 export default {
     data() {
@@ -236,12 +291,17 @@ export default {
             bpm: 120, //bpm a maxima velocidad ajustable
             // modales
             showEmailModal: false,
+            showRealTimeModbusMonitor: false,
             // cargas
             loading: false,
             // general
             editModbusConfig: false,
             searchDate: [],
             activeTab: '1',
+            // monitor de modbus
+            modbusData: null,
+            intervalId: null,
+            pausedMonitor: false,
         }
     },
     components: {
@@ -253,6 +313,7 @@ export default {
         Link,
         General,
         Variables,
+        Monitor,
     },
     props: {
         schedule_settings: {
@@ -260,8 +321,28 @@ export default {
             default: null,
         },
         modbus_configurations: Object,
+        variables: Array,
     },
     methods: {
+        openModbusMonitor() {
+            this.showRealTimeModbusMonitor = true;
+
+            // Ejecutar fetchMachineModbusRegisters cada x mili segundos
+            this.intervalId = setInterval(async () => {
+                if (!this.pausedMonitor) {
+                    await this.fetchMachineModbusRegisters();
+                }
+            }, 2000);
+        },
+        closeModbusMonitor() {
+            this.showRealTimeModbusMonitor = false;
+            this.pausedMonitor = false;
+
+            // Limpiar el intervalo cuando se cierra el modal
+            if (this.intervalId) {
+                clearInterval(this.intervalId);
+            }
+        },
         handleClick(tab) {
             // Agrega la variable currentTab=tab.props.name a la URL para mejorar la navegacion al actalizar o cambiar de pagina
             const currentURL = new URL(window.location.href);
@@ -322,6 +403,17 @@ export default {
             const url = route('robag.export-report', { dates: this.searchDate });
             window.open(url, '_blank');
         },
+        async fetchMachineModbusRegisters() {
+            try {
+                const response = await axios.get(route('robag.get-modbus-registers'));
+
+                if (response.status === 200) {
+                    this.modbusData = response.data.data;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
     },
     computed: {
         isMobile() {
