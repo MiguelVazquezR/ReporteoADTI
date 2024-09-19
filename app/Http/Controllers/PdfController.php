@@ -11,7 +11,7 @@ class PdfController extends Controller
     {   
         // Abrir pdf desde una vista sin descargar. -------------------------------------
         // $html = inertia('Home/Template');
-        $pdf = Browsershot::url('http://localhost:8000/pdf-template?bpm=120&date=2024-09-18&dates%5B0%5D=2024-09-04T06%3A00%3A00.000Z&dates%5B1%5D=2024-09-11T06%3A00%3A00.000Z&selectedVariables%5B0%5D=Estado%20de%20la%20m%C3%A1quina&selectedVariables%5B1%5D=Cantidad%20baja%20de%20bolsas&selectedVariables%5B2%5D=Restablecer%20contadores&selectedVariables%5B3%5D=Estado%20interno%20de%20la%20b%C3%A1scula&selectedVariables%5B4%5D=Tiempo%20de%20actividad%20de%20Robag&selectedVariables%5B5%5D=Motivo%20del%20estado%20de%20parada&timeSlots%5B0%5D=6%3A00&timeSlots%5B1%5D=6%3A30&timeSlots%5B2%5D=7%3A00&timeSlots%5B3%5D=7%3A30&timeSlots%5B4%5D=8%3A00&timeSlots%5B5%5D=8%3A30')
+        $pdf = Browsershot::url('http://localhost:8000/pdf-template')
             ->format('A4')
             ->landscape()
             ->showBackground()

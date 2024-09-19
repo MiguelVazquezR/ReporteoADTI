@@ -5,7 +5,8 @@
         <p>
             Reporte de Robag: {{ formatDateTime(dates[0]) }} a {{ formatDateTime(dates[1]) }}
         </p>
-        <!-- <button @click="downloadPdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
+        <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button>
+        <button v-if="!loading && !printing" @click="downloadPdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button>
     </header>
     <Loading v-if="loading" class="mt-16" />
     <main v-else class="px-10 min-h-screen">
@@ -106,6 +107,7 @@ export default {
             // general
             editModbusConfig: false,
             data: [],
+            printing: false,
             // para graficas de variables
             panelLoading: true,
             items: [],
@@ -230,12 +232,25 @@ export default {
             } finally {
                 this.loading = false;
             }
-        }
+        },
+        print() {
+            this.printing = true;
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        },
+        handleAfterPrint() {
+            this.printing = false;
+        },
     },
     async mounted() {
         await this.fetchMachineVariables();
         await this.getDataByDateRange(); // Recupera los registros del día de hoy
         await this.fetchMachineData();
+        window.addEventListener('afterprint', this.handleAfterPrint);
+    },
+    beforeDestroy() {
+        window.removeEventListener('afterprint', this.handleAfterPrint);
     }
 }
 </script>
