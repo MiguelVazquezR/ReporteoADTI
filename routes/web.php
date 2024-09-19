@@ -79,3 +79,4 @@ Route::get('/pdf-template', function () {
     // return compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'); 
     return inertia('Home/Template', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'));
 })->name('robag.pdf-template');
+

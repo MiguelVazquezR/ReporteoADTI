@@ -443,7 +443,6 @@ export default {
             }
         },
         exportReport() {
-            // const url = route('robag.export-report', { dates: this.searchDate });
             const url = route('robag.pdf-template', {
                 dates: this.searchDate,
                 bpm: this.bpm, 
