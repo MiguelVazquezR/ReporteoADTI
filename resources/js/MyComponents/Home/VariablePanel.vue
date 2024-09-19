@@ -1,8 +1,8 @@
 <template>
-    <main class="rounded-[20px] border border-grayD9 p-4" :class="width ? 'h-[250px]' : 'h-[350px]'">
+    <main class="rounded-[20px] border border-grayD9 p-4" :class="height ? 'h-[220px]' : 'h-[350px]'">
         <div>
             <p class="text-[#6D6E72] font-bold text-sm">{{ variableName }}</p>
-            <BasicArea :series="series" :chartOptions="chartOptions" :width="width" />
+            <BasicArea :series="series" :chartOptions="chartOptions" :width="width" :height="height" />
         </div>
     </main>
 </template>
@@ -79,6 +79,7 @@ export default {
         variableName: String,
         data: Object, // Se espera un objeto con pares clave-valor
         width: String,
+        height: String,
     },
     watch: {
         data: {

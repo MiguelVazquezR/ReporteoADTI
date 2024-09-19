@@ -2,7 +2,7 @@
     <PublicLayout title="Inicio">
         <!-- Botones -->
         <section class="flex items-center justify-end space-x-2 mt-6 lg:px-14">
-            <el-dropdown split-button type="primary" @click="exportReport" @command="handleDropdownCommand"
+            <!-- <el-dropdown split-button type="primary" @click="exportReport" @command="handleDropdownCommand"
                 :disabled="!searchDate.length">
                 Generar reporte
                 <template #dropdown>
@@ -10,7 +10,8 @@
                         <el-dropdown-item command="email">Enviar por correo</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
-            </el-dropdown>
+            </el-dropdown> -->
+            <PrimaryButton :disabled="!searchDate.length" @click="exportReport">Generar reporte</PrimaryButton>
             <el-dropdown trigger="click">
                 <button
                     class="flex items-center justify-center text-secondary rounded-full bg-grayED size-8 focus:border-0 focus:outline-none">
@@ -443,7 +444,6 @@ export default {
             }
         },
         exportReport() {
-            // const url = route('robag.export-report', { dates: this.searchDate });
             const url = route('robag.pdf-template', {
                 dates: this.searchDate,
                 bpm: this.bpm, 
@@ -452,7 +452,7 @@ export default {
                 selectedVariables: this.$refs.variables.selectedVariables,
             });
             window.open(url, '_blank');
-            // this.$inertia.visit(route('robag.pdf-template', {dates: this.searchDate}));
+            // this.$inertia.visit(route('pdf.example'));
         },
         async fetchMachineModbusRegisters() {
             try {

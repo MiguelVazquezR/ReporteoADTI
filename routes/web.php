@@ -45,6 +45,8 @@ Route::middleware([
 
 //Creacion de pdf con Spatie Browsershot -----------
 Route::get('/download-pdf', [PdfController::class, 'downloadPdf'])->name('download.pdf');
+Route::post('/upload-pdf', [PdfController::class, 'uploadPdf'])->name('upload.pdf');
+Route::post('/save-pdf', [PdfController::class, 'savePdf'])->name('save.pdf');
 
 
 // ------- maquinas y sus variables rutas --------
@@ -79,3 +81,9 @@ Route::get('/pdf-template', function () {
     // return compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'); 
     return inertia('Home/Template', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'));
 })->name('robag.pdf-template');
+
+
+Route::get('/pdf-example', function () {
+    return inertia('Home/ExamplePdf');
+})->name('pdf.example');
+

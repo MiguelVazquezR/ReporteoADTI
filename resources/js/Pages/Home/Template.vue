@@ -1,16 +1,30 @@
 <template>
 
     <Head title="Reporte Robag" />
-    <header class="py-7 text-center font-bold">
-        <p>
-            Reporte de Robag: {{ formatDateTime(dates[0]) }} a {{ formatDateTime(dates[1]) }}
-        </p>
-        <button @click="downloadPdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar
-            PDF</button>
-    </header>
+    <div v-if="!loading && !printing" class="flex space-x-3 justify-end mx-20 mt-5">
+            <el-dropdown split-button type="primary" @click="generatePdf" @command="handleDropdownCommand">
+                Descargar PDF
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item @click="showEmailModal = true">Enviar por correo</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+            <!-- <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
+            <!-- <button :disabled="loadingPDF" v-if="!loading && !printing" @click="generatePdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar PDF</button>
+            <button :disabled="loadingPDF" v-if="!loading && !printing" @click="showEmailModal = true" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Enviar por correo</button> -->
+        </div>
+    <div class="text-center mt-4">
+        <i v-if="loadingPDF" class="fa-solid fa-circle-notch fa-spin text-xl mr-2"></i>
+    </div>
     <Loading v-if="loading" class="mt-16" />
-    <main v-else class="px-10 min-h-screen">
-        <section class="h-screen space-y-4">
+    <main v-else class="px-10 min-h-screen my-4" id="pdf-content">
+        <header class="text-center font-bold">
+            <p>
+                Reporte de Robag: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? '' }}
+            </p>
+        </header>
+        <section class="space-y-4">
             <!-- graficas en rectangulo negro -->
             <OEEPanel ref="oeePanel" :date="dates" :items="data" :loading="loading" :teoricProduction="bpm"
                 width="65%" />
@@ -25,9 +39,9 @@
                 <ProductionPanel :items="data" :loading="loading" width="65%" class="col-span-2" />
             </div>
         </section>
-        <section class="h-screen space-y-4">
+        <section class="space-y-4">
             <!-- Segunda fila -->
-            <div class="flex space-x-4">
+            <div class="flex space-x-4 mt-4">
                 <!-- Velocidad -->
                 <VelocityPanel :items="data" :loading="loading" class="w-1/2" width="65%" />
 
@@ -36,7 +50,7 @@
             </div>
 
             <!-- Tercera fila -->
-            <div class="flex space-x-4">
+            <div class="flex space-x-4 pt-0">
                 <!-- PELICULA -->
                 <FilmPanel :items="data" :loading="loading" class="w-[45%]" />
 
@@ -44,20 +58,12 @@
                 <ScalePanel :items="data" :loading="loading" class="w-[55%]" width="65%" />
             </div>
         </section>
-        <section v-for="(page, index) in Math.ceil(selectedVariables.length / 4)" :key="page" class="h-screen space-x-4">
-            <h1 class="font-bold text-lg">Variables ({{ index+1 }})</h1>
-            <div class="mt-6 grid grid-cols-2 gap-3">
-                <div v-for="(variable, index2) in selectedVariables.filter((e, i) => i >= index * 4 && i < (index + 1) * 4)"
-                    :key="index2">
-                    <VariablePanel :variableName="variable" width="65%"
+        <section v-if="selectedVariables.length" class="mt-44 space-x-4">
+            <h1 class="font-bold text-lg">Variables</h1>
+            <div class="mt-6 grid grid-cols-3 gap-3">
+                <div v-for="(variable, index2) in selectedVariables" :key="index2">
+                    <VariablePanel :variableName="variable" height="180"
                         :data="mapItemsToTimeSlots(variables.find(v => v.variable_name == variable).variable_original_name)" />
-                </div>
-                <div v-if="!selectedVariables.length" class="col-span-full mt-20">
-                    <p class="flex flex-col space-y-2 items-center justify-center text-gray-400">
-                        <i class="fa-regular fa-hand-point-left text-4xl"></i>
-                        <span>Para ver información, selecciona las variables que quieras de lado
-                            izquierdo.</span>
-                    </p>
                 </div>
             </div>
         </section>
@@ -83,8 +89,68 @@
             </table>
         </section>
     </main>
+
+    <!-- Email modal -->
+    <DialogModal :show="showEmailModal" @close="showEmailModal = false">
+        <template #title>
+            <h1>Enviar reporte por correo</h1>
+        </template>
+        <template #content>
+            <form @submit.prevent="sendEmail">
+                <div>
+                    <InputLabel value="Correo electrónico detinatario*" />
+                    <el-input v-model="emailForm.main_email" placeholder="Ej. admin@gmail.com" clearable />
+                    <InputError :message="emailForm.errors.main_email" />
+                </div>
+                <div class="mt-3">
+                    <InputLabel value="CCO" />
+                    <el-select v-model="emailForm.cco" multiple filterable allow-create default-first-option
+                        :reserve-keyword="false" placeholder="Agrega cualquier correo y presiona enter">
+                    </el-select>
+                    <InputError :message="emailForm.errors.cco" />
+                </div>
+                <div class="mt-3">
+                    <InputLabel value="Asunto*" />
+                    <el-input v-model="emailForm.subject" placeholder="Reporte de ..." clearable />
+                    <InputError :message="emailForm.errors.subject" />
+                </div>
+                <div class="mt-3">
+                    <InputLabel value="Descripción del correo" />
+                    <el-input v-model="emailForm.description" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
+                        placeholder="Escribe una descripción si es necesario" clearable />
+                    <InputError :message="emailForm.errors.description" />
+                </div>
+                <div class="mt-3">
+                    <InputLabel value="Adjunto" />
+                    <p class="text-xs flex items-center space-x-2">
+                        <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 22 22" class="text-green-700"
+                                id="Microsoft-Excel-Logo--Streamline-Ultimate" height="16" width="16">
+                                <desc>Microsoft Excel Logo Streamline Icon: https://streamlinehq.com</desc>
+                                <g id="Microsoft-Excel-Logo--Streamline-Ultimate.svg">
+                                    <path
+                                        d="M20.125 1.75H7.4375a0.875 0.875 0 0 0 -0.875 0.875v1.3125h1.75V3.5h4.375v2.9575h-0.875l0 0.105v1.58375h0.875v2.9575h-0.875v1.68875h0.875V15.75h-1.2425a2.625 2.625 0 0 1 -2.2575000000000003 1.3125h-2.625V18.375a0.875 0.875 0 0 0 0.875 0.875H20.125a0.875 0.875 0 0 0 0.875 -0.875V2.625a0.875 0.875 0 0 0 -0.875 -0.875Zm-0.875 14h-4.375v-2.9575h4.375Zm0 -4.646249999999999h-4.375V8.14625h4.375Zm0 -4.646249999999999h-4.375V3.5h4.375Z"
+                                        fill="currentColor" stroke-width="1"></path>
+                                    <path
+                                        d="M8.3125 15.75h0.875a1.3125 1.3125 0 0 0 1.3125 -1.3125v-7.875A1.3125 1.3125 0 0 0 9.1875 5.25h-7.875A1.3125 1.3125 0 0 0 0 6.5625v7.875A1.3125 1.3125 0 0 0 1.3125 15.75ZM4.1125 7.4375 5.25 9.2575 6.3875 7.4375h1.54875L6.02 10.5l1.91625 3.0625H6.3875L5.25 11.7425 4.1125 13.5625H2.56375L4.48 10.5 2.56375 7.4375Z"
+                                        fill="currentColor" stroke-width="1"></path>
+                                </g>
+                            </svg> -->
+                        <i class="fa-solid fa-file-pdf text-lg text-red-600"></i>
+                        <span class="text-secondary">Reporte Robag</span>
+                    </p>
+                </div>
+            </form>
+        </template>
+        <template #footer>
+            <PrimaryButton @click="savePdfInProjectAndSend" :disabled="emailForm.processing || loadingPDF">
+                <i v-if="emailForm.processing" class="fa-solid fa-circle-notch fa-spin mr-2"></i>
+                Enviar correo
+            </PrimaryButton>
+        </template>
+    </DialogModal>
 </template>
 <script>
+import PrimaryButton from '@/Components/PrimaryButton.vue';
 import OEEPanel from '@/MyComponents/Home/OEEPanel.vue';
 import TimePanel from '@/MyComponents/Home/TimePanel.vue';
 import ProductionPanel from '@/MyComponents/Home/ProductionPanel.vue';
@@ -93,20 +159,37 @@ import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
 import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
 import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
 import { Head } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { format, parse, parseISO, differenceInMinutes } from "date-fns";
 import Loading from '@/Components/MyComponents/Loading.vue';
 import VariablePanel from '@/MyComponents/Home/VariablePanel.vue';
+import DialogModal from '@/Components/DialogModal.vue';
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import jsPDF from 'jspdf'; // generador de pdf
+import html2canvas from 'html2canvas'; // generador de pdf
 
 export default {
     data() {
+        const emailForm = useForm({
+            main_email: null,
+            cco: [],
+            subject: null,
+            description: null,
+        });
+
         return {
+            //forms
+            emailForm,
             // modales
             showEmailModal: false,
             // cargas
             loading: true,
+            loadingPDF: false,
             // general
             editModbusConfig: false,
             data: [],
+            printing: false,
             // para graficas de variables
             panelLoading: true,
             items: [],
@@ -115,6 +198,7 @@ export default {
     },
     components: {
         ProductionPanel,
+        PrimaryButton,
         DesviacionPanel,
         VelocityPanel,
         ScalePanel,
@@ -124,6 +208,9 @@ export default {
         Head,
         Loading,
         VariablePanel,
+        DialogModal,
+        InputError,
+        InputLabel,
     },
     emits: ['updated-dates'],
     props: {
@@ -176,6 +263,143 @@ export default {
         },
         downloadPdf() {
             window.location.href = '/download-pdf'; // Redirige a la ruta para descargar el PDF
+        },
+        async generatePdf() {
+            this.loadingPDF = true;
+            const content = document.getElementById('pdf-content');
+
+            // Capturar el contenido con html2canvas
+            const canvas = await html2canvas(content, {
+                scale: 2, // Ajusta la escala para mejorar la calidad
+                windowWidth: document.documentElement.scrollWidth, // Ajusta el ancho del contenido
+            });
+
+            // Convertir el contenido capturado en imagen
+            const imgData = canvas.toDataURL('image/png');
+
+            // Crear una instancia de jsPDF con orientación "landscape" y formato A4
+            const pdf = new jsPDF({
+                orientation: 'landscape', // Cambia la orientación a landscape
+                unit: 'mm',
+                format: 'a4',
+            });
+
+            // Obtener las dimensiones de la página
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            // Calcular las dimensiones de la imagen dentro del PDF
+            let imgWidth = pdfWidth;
+            let imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            // Agregar la primera parte de la imagen
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, '', 'FAST'); // FAST usa compresión
+
+            // Dividir en varias páginas si es necesario
+            while (heightLeft > 0) {
+                position -= pdfHeight;
+                heightLeft -= pdfHeight;
+
+                if (heightLeft > 0) {
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, '', 'FAST'); // FAST usa compresión
+                }
+            }
+            this.loadingPDF = false;
+            // Descargar el PDF generado
+            pdf.save('example.pdf');
+        },
+        async savePdfInProjectAndSend() {
+            this.loadingPDF = true;
+            const content = document.getElementById('pdf-content');
+
+            // Capturar el contenido con html2canvas
+            const canvas = await html2canvas(content, {
+                scale: 2, // Ajusta la escala para mejorar la calidad
+                windowWidth: document.documentElement.scrollWidth,
+            });
+
+            // Convertir el contenido capturado en imagen
+            const imgData = canvas.toDataURL('image/png');
+
+            // Crear una instancia de jsPDF con orientación "landscape" y formato A4
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4',
+            });
+
+            // Obtener las dimensiones de la página
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            let imgWidth = pdfWidth;
+            let imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            // Agregar la primera parte de la imagen
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, '', 'FAST'); // FAST usa compresión
+
+            while (heightLeft > 0) {
+                position -= pdfHeight;
+                heightLeft -= pdfHeight;
+
+                if (heightLeft > 0) {
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, '', 'FAST'); // FAST usa compresión
+                }
+            }
+
+            // Obtener el contenido del PDF en formato binario
+            const pdfOutput = pdf.output('blob');
+
+            // Crear un FormData para enviar el PDF al backend
+            const formData = new FormData();
+            formData.append('file', pdfOutput, 'example.pdf');
+
+            try {
+                // Enviar el PDF al backend y obtener la ruta del archivo guardado
+                const response = await axios.post('/save-pdf', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                const filePath = response.data.path; // La ruta donde se guardó el PDF
+
+                // Pasar la ruta del PDF a la función sendEmail
+                this.sendEmail(filePath);
+
+            } catch (error) {
+                console.error("Error guardando el PDF:", error);
+            } finally {
+                this.loadingPDF = false;
+            }
+        },
+        sendEmail(pdfPath) {
+            this.emailForm.transform(data => ({
+                ...data,
+                dates: this.searchDate,
+                pdf_path: pdfPath // Incluir la ruta del PDF en la petición
+            })).post(route('robag.email-report'), {
+                onSuccess: () => {
+                    this.showEmailModal = false;
+                    this.emailForm.reset();
+                    this.$notify({
+                        title: 'Correo enviado',
+                        message: '',
+                        type: 'success'
+                    });
+                },
+                onError: (error) => {
+                    console.log(error);
+                },
+            });
         },
         formatDateTime(dateTime) {
             return format(dateTime, "dd MMM, yyyy - H:mm a");
@@ -231,12 +455,25 @@ export default {
             } finally {
                 this.loading = false;
             }
-        }
+        },
+        print() {
+            this.printing = true;
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        },
+        handleAfterPrint() {
+            this.printing = false;
+        },
     },
     async mounted() {
         await this.fetchMachineVariables();
         await this.getDataByDateRange(); // Recupera los registros del día de hoy
         await this.fetchMachineData();
+        window.addEventListener('afterprint', this.handleAfterPrint);
+    },
+    beforeDestroy() {
+        window.removeEventListener('afterprint', this.handleAfterPrint);
     }
 }
 </script>
