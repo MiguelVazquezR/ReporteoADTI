@@ -443,10 +443,10 @@ export default {
             }
         },
         exportReport() {
+            window.location.href = '/download-pdf'; // Redirige a la ruta para descargar el PDF
             // const url = route('robag.export-report', { dates: this.searchDate });
-            const url = route('robag.pdf-template', { dates: this.searchDate });
-            window.open(url, '_blank');
-            // this.$inertia.visit(route('robag.pdf-template', {dates: this.searchDate}));
+            // const url = route('robag.pdf-template', { dates: this.searchDate });
+            // window.open(url, '_blank');
         },
         async fetchMachineModbusRegisters() {
             try {

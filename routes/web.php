@@ -76,3 +76,4 @@ Route::get('/pdf-template', function () {
 
     return inertia('Home/Template', compact('bpm', 'dates'));
 })->name('robag.pdf-template');
+

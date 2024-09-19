@@ -4,7 +4,7 @@
         <p>
             Reporte de Robag: {{ formatDateTime(dates[0]) }} a {{ formatDateTime(dates[1]) }}
         </p>
-        <button @click="downloadPdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button>
+        <!-- <button @click="downloadPdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
     </header>
     <main class="px-10 min-h-screen">
         <section>
