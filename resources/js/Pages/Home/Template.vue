@@ -43,11 +43,11 @@
                 <ScalePanel :items="data" :loading="loading" class="w-[55%]" width="65%" />
             </div>
         </section>
-        <section v-for="page in Math.ceil(selectedVariables.length / 4)" :key="page" class="h-screen space-x-4">
-            <h1 class="font-bold text-lg">Variables</h1>
+        <section v-for="(page, index) in Math.ceil(selectedVariables.length / 4)" :key="page" class="h-screen space-x-4">
+            <h1 class="font-bold text-lg">Variables ({{ index+1 }})</h1>
             <div class="mt-6 grid grid-cols-2 gap-3">
-                <div v-for="(variable, index) in selectedVariables.filter((e, index) => index > page * 3 && index < page * 4)"
-                    :key="index">
+                <div v-for="(variable, index2) in selectedVariables.filter((e, i) => i >= index * 4 && i < (index + 1) * 4)"
+                    :key="index2">
                     <VariablePanel :variableName="variable" width="65%"
                         :data="mapItemsToTimeSlots(variables.find(v => v.variable_name == variable).variable_original_name)" />
                 </div>
