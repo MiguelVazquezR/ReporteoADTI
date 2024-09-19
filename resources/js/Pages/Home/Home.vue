@@ -179,7 +179,7 @@
                     <template #label>
                         <span>Reporte de variables</span>
                     </template>
-                    <Variables />
+                    <Variables ref="variables" />
                 </el-tab-pane>
             </el-tabs>
         </main>
@@ -443,10 +443,15 @@ export default {
             }
         },
         exportReport() {
-            window.location.href = '/download-pdf'; // Redirige a la ruta para descargar el PDF
-            // const url = route('robag.export-report', { dates: this.searchDate });
-            // const url = route('robag.pdf-template', { dates: this.searchDate });
-            // window.open(url, '_blank');
+            const url = route('robag.pdf-template', {
+                dates: this.searchDate,
+                bpm: this.bpm, 
+                date: this.$refs.variables.date,
+                timeSlots: this.$refs.variables.timeSlots,
+                selectedVariables: this.$refs.variables.selectedVariables,
+            });
+            window.open(url, '_blank');
+            // this.$inertia.visit(route('robag.pdf-template', {dates: this.searchDate}));
         },
         async fetchMachineModbusRegisters() {
             try {

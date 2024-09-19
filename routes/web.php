@@ -71,9 +71,12 @@ Route::resource('/modbus-configuration', ModbusConfigurationController::class);
 
 
 Route::get('/pdf-template', function () {
-    $bpm = 120;
+    $bpm = intval(request('bpm'));
     $dates = request('dates');
-
-    return inertia('Home/Template', compact('bpm', 'dates'));
+    $date = request('date');
+    $timeSlots = request('timeSlots');
+    $selectedVariables = request('selectedVariables') ?? [];
+    // return compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'); 
+    return inertia('Home/Template', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'));
 })->name('robag.pdf-template');
 
