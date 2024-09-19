@@ -5,7 +5,6 @@
             <!-- <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
             <button :disabled="loadingPDF" v-if="!loading && !printing" @click="generatePdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar PDF</button>
             <button :disabled="loadingPDF" v-if="!loading && !printing" @click="showEmailModal = true" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Enviar por correo</button>
-            <!-- <button v-if="!loading && !printing" @click="downloadPdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 ml-5">Test ruta local</button> -->
         </div>
         <div class="text-center mt-4">
             <i v-if="loadingPDF" class="fa-solid fa-circle-notch fa-spin text-xl mr-2"></i>
@@ -51,23 +50,6 @@
                 <ScalePanel :items="data" :loading="loading" class="w-[55%]" width="65%" />
             </div>
         </section>
-        <!-- <section v-for="(page, index) in Math.ceil(selectedVariables.length / 4)" :key="page" class="mt-52 space-x-4">
-            <h1 class="font-bold text-lg">Variables ({{ index+1 }})</h1>
-            <div class="mt-6 grid grid-cols-2 gap-3">
-                <div v-for="(variable, index2) in selectedVariables.filter((e, i) => i >= index * 4 && i < (index + 1) * 4)"
-                    :key="index2">
-                    <VariablePanel :variableName="variable" width="65%"
-                        :data="mapItemsToTimeSlots(variables.find(v => v.variable_name == variable).variable_original_name)" />
-                </div>
-                <div v-if="!selectedVariables.length" class="col-span-full mt-20">
-                    <p class="flex flex-col space-y-2 items-center justify-center text-gray-400">
-                        <i class="fa-regular fa-hand-point-left text-4xl"></i>
-                        <span>Para ver información, selecciona las variables que quieras de lado
-                            izquierdo.</span>
-                    </p>
-                </div>
-            </div>
-        </section> -->
         <section v-if="selectedVariables.length" class="mt-44 space-x-4">
             <h1 class="font-bold text-lg">Variables</h1>
             <div class="mt-6 grid grid-cols-3 gap-3">
@@ -134,7 +116,7 @@
                     <div class="mt-3">
                         <InputLabel value="Adjunto" />
                         <p class="text-xs flex items-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 22 22" class="text-green-700"
+                            <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 22 22" class="text-green-700"
                                 id="Microsoft-Excel-Logo--Streamline-Ultimate" height="16" width="16">
                                 <desc>Microsoft Excel Logo Streamline Icon: https://streamlinehq.com</desc>
                                 <g id="Microsoft-Excel-Logo--Streamline-Ultimate.svg">
@@ -145,7 +127,8 @@
                                         d="M8.3125 15.75h0.875a1.3125 1.3125 0 0 0 1.3125 -1.3125v-7.875A1.3125 1.3125 0 0 0 9.1875 5.25h-7.875A1.3125 1.3125 0 0 0 0 6.5625v7.875A1.3125 1.3125 0 0 0 1.3125 15.75ZM4.1125 7.4375 5.25 9.2575 6.3875 7.4375h1.54875L6.02 10.5l1.91625 3.0625H6.3875L5.25 11.7425 4.1125 13.5625H2.56375L4.48 10.5 2.56375 7.4375Z"
                                         fill="currentColor" stroke-width="1"></path>
                                 </g>
-                            </svg>
+                            </svg> -->
+                            <i class="fa-solid fa-file-pdf text-lg text-red-600"></i>
                             <span class="text-secondary">Reporte Robag</span>
                         </p>
                     </div>
@@ -379,11 +362,6 @@ export default {
                 },
             });
             this.loadingPDF = false;
-            this.$notify({
-                title: 'Correcto',
-                message: 'Correo enviado',
-                type: 'success'
-            })
         },
         sendEmail() {
             this.emailForm.transform(data => ({
