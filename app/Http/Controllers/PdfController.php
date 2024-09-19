@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Spatie\Browsershot\Browsershot;
+use Illuminate\Support\Facades\Storage;
 
 class PdfController extends Controller
 {
@@ -65,5 +66,37 @@ class PdfController extends Controller
         // return response()->download($pdfPath);
         // ----------------------------------------------------------------------------------------
 
+    }
+
+    public function uploadPdf(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filePath = 'pdfs/' . $file->getClientOriginalName();
+            Storage::disk('public')->put($filePath, file_get_contents($file));
+
+            return response()->json(['message' => 'PDF guardado con éxito en la carpeta public']);
+        }
+
+        return response()->json(['message' => 'No se recibió ningún archivo'], 400);
+    }
+
+    public function savePdf(Request $request)
+    {
+        // Verificar si se ha recibido un archivo PDF
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            
+            // Definir el nombre del archivo y la ruta de destino
+            $fileName = 'example.pdf';
+            $filePath = public_path('pdf/' . $fileName);
+
+            // Mover el archivo a la carpeta public/pdf
+            $file->move(public_path('pdf'), $fileName);
+
+            return response()->json(['message' => 'PDF guardado en: ' . $filePath]);
+        } else {
+            return response()->json(['message' => 'No se recibió ningún archivo'], 400);
+        }
     }
 }
