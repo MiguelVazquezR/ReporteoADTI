@@ -94,7 +94,7 @@ class PdfController extends Controller
             // Mover el archivo a la carpeta public/pdf
             $file->move(public_path('pdf'), $fileName);
 
-            return response()->json(['message' => 'PDF guardado en: ' . $filePath]);
+            return response()->json(['path' => $filePath]);
         } else {
             return response()->json(['message' => 'No se recibió ningún archivo'], 400);
         }

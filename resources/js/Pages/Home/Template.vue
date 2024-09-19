@@ -1,14 +1,18 @@
 <template>
 
     <Head title="Reporte Robag" />
-        <div class="flex space-x-3 justify-center">
-            <!-- <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
-            <button :disabled="loadingPDF" v-if="!loading && !printing" @click="generatePdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar PDF</button>
-            <button :disabled="loadingPDF" v-if="!loading && !printing" @click="showEmailModal = true" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Enviar por correo</button>
-        </div>
-        <div class="text-center mt-4">
-            <i v-if="loadingPDF" class="fa-solid fa-circle-notch fa-spin text-xl mr-2"></i>
-        </div>
+    <div class="flex space-x-3 justify-center">
+        <!-- <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
+        <button :disabled="loadingPDF" v-if="!loading && !printing" @click="generatePdf"
+            class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar
+            PDF</button>
+        <button :disabled="loadingPDF" v-if="!loading && !printing" @click="showEmailModal = true"
+            class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Enviar
+            por correo</button>
+    </div>
+    <div class="text-center mt-4">
+        <i v-if="loadingPDF" class="fa-solid fa-circle-notch fa-spin text-xl mr-2"></i>
+    </div>
     <Loading v-if="loading" class="mt-16" />
     <main v-else class="px-10 min-h-screen my-4" id="pdf-content">
         <header class="text-center font-bold">
@@ -53,8 +57,7 @@
         <section v-if="selectedVariables.length" class="mt-44 space-x-4">
             <h1 class="font-bold text-lg">Variables</h1>
             <div class="mt-6 grid grid-cols-3 gap-3">
-                <div v-for="(variable, index2) in selectedVariables"
-                    :key="index2">
+                <div v-for="(variable, index2) in selectedVariables" :key="index2">
                     <VariablePanel :variableName="variable" height="180"
                         :data="mapItemsToTimeSlots(variables.find(v => v.variable_name == variable).variable_original_name)" />
                 </div>
@@ -85,38 +88,38 @@
 
     <!-- Email modal -->
     <DialogModal :show="showEmailModal" @close="showEmailModal = false">
-            <template #title>
-                <h1>Enviar reporte por correo</h1>
-            </template>
-            <template #content>
-                <form @submit.prevent="sendEmail">
-                    <div>
-                        <InputLabel value="Correo electrónico detinatario*" />
-                        <el-input v-model="emailForm.main_email" placeholder="Ej. admin@gmail.com" clearable />
-                        <InputError :message="emailForm.errors.main_email" />
-                    </div>
-                    <div class="mt-3">
-                        <InputLabel value="CCO" />
-                        <el-select v-model="emailForm.cco" multiple filterable allow-create default-first-option
-                            :reserve-keyword="false" placeholder="Agrega cualquier correo y presiona enter">
-                        </el-select>
-                        <InputError :message="emailForm.errors.cco" />
-                    </div>
-                    <div class="mt-3">
-                        <InputLabel value="Asunto*" />
-                        <el-input v-model="emailForm.subject" placeholder="Reporte de ..." clearable />
-                        <InputError :message="emailForm.errors.subject" />
-                    </div>
-                    <div class="mt-3">
-                        <InputLabel value="Descripción del correo" />
-                        <el-input v-model="emailForm.description" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
-                            placeholder="Escribe una descripción si es necesario" clearable />
-                        <InputError :message="emailForm.errors.description" />
-                    </div>
-                    <div class="mt-3">
-                        <InputLabel value="Adjunto" />
-                        <p class="text-xs flex items-center space-x-2">
-                            <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 22 22" class="text-green-700"
+        <template #title>
+            <h1>Enviar reporte por correo</h1>
+        </template>
+        <template #content>
+            <form @submit.prevent="sendEmail">
+                <div>
+                    <InputLabel value="Correo electrónico detinatario*" />
+                    <el-input v-model="emailForm.main_email" placeholder="Ej. admin@gmail.com" clearable />
+                    <InputError :message="emailForm.errors.main_email" />
+                </div>
+                <div class="mt-3">
+                    <InputLabel value="CCO" />
+                    <el-select v-model="emailForm.cco" multiple filterable allow-create default-first-option
+                        :reserve-keyword="false" placeholder="Agrega cualquier correo y presiona enter">
+                    </el-select>
+                    <InputError :message="emailForm.errors.cco" />
+                </div>
+                <div class="mt-3">
+                    <InputLabel value="Asunto*" />
+                    <el-input v-model="emailForm.subject" placeholder="Reporte de ..." clearable />
+                    <InputError :message="emailForm.errors.subject" />
+                </div>
+                <div class="mt-3">
+                    <InputLabel value="Descripción del correo" />
+                    <el-input v-model="emailForm.description" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
+                        placeholder="Escribe una descripción si es necesario" clearable />
+                    <InputError :message="emailForm.errors.description" />
+                </div>
+                <div class="mt-3">
+                    <InputLabel value="Adjunto" />
+                    <p class="text-xs flex items-center space-x-2">
+                        <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 22 22" class="text-green-700"
                                 id="Microsoft-Excel-Logo--Streamline-Ultimate" height="16" width="16">
                                 <desc>Microsoft Excel Logo Streamline Icon: https://streamlinehq.com</desc>
                                 <g id="Microsoft-Excel-Logo--Streamline-Ultimate.svg">
@@ -128,19 +131,19 @@
                                         fill="currentColor" stroke-width="1"></path>
                                 </g>
                             </svg> -->
-                            <i class="fa-solid fa-file-pdf text-lg text-red-600"></i>
-                            <span class="text-secondary">Reporte Robag</span>
-                        </p>
-                    </div>
-                </form>
-            </template>
-            <template #footer>
-                <PrimaryButton @click="savePdfInProject" :disabled="emailForm.processing">
-                    <i v-if="emailForm.processing" class="fa-solid fa-circle-notch fa-spin mr-2"></i>
-                    Enviar correo
-                </PrimaryButton>
-            </template>
-        </DialogModal>
+                        <i class="fa-solid fa-file-pdf text-lg text-red-600"></i>
+                        <span class="text-secondary">Reporte Robag</span>
+                    </p>
+                </div>
+            </form>
+        </template>
+        <template #footer>
+            <PrimaryButton @click="savePdfInProjectAndSend" :disabled="emailForm.processing || loadingPDF">
+                <i v-if="emailForm.processing" class="fa-solid fa-circle-notch fa-spin mr-2"></i>
+                Enviar correo
+            </PrimaryButton>
+        </template>
+    </DialogModal>
 </template>
 <script>
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -297,15 +300,15 @@ export default {
                 heightLeft -= pdfHeight;
 
                 if (heightLeft > 0) {
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, '', 'FAST'); // FAST usa compresión
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, '', 'FAST'); // FAST usa compresión
                 }
             }
             this.loadingPDF = false;
             // Descargar el PDF generado
             pdf.save('example.pdf');
         },
-        async savePdfInProject() {
+        async savePdfInProjectAndSend() {
             this.loadingPDF = true;
             const content = document.getElementById('pdf-content');
 
@@ -355,18 +358,30 @@ export default {
             const formData = new FormData();
             formData.append('file', pdfOutput, 'example.pdf');
 
-            // Enviar el PDF al backend con Axios o Fetch
-            await axios.post('/save-pdf', formData, {
-                headers: {
-                'Content-Type': 'multipart/form-data',
-                },
-            });
-            this.loadingPDF = false;
+            try {
+                // Enviar el PDF al backend y obtener la ruta del archivo guardado
+                const response = await axios.post('/save-pdf', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                const filePath = response.data.path; // La ruta donde se guardó el PDF
+
+                // Pasar la ruta del PDF a la función sendEmail
+                this.sendEmail(filePath);
+
+            } catch (error) {
+                console.error("Error guardando el PDF:", error);
+            } finally {
+                this.loadingPDF = false;
+            }
         },
-        sendEmail() {
+        sendEmail(pdfPath) {
             this.emailForm.transform(data => ({
                 ...data,
                 dates: this.searchDate,
+                pdf_path: pdfPath // Incluir la ruta del PDF en la petición
             })).post(route('robag.email-report'), {
                 onSuccess: () => {
                     this.showEmailModal = false;
@@ -375,7 +390,7 @@ export default {
                         title: 'Correo enviado',
                         message: '',
                         type: 'success'
-                    })
+                    });
                 },
                 onError: (error) => {
                     console.log(error);

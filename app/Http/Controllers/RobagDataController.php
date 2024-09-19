@@ -777,9 +777,10 @@ class RobagDataController extends Controller
         $subject = $validatedData['subject'];
         $description = $validatedData['description'] ?? '';
 
-        // Generar el reporte y guardar en storage
-        $filePath = $this->generateReport(true, $request->dates); // Guardar el archivo y obtener la ruta
+        // Generar el reporte excel y guardar en storage
+        // $filePath = $this->generateReport(true, $request->dates); // Guardar el archivo y obtener la ruta
 
+        $filePath = $request->pdf_path;
         // Enviar el correo con el archivo adjunto
         Mail::to($mainEmail)
             ->cc($cco)
