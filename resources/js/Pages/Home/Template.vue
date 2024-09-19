@@ -11,7 +11,7 @@
             <i v-if="loadingPDF" class="fa-solid fa-circle-notch fa-spin text-xl mr-2"></i>
         </div>
     <Loading v-if="loading" class="mt-16" />
-    <main v-else class="px-10 min-h-screen my-0" id="pdf-content">
+    <main v-else class="px-10 min-h-screen my-4" id="pdf-content">
         <header class="text-center font-bold">
             <p>
                 Reporte de Robag: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? '' }}
@@ -384,6 +384,25 @@ export default {
                 message: 'Correo enviado',
                 type: 'success'
             })
+        },
+        sendEmail() {
+            this.emailForm.transform(data => ({
+                ...data,
+                dates: this.searchDate,
+            })).post(route('robag.email-report'), {
+                onSuccess: () => {
+                    this.showEmailModal = false;
+                    this.emailForm.reset();
+                    this.$notify({
+                        title: 'Correo enviado',
+                        message: '',
+                        type: 'success'
+                    })
+                },
+                onError: (error) => {
+                    console.log(error);
+                },
+            });
         },
         formatDateTime(dateTime) {
             return format(dateTime, "dd MMM, yyyy - H:mm a");
