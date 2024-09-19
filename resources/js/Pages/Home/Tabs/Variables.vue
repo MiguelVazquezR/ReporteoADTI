@@ -87,13 +87,14 @@
                             </div>
                         </div>
                         <!-- tablas -->
-                        <div v-if="selectedVariables.length" class="my-10 overflow-x-auto col-span-full">
+                        <div v-if="selectedVariables.length && !panelLoading" class="my-10 overflow-y-auto col-span-full">
                             <table class="w-full text-[13px] table-fixed">
                                 <thead class="*:border">
                                     <tr class="*:px-2 *:py-1 *:text-start">
                                         <th class="w-[15%]">Tiempo</th>
-                                        <th v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">{{
-                                            variable }}</th>
+                                        <th v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">
+                                            {{ variable }}
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="*:border-x">
@@ -118,7 +119,6 @@
 import InputLabel from '@/Components/InputLabel.vue';
 import Loading from '@/Components/MyComponents/Loading.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import BasicArea from '@/MyComponents/Chart/Area/BasicArea.vue';
 import VariablePanel from '@/MyComponents/Home/VariablePanel.vue';
 import { Link } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -169,7 +169,6 @@ export default {
         Link,
         Loading,
         InputLabel,
-        BasicArea,
         VariablePanel,
     },
     watch: {
@@ -286,7 +285,7 @@ export default {
     async mounted() {
         await this.fetchMachineVariables();
         this.generateTimeSlots();
-        this.fetchMachineData();
+        await this.fetchMachineData();
     },
 }
 </script>
