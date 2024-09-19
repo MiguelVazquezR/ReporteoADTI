@@ -6,7 +6,7 @@
             Reporte de Robag: {{ formatDateTime(dates[0]) }} a {{ formatDateTime(dates[1]) }}
         </p>
         <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button>
-        <button v-if="!loading && !printing" @click="downloadPdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button>
+        <button v-if="!loading && !printing" @click="downloadPdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 ml-5">Test ruta local</button>
     </header>
     <Loading v-if="loading" class="mt-16" />
     <main v-else class="px-10 min-h-screen">
