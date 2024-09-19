@@ -11,10 +11,10 @@
             <i v-if="loadingPDF" class="fa-solid fa-circle-notch fa-spin text-xl mr-2"></i>
         </div>
     <Loading v-if="loading" class="mt-16" />
-    <main v-else class="px-10 min-h-screen" id="pdf-content">
+    <main v-else class="px-10 min-h-screen my-0" id="pdf-content">
         <header class="text-center font-bold">
             <p>
-                Reporte de Robag: {{ formatDateTime(dates[0]) }} a {{ formatDateTime(dates[1]) }}
+                Reporte de Robag: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? '' }}
             </p>
         </header>
         <section class="space-y-4">
@@ -43,7 +43,7 @@
             </div>
 
             <!-- Tercera fila -->
-            <div class="flex space-x-4">
+            <div class="flex space-x-4 pt-0">
                 <!-- PELICULA -->
                 <FilmPanel :items="data" :loading="loading" class="w-[45%]" />
 
@@ -68,20 +68,13 @@
                 </div>
             </div>
         </section> -->
-        <section class="mt-44 space-x-4">
+        <section v-if="selectedVariables.length" class="mt-44 space-x-4">
             <h1 class="font-bold text-lg">Variables</h1>
             <div class="mt-6 grid grid-cols-3 gap-3">
                 <div v-for="(variable, index2) in selectedVariables"
                     :key="index2">
                     <VariablePanel :variableName="variable" height="180"
                         :data="mapItemsToTimeSlots(variables.find(v => v.variable_name == variable).variable_original_name)" />
-                </div>
-                <div v-if="!selectedVariables.length" class="col-span-full mt-20">
-                    <p class="flex flex-col space-y-2 items-center justify-center text-gray-400">
-                        <i class="fa-regular fa-hand-point-left text-4xl"></i>
-                        <span>Para ver información, selecciona las variables que quieras de lado
-                            izquierdo.</span>
-                    </p>
                 </div>
             </div>
         </section>
