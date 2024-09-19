@@ -11,7 +11,7 @@
                     </el-dropdown-menu>
                 </template>
             </el-dropdown> -->
-            <PrimaryButton @click="exportReport">Generar reporte</PrimaryButton>
+            <PrimaryButton :disabled="!searchDate.length" @click="exportReport">Generar reporte</PrimaryButton>
             <el-dropdown trigger="click">
                 <button
                     class="flex items-center justify-center text-secondary rounded-full bg-grayED size-8 focus:border-0 focus:outline-none">

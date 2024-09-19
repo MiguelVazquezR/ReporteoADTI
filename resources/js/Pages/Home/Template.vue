@@ -1,15 +1,19 @@
 <template>
 
     <Head title="Reporte Robag" />
-    <div class="flex space-x-3 justify-center">
-        <!-- <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
-        <button :disabled="loadingPDF" v-if="!loading && !printing" @click="generatePdf"
-            class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar
-            PDF</button>
-        <button :disabled="loadingPDF" v-if="!loading && !printing" @click="showEmailModal = true"
-            class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Enviar
-            por correo</button>
-    </div>
+    <div v-if="!loading && !printing" class="flex space-x-3 justify-end mx-20 mt-5">
+            <el-dropdown split-button type="primary" @click="generatePdf" @command="handleDropdownCommand">
+                Descargar PDF
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item @click="showEmailModal = true">Enviar por correo</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+            <!-- <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
+            <!-- <button :disabled="loadingPDF" v-if="!loading && !printing" @click="generatePdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar PDF</button>
+            <button :disabled="loadingPDF" v-if="!loading && !printing" @click="showEmailModal = true" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Enviar por correo</button> -->
+        </div>
     <div class="text-center mt-4">
         <i v-if="loadingPDF" class="fa-solid fa-circle-notch fa-spin text-xl mr-2"></i>
     </div>
