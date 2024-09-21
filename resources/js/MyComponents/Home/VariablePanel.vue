@@ -1,5 +1,5 @@
 <template>
-    <main class="rounded-[20px] border border-grayD9 p-4" :class="height ? 'h-[220px]' : 'h-[350px]'">
+    <main class="rounded-[20px] border border-grayD9 p-4 h-[220px]">
         <div>
             <p class="text-[#6D6E72] font-bold text-sm">{{ variableName }}</p>
             <BasicArea :series="series" :chartOptions="chartOptions" :width="width" :height="height" />

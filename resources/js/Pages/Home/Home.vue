@@ -310,7 +310,7 @@ export default {
             host: this.modbus_configurations?.host,
             port: this.modbus_configurations?.port,
             sampling_minutes: this.modbus_configurations?.sampling_minutes,
-            machine: 'Robag',
+            machine: 'Robag1',
         });
 
         return {

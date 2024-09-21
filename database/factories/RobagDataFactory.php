@@ -16,7 +16,7 @@ class RobagDataFactory extends Factory
             'data' => [
                 'Estado' => (string) $this->faker->randomElement(['1', '5', '10']),
                 'Cantidad baja de bolsas' => (string) $this->faker->randomElement(['0', '1']),
-                'Restablecer contadores' => (string) $this->faker->randomElement(['0', '1']),
+                'Restablecer contadores' => (string) $this->faker->randomElement(['2', '1']),
                 'Estado interno de la báscula' => (string) $this->faker->randomElement(['200', '404']),
                 'Tiempo de actividad de Robag' => (string) $this->faker->numberBetween(30000, 50000 ),
                 'Motivo del estado de parada' => (string) $this->faker->randomElement(['101', '202', '303']),

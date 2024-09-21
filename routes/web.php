@@ -12,12 +12,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    //ejemplo de Spatie Browsershot
-
-
-
-    $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag');
-    $modbus_configurations = ModbusConfiguration::firstWhere('machine', 'Robag');
+    $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag1');
+    $modbus_configurations = ModbusConfiguration::firstWhere('machine', 'Robag1');
     $variables = MachineVariable::where('machine_name', 'Robag1')->get();
 
     return Inertia::render('Home/Home', [
