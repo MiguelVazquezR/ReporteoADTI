@@ -32,20 +32,20 @@
             </h1>
 
             <OEEPanel ref="oeePanel" :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm" />
-            <!-- <div class="mt-4 space-y-4">
+            <div class="mt-4 space-y-4">
                 <div class="flex space-x-4">
                     <TimePanel :date="searchDate" :items="data" :loading="loading" class="w-1/3" />
                     <ProductionPanel :items="data" :loading="loading" class="w-2/3" />
                 </div>
                 <div class="flex space-x-4">
-                    <VelocityPanel :items="data" :loading="loading" class="w-1/2" />
+                    <VelocityPanel :items="data" height="260" :loading="loading" class="w-1/2" />
                     <DesviacionPanel :items="data" :loading="loading" class="w-1/2" />
                 </div>
                 <div class="flex space-x-4">
                     <FilmPanel :items="data" :loading="loading" class="w-2/5" />
                     <ScalePanel :items="data" :loading="loading" class="w-3/5" />
                 </div>
-            </div> -->
+            </div>
         </article>
     </section>
 </template>

@@ -160,7 +160,7 @@ export default {
         calculateTotalBags() {
             //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
             const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString();
-
+            
             if (sameDay) {
                 //si es el mismo dia toma el ultimo valor total_bags (bolsas totales) y total_waste (desperdicio total) de los registros obtenidos de ese dia.
                 this.totalBags = parseFloat(this.items[this.items.length - 1].data['Total de bolsas']);
@@ -169,7 +169,7 @@ export default {
             } else {
                 //si son dias distintos en el intervalo de fechas se suman todos los total_bags y total_waste del valor maximo de esos dias para calcular el total de bolsas buenas
                 const uniqueDays = [...new Set(this.items.map(item => new Date(item.created_at).toDateString()))];
-
+                
                 this.totalBags = uniqueDays.reduce((total, day) => {
                     const maxBags = Math.max(...this.items
                         .filter(item => new Date(item.created_at).toDateString() === day)
@@ -177,7 +177,7 @@ export default {
                     );
                     return total + maxBags;
                 }, 0);
-
+                
                 this.totalWasteBags = uniqueDays.reduce((total, day) => {
                     const maxBags = Math.max(...this.items
                         .filter(item => new Date(item.created_at).toDateString() === day)

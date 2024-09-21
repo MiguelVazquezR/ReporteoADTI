@@ -134,7 +134,7 @@ export default {
             // Recorrer todos los elementos
             this.items.forEach(item => {
                 // Redondear la desviación estándar
-                const roundedDeviation = Math.round(item.standard_deviation);
+                const roundedDeviation = Math.round(item.data['Desviación estándar']);
 
                 // Si la desviación redondeada ya existe en deviationCounts, aumentar el conteo
                 // Si no, inicializar el conteo en 1

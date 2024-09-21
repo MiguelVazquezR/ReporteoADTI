@@ -44,8 +44,8 @@ class RobagDataFactory extends Factory
                 'Bolsas por minuto' => (string) $this->faker->randomFloat(2, 80, 120), //bolsas por minuto, normalmene de 120
                 'Total regalado (gramos)' => (string) $this->faker->randomFloat(2, 0, 100),
                 'Producto ragalado %' => (string) $this->faker->randomFloat(2, 0, 5),
-                'Total desechado -recuento-' => (string) $this->faker->randomFloat(2, 0, 1000), //total de bolsas malas
-                'Total de bolsas -recuento-' => (string) $this->faker->numberBetween(10000, 100000), //bolsas totales empacadas
+                'Total desechado' => (string) $this->faker->randomFloat(2, 0, 1000), //total de bolsas malas
+                'Total de bolsas' => (string) $this->faker->numberBetween(10000, 100000), //bolsas totales empacadas
                 'Peso medio' => (string) $this->faker->randomFloat(2, 10, 100),
                 'Desviación estándar' => (string) $this->faker->randomFloat(2, -4, 4),
                 'Volcados totales' => (string) $this->faker->numberBetween(0, 1000),
