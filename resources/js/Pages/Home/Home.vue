@@ -2,7 +2,7 @@
     <PublicLayout title="Inicio">
         <!-- Botones -->
         <section class="flex items-center justify-end space-x-2 mt-6 lg:px-14">
-            <el-dropdown split-button type="primary" @click="exportReport" @command="handleDropdownCommand"
+            <!-- <el-dropdown split-button type="primary" @click="exportReport" @command="handleDropdownCommand"
                 :disabled="!searchDate.length">
                 Generar reporte
                 <template #dropdown>
@@ -10,7 +10,8 @@
                         <el-dropdown-item command="email">Enviar por correo</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
-            </el-dropdown>
+            </el-dropdown> -->
+            <PrimaryButton :disabled="!searchDate.length" @click="exportReport">Generar reporte</PrimaryButton>
             <el-dropdown trigger="click">
                 <button
                     class="flex items-center justify-center text-secondary rounded-full bg-grayED size-8 focus:border-0 focus:outline-none">
@@ -179,7 +180,7 @@
                     <template #label>
                         <span>Reporte de variables</span>
                     </template>
-                    <Variables />
+                    <Variables ref="variables" />
                 </el-tab-pane>
             </el-tabs>
         </main>
@@ -213,7 +214,9 @@
                         <article v-for="(item, index) in variables" :key="index"
                             class="grid grid-cols-3 gap-x-6 gap-y-1">
                             <span>{{ item.variable_name }}:</span>
-                            <span class="col-span-2">{{ modbusData[item.variable_original_name] }}</span>
+                            <span class="col-span-2">
+                                {{ applyFilters(modbusData[item.variable_original_name], item.filters) }}
+                            </span>
                         </article>
                     </div>
                 </section>
@@ -304,9 +307,9 @@ export default {
         });
 
         const modbusForm = useForm({
-            host: this.modbus_configurations.host,
-            port: this.modbus_configurations.port,
-            sampling_minutes: this.modbus_configurations.sampling_minutes,
+            host: this.modbus_configurations?.host,
+            port: this.modbus_configurations?.port,
+            sampling_minutes: this.modbus_configurations?.sampling_minutes,
             machine: 'Robag',
         });
 
@@ -367,6 +370,15 @@ export default {
         variables: Array,
     },
     methods: {
+        applyFilters(val, filters) {
+            if (!filters) {
+                return val;
+            }
+
+            if (filters = 'porcentaje') {
+                return (val * 100) + '%';
+            }
+        },
         openModbusMonitor() {
             this.showRealTimeModbusMonitor = true;
 
@@ -443,10 +455,15 @@ export default {
             }
         },
         exportReport() {
-            // const url = route('robag.export-report', { dates: this.searchDate });
-            const url = route('robag.pdf-template', { dates: this.searchDate });
+            const url = route('robag.pdf-template', {
+                dates: this.searchDate,
+                bpm: this.bpm, 
+                date: this.$refs.variables.date,
+                timeSlots: this.$refs.variables.timeSlots,
+                selectedVariables: this.$refs.variables.selectedVariables,
+            });
             window.open(url, '_blank');
-            // this.$inertia.visit(route('robag.pdf-template', {dates: this.searchDate}));
+            // this.$inertia.visit(route('pdf.example'));
         },
         async fetchMachineModbusRegisters() {
             try {

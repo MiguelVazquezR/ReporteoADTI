@@ -45,6 +45,8 @@ Route::middleware([
 
 //Creacion de pdf con Spatie Browsershot -----------
 Route::get('/download-pdf', [PdfController::class, 'downloadPdf'])->name('download.pdf');
+Route::post('/upload-pdf', [PdfController::class, 'uploadPdf'])->name('upload.pdf');
+Route::post('/save-pdf', [PdfController::class, 'savePdf'])->name('save.pdf');
 
 
 // ------- maquinas y sus variables rutas --------
@@ -70,18 +72,18 @@ Route::resource('/modbus-configuration', ModbusConfigurationController::class);
 // Route::get('/modbus-configuration-test', [ModbusConfigurationController::class, 'readModbusData']);//**// PRUEBAS DE LECTURA */
 
 
-Route::get('/get-npm-node-codes', function () {
-    // Ejecutar los comandos
-    $nodePath = shell_exec('which node');
-    $npmPath = shell_exec('which npm');
-
-    // Mostrar los resultados
-   return ' node: ' . $nodePath . ' npm: ' . $npmPath;
-});
-
 Route::get('/pdf-template', function () {
-    $bpm = 120;
+    $bpm = intval(request('bpm'));
     $dates = request('dates');
-
-    return inertia('Home/Template', compact('bpm', 'dates'));
+    $date = request('date');
+    $timeSlots = request('timeSlots');
+    $selectedVariables = request('selectedVariables') ?? [];
+    // return compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'); 
+    return inertia('Home/Template', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'));
 })->name('robag.pdf-template');
+
+
+Route::get('/pdf-example', function () {
+    return inertia('Home/ExamplePdf');
+})->name('pdf.example');
+

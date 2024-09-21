@@ -9,7 +9,7 @@
             <div v-else>
                 <div>
                     <p class="text-black font-bold">OEE</p>
-                    <Semicircle :series="oee" />
+                    <Semicircle :series="oee" :width="width" />
                 </div>
             </div>
             <!-- <p v-else-if="!loading" class="text-sm text-gray-600">No hay datos</p> -->
@@ -30,7 +30,7 @@
                             <p class="text-gray9A mt-2">Producción</p>
                             <p class="text-black">{{ formatNumber(productionTime) }} min</p>
                         </div>
-                        <Basic :series="availabilityPercentage" class="w-full" />
+                        <Basic :series="availabilityPercentage" class="w-full" :width="width" />
                     </div>
                 </article>
             </div>
@@ -53,7 +53,7 @@
                             <p class="text-gray9A mt-2">Prod. Real</p>
                             <p class="text-black">{{ formatNumber(realProduction) }} bpm</p>
                         </div>
-                        <Basic :series="performancePercentage" class="w-full" />
+                        <Basic :series="performancePercentage" class="w-full" :width="width" />
                     </div>
                 </section>
             </div>
@@ -78,7 +78,7 @@
                             <p class="text-gray9A mt-1">Bolsas malas</p>
                             <p class="text-black ml-2">{{ formatNumber(totalWasteBags) }}</p>
                         </div>
-                        <Basic :series="quality" class="w-full" />
+                        <Basic :series="quality" :width="width" />
                     </div>
                 </section>
             </div>
@@ -119,6 +119,7 @@ export default {
         date: Array, //Intervalo de fechas buscadas
         loading: Boolean, //estado de carga al obtener las datos
         teoricProduction: Number, //bolsas por minuto a m{axima capacidad de la maquina (valor ajustable desde home)
+        width: String,
     },
     methods: {
         updateOEEData() {

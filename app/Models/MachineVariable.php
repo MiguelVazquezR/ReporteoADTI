@@ -17,5 +17,6 @@ class MachineVariable extends Model
         'variable_address',
         'type',
         'words',
+        'filters',
     ];
 }

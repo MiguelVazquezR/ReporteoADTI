@@ -2,7 +2,7 @@
     <PublicLayout title="Inicio">
         <main class="lg:py-10 lg:px-7">
             
-            <button @click="downloadPdf" class="bg-primary text-white font-bold p-1">Descargar PDF</button>
+            <!-- <button @click="downloadPdf" class="bg-primary text-white font-bold p-1">Descargar PDF</button> -->
 
             <!-- Cuerpo del documento -->
             <section class="flex space-x-4 w-full">
