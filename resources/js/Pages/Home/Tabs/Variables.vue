@@ -122,7 +122,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import VariablePanel from '@/MyComponents/Home/VariablePanel.vue';
 import { Link } from '@inertiajs/vue3';
 import axios from 'axios';
-import { format, addMinutes, isBefore, isEqual, parse, parseISO, differenceInMinutes } from "date-fns";
+import { format, addMinutes, isBefore, isEqual, parse, parseISO, differenceInMinutes, subDays } from "date-fns";
 
 export default {
     data() {
@@ -172,21 +172,21 @@ export default {
         VariablePanel,
     },
     watch: {
-        date(newVal, oldVal) {
+        async date(newVal, oldVal) {
             this.generateTimeSlots();
-            this.fetchMachineData();
+            await this.fetchMachineData();
         },
-        startTime(newVal, oldVal) {
+        async startTime(newVal, oldVal) {
             this.generateTimeSlots();
-            this.fetchMachineData();
+            await this.fetchMachineData();
         },
-        endTime(newVal, oldVal) {
+        async endTime(newVal, oldVal) {
             this.generateTimeSlots();
-            this.fetchMachineData();
+            await this.fetchMachineData();
         },
-        resolution(newVal, oldVal) {
+        async resolution(newVal, oldVal) {
             this.generateTimeSlots();
-            this.fetchMachineData();
+            await this.fetchMachineData();
         }
     },
     computed: {

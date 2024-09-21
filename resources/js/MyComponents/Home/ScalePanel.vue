@@ -70,16 +70,16 @@ export default {
                     value: averages.total_dump_weight,
                     tagColor: '#FAFDE6',
                 },
-                {
-                    name: 'Total regalado',
-                    value: averages.total_giveaway,
-                    tagColor: '#FFF2DE',
-                },
-                {
-                    name: 'Porcentaje regalado',
-                    value: averages.giveaway_percentage,
-                    tagColor: '#FFDEDE',
-                },
+                // {
+                //     name: 'Total regalado',
+                //     value: averages.total_giveaway,
+                //     tagColor: '#FFF2DE',
+                // },
+                // {
+                //     name: 'Porcentaje regalado',
+                //     value: averages.giveaway_percentage,
+                //     tagColor: '#FFDEDE',
+                // },
             ];
         }
     },

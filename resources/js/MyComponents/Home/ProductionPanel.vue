@@ -4,7 +4,24 @@
             Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
         </div>
         <div v-else>
-            <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN POR DIA</p>
+            <div class="flex items-center space-x-1">
+                <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN POR DIA</p>
+                <el-tooltip placement="top">
+                    <template #content>
+                        <p>
+                            Cantidad de bolsas producidas por día, representada <br>
+                            en función de los días seleccionados. El eje X <br>
+                            muestra los días según las fechas elegidas, mientras <br>
+                            que el eje Y indica el total de bolsas producidas en cada día.
+                        </p>
+                    </template>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-4 text-primary">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                    </svg>
+                </el-tooltip>
+            </div>
             <ColumnWithMarkers :series="updatedSeries" :chartOptions="chartOptions" :width="width" />
         </div>
     </main>

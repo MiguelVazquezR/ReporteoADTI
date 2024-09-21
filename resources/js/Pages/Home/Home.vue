@@ -214,7 +214,9 @@
                         <article v-for="(item, index) in variables" :key="index"
                             class="grid grid-cols-3 gap-x-6 gap-y-1">
                             <span>{{ item.variable_name }}:</span>
-                            <span class="col-span-2">{{ modbusData[item.variable_original_name] }}</span>
+                            <span class="col-span-2">
+                                {{ applyFilters(modbusData[item.variable_original_name], item.filters) }}
+                            </span>
                         </article>
                     </div>
                 </section>
@@ -368,6 +370,15 @@ export default {
         variables: Array,
     },
     methods: {
+        applyFilters(val, filters) {
+            if (!filters) {
+                return val;
+            }
+
+            if (filters = 'porcentaje') {
+                return (val * 100) + '%';
+            }
+        },
         openModbusMonitor() {
             this.showRealTimeModbusMonitor = true;
 
