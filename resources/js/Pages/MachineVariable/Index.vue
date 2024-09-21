@@ -30,9 +30,9 @@
                     @selection-change="handleSelectionChange" ref="multipleTableRef"
                     :row-class-name="tableRowClassName">
                     <el-table-column type="selection" width="30" />
-                    <el-table-column prop="variable_name" label="Nombre" />
-                    <el-table-column prop="variable_description" label="Descripción" width="450" />
-                    <el-table-column prop="variable_address" label="Dirección" />
+                    <el-table-column prop="name" label="Nombre" />
+                    <el-table-column prop="description" label="Descripción" width="450" />
+                    <el-table-column prop="address" label="Dirección" />
                     <el-table-column prop="words" label="Longitud (palabras)" />
                     <el-table-column prop="type" label="Tipo de dato" />
                 </el-table>
@@ -75,8 +75,8 @@ export default {
             } else {
                 return this.variables.filter(
                     (variable) =>
-                        variable.variable_name.toLowerCase().includes(this.search.toLowerCase()) ||
-                        variable.variable_address.toLowerCase().includes(this.search.toLowerCase()) ||
+                        variable.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                        variable.address.toLowerCase().includes(this.search.toLowerCase()) ||
                         variable.type.toLowerCase().includes(this.search.toLowerCase())
                 )
             }

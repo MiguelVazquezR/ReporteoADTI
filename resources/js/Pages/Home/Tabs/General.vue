@@ -1,13 +1,13 @@
 <template>
     <section class="flex space-x-4 w-full min-h-screen mb-10">
-        <!-- Imagen de la maquina (parte izquierda) -->
+        <!-- Imagen de la maquina -->
         <figure class="w-1/4">
             <h1 class="font-bold text-xl mb-6 ml-4">ROBAG</h1>
             <img class="rounded-[20px] border border-grayD9 p-4 w-full" src="@/../../public/images/machine_1.png"
                 alt="">
         </figure>
 
-        <!-- Infomracion de producción (parte derecha) -->
+        <!-- graficas -->
         <article class="w-3/4">
             <div class="flex items-center justify-between space-x-3">
                 <div class="flex items-center space-x-4 lg:-left-40 z-10">
@@ -31,35 +31,18 @@
                 *No hay datos para este intervalo de tiempo
             </h1>
 
-            <!-- graficas en rectangulo negro -->
             <OEEPanel ref="oeePanel" :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm" />
-
-            <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
             <div class="mt-4 space-y-4">
-                <!-- primer fila -->
                 <div class="flex space-x-4">
-                    <!-- Tiempos -->
                     <TimePanel :date="searchDate" :items="data" :loading="loading" class="w-1/3" />
-
-                    <!-- PRODUCCIÓN DIARIA -->
                     <ProductionPanel :items="data" :loading="loading" class="w-2/3" />
                 </div>
-
-                <!-- Segunda fila -->
                 <div class="flex space-x-4">
-                    <!-- Velocidad -->
-                    <VelocityPanel :items="data" :loading="loading" class="w-1/2" />
-
-                    <!-- HISTOGRAMA -->
+                    <VelocityPanel :items="data" height="260" :loading="loading" class="w-1/2" />
                     <DesviacionPanel :items="data" :loading="loading" class="w-1/2" />
                 </div>
-
-                <!-- Tercera fila -->
                 <div class="flex space-x-4">
-                    <!-- PELICULA -->
                     <FilmPanel :items="data" :loading="loading" class="w-2/5" />
-
-                    <!-- BASCULA -->
                     <ScalePanel :items="data" :loading="loading" class="w-3/5" />
                 </div>
             </div>

@@ -12,7 +12,7 @@
                         <p>
                             Tiempos totales acumulados de la maquina (ejecución, pausado, <br>
                             en falla, sin pelicula e interlock) <br>
-                            de {{ interval[0] }} a {{ interval[1] }}.
+                            desde <span class="text-yellow-500">{{ interval[0] }}</span> a <span class="text-yellow-500">{{ interval[1] }}</span>
                         </p>
                     </template>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -137,11 +137,11 @@ export default {
                 const filteredItems = this.items.filter(item => format(new Date(item.created_at), 'yyyy-MM-dd') === date);
 
                 // Obtenemos los valores máximos de cada propiedad para la fecha actual
-                const maxRunTime = Math.max(...filteredItems.map(item => parseFloat(item.run_time) || 0));
-                const maxPausedTime = Math.max(...filteredItems.map(item => parseFloat(item.paused_time) || 0));
-                const maxFaultTime = Math.max(...filteredItems.map(item => parseFloat(item.fault_time) || 0));
-                const maxOutOfFilmTime = Math.max(...filteredItems.map(item => parseFloat(item.out_of_film_time) || 0));
-                const maxInterlockTime = Math.max(...filteredItems.map(item => parseFloat(item.interlock_time) || 0));
+                const maxRunTime = Math.max(...filteredItems.map(item => parseFloat(item.data['Tiempo de ejecución']) || 0));
+                const maxPausedTime = Math.max(...filteredItems.map(item => parseFloat(item.data['Tiempo pausado']) || 0));
+                const maxFaultTime = Math.max(...filteredItems.map(item => parseFloat(item.data['Tiempo de falla']) || 0));
+                const maxOutOfFilmTime = Math.max(...filteredItems.map(item => parseFloat(item.data['Tiempo sin película']) || 0));
+                const maxInterlockTime = Math.max(...filteredItems.map(item => parseFloat(item.data['Tiempo de interlock']) || 0));
 
                 // Sumamos los valores máximos al total correspondiente
                 totalRunTime += maxRunTime;

@@ -69,12 +69,12 @@ class ModbusService
             $this->connection->connect();
 
             foreach ($variables as $variable) {
-                $startAddress = $variable->variable_address - 1;
+                $startAddress = $variable->address - 1;
                 $packet = new ReadHoldingRegistersRequest($startAddress, $variable->words, 1);
                 $binaryData = $this->connection->sendAndReceive($packet);
                 $response = ResponseFactory::parseResponseOrThrow($binaryData);
 
-                $data[$variable->variable_original_name] = $this->parseVariable($response, $variable);
+                $data[$variable->name] = $this->parseVariable($response, $variable);
             }
 
             return $data;

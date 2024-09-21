@@ -21,13 +21,12 @@
                     <div class="flex flex-col ml-1">
                         <label v-for="variable in variables" :key="variable.id"
                             class="flex items-center text-sm cursor-pointer mt-px">
-                            <input type="checkbox" v-model="selectedVariables" name="var"
-                                :value="variable.variable_name"
+                            <input type="checkbox" v-model="selectedVariables" name="var" :value="variable.name"
                                 class="rounded-[3px] text-primary focus:ring-primary cursor-pointer" />
-                            <span class="ms-2 text-sm text-secondary">{{ variable.variable_name }}</span>
+                            <span class="ms-2 text-sm text-secondary">{{ variable.name }}</span>
                         </label>
                         <!-- <el-checkbox v-for="variable in variables" :key="variable.id" v-model="selectedVariables"
-                            :label="variable.variable_name" size="small" /> -->
+                            :label="variable.name" size="small" /> -->
                     </div>
                 </div>
 
@@ -75,8 +74,8 @@
                         </div>
                         <div v-else class="mt-6 grid grid-cols-2 gap-3">
                             <div v-for="(variable, index) in selectedVariables" :key="index">
-                                <VariablePanel :variableName="variable"
-                                    :data="mapItemsToTimeSlots(variables.find(v => v.variable_name == variable).variable_original_name)" />
+                                <VariablePanel :variableName="variable" height="180"
+                                    :data="variablesMapped[variable]" />
                             </div>
                             <div v-if="!selectedVariables.length" class="col-span-full mt-20">
                                 <p class="flex flex-col space-y-2 items-center justify-center text-gray-400">
@@ -87,7 +86,8 @@
                             </div>
                         </div>
                         <!-- tablas -->
-                        <div v-if="selectedVariables.length && !panelLoading" class="my-10 overflow-y-auto col-span-full">
+                        <div v-if="selectedVariables.length && !panelLoading"
+                            class="my-10 overflow-y-auto col-span-full">
                             <table class="w-full text-[13px] table-fixed">
                                 <thead class="*:border">
                                     <tr class="*:px-2 *:py-1 *:text-start">
@@ -100,10 +100,9 @@
                                 <tbody class="*:border-x">
                                     <tr v-for="(time, index) in timeSlots" :key="index"
                                         class="*:px-2 *:py-1 *:text-start even:bg-gray-100 last:border-b">
-                                        <td class="w-[15%]">{{ time }}</td>
+                                        <td class="w-[15%]">{{ time.split(' ')[1] }}</td>
                                         <td v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">
-                                            {{ mapItemsToTimeSlots(variables.find(v => v.variable_name ==
-                                            variable).variable_original_name)[time] }}
+                                            {{ variablesMapped[variable][time.split(' ')[1]] }}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -122,7 +121,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import VariablePanel from '@/MyComponents/Home/VariablePanel.vue';
 import { Link } from '@inertiajs/vue3';
 import axios from 'axios';
-import { format, addMinutes, isBefore, isEqual, parse, parseISO, differenceInMinutes, subDays } from "date-fns";
+import { format, addMinutes, isBefore, isEqual, parse, parseISO, differenceInMinutes } from "date-fns";
 
 export default {
     data() {
@@ -133,6 +132,7 @@ export default {
             // general
             items: [],
             variables: [],
+            variablesMapped: null,
             selectedVariables: [],
             resolutions: [
                 {
@@ -193,15 +193,31 @@ export default {
 
     },
     methods: {
+        getItemsDate() {
+            // return this.items.map(i => i.id)
+            return this.items.map(i => format(i.created_at, "yyyy-MM-dd H:mm"))
+        },
+        mapAllVariables() {
+            let variablesMapped = {};
+
+            this.variables.forEach(variable => {
+                const variableName = variable.name;
+                variablesMapped[variableName] = this.mapItemsToTimeSlots(variableName);
+            });
+
+            this.variablesMapped = variablesMapped;
+        },
         mapItemsToTimeSlots(variable) {
             const usedItems = new Set(); // Para almacenar los IDs de los items ya utilizados
 
             const mappedData = this.timeSlots.map(slot => {
-                const slotTime = parse(slot, "HH:mm", new Date());
+                // Convertir el slot en una fecha completa (fecha + hora)
+                const slotTime = parse(slot, "yyyy-MM-dd H:mm", new Date());
                 let closestItem = null;
                 let minDifference = Infinity;
 
                 this.items.forEach(item => {
+                    // Asegúrate de que la fecha de 'item.created_at' también incluya la fecha
                     const itemDate = parseISO(item.created_at);
                     const difference = differenceInMinutes(slotTime, itemDate);
 
@@ -215,12 +231,12 @@ export default {
                     }
                 });
 
-                // Si hay un item cercano dentro de los 5 minutos, se usa, de lo contrario, se usa 0
+                // Si hay un item cercano dentro de los 10 minutos, se usa, de lo contrario, se usa 0
                 if (closestItem) {
                     usedItems.add(closestItem.id); // Marcar el item como usado
                 }
 
-                return { [slot]: closestItem ? parseFloat(closestItem[variable]) : 0 };
+                return { [slot.split(' ')[1]]: closestItem ? parseFloat(parseFloat(closestItem.data[variable]).toFixed(2)) : 0 };
             });
 
             // Combinar el array de objetos en un solo objeto
@@ -228,19 +244,20 @@ export default {
                 return { ...acc, ...curr };
             }, {});
 
+            console.log(mergedData);
             return mergedData;
         },
         generateTimeSlots() {
             // Verifica que todos los valores estén definidos
             if (this.date && this.startTime && this.endTime && this.resolution) {
                 const slots = [];
-                let currentTime = parse(this.startTime, "H:mm", new Date());
-                const endTime = parse(this.endTime, "H:mm", new Date());
+                let currentTime = parse(`${this.date} ${this.startTime}`, "yyyy-MM-dd H:mm", new Date());
+                const endTime = parse(`${this.date} ${this.endTime}`, "yyyy-MM-dd H:mm", new Date());
                 const step = parseInt(this.resolution); // Resolución en minutos
 
-                // Genera los intervalos de tiempo
+                // Genera los intervalos de tiempo con la fecha incluida
                 while (isBefore(currentTime, endTime) || isEqual(currentTime, endTime)) {
-                    slots.push(format(currentTime, "H:mm"));
+                    slots.push(format(currentTime, "yyyy-MM-dd H:mm"));
                     currentTime = addMinutes(currentTime, step);
                 }
 
@@ -252,7 +269,7 @@ export default {
             try {
                 this.loading = true;
 
-                const response = await axios.get(route('machine-variables.get-variables', 'Robag'));
+                const response = await axios.get(route('machine-variables.get-variables', 'Robag1'));
 
                 if (response.status === 200) {
                     this.variables = response.data.items;
@@ -267,20 +284,22 @@ export default {
             try {
                 this.panelLoading = true;
 
+                // Enviar el rango de fechas correctamente
                 const response = await axios.post(route('robag.get-data-by-date-range', {
-                    date: [`${this.date} ${this.timeSlots[0]}`, `${this.date} ${this.timeSlots[this.timeSlots.length - 1]}`],
+                    date: [`${this.date} ${this.timeSlots[0].split(' ')[1]}`, `${this.date} ${this.timeSlots[this.timeSlots.length - 1].split(' ')[1]}`],
                     subHours: 0,
                 }));
 
                 if (response.status === 200) {
                     this.items = response.data.data;
+                    this.mapAllVariables();
                 }
             } catch (error) {
                 console.log(error);
             } finally {
                 this.panelLoading = false;
             }
-        }
+        },
     },
     async mounted() {
         await this.fetchMachineVariables();

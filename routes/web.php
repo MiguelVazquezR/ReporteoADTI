@@ -12,23 +12,14 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    //ejemplo de Spatie Browsershot
-
-
-
-    $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag');
-    $modbus_configurations = ModbusConfiguration::firstWhere('machine', 'Robag');
-    $variables = MachineVariable::where('machine_name', 'Robag')->get();
+    $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag1');
+    $modbus_configurations = ModbusConfiguration::firstWhere('machine', 'Robag1');
+    $variables = MachineVariable::where('machine_name', 'Robag1')->get();
 
     return Inertia::render('Home/Home', [
         'schedule_settings' => $schedule_settings,
         'modbus_configurations' => $modbus_configurations,
         'variables' => $variables,
-        // 'canLogin' => Route::has('login'),
-        // 'canRegister' => Route::has('register'),
-        // 'laravelVersion' => Application::VERSION,
-        // 'phpVersion' => PHP_VERSION,
-        // 'today_data' => $today_data,
     ]);
 })->name('home');
 

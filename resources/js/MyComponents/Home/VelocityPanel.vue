@@ -24,7 +24,7 @@
                     </svg>
                 </el-tooltip>
             </div>
-            <BasicArea :series="getChartSeries" :chartOptions="updatedChartOptions" :width="width" />
+            <BasicArea :series="getChartSeries" :chartOptions="updatedChartOptions" :width="width" :height="height" />
         </div>
     </main>
 </template>
@@ -63,7 +63,7 @@ export default {
                 },
                 chart: {
                     type: 'area',
-                    height: 280,
+                    height: 250,
                     zoom: {
                         enabled: false
                     }
@@ -100,6 +100,7 @@ export default {
         },
         loading: Boolean, //estado de carga al obtener las datos
         width: String,
+        height: String,
     },
     computed: {
         uniqueFormattedDates() {
@@ -111,7 +112,7 @@ export default {
         getChartSeries() {
             const averages = this.uniqueFormattedDates.map(date => {
                 const filteredItems = this.items.filter(item => format(new Date(item.created_at), 'yyyy-MM-dd') === date);
-                const totalBagsPerMinute = filteredItems.reduce((sum, item) => sum + (parseFloat(item.bags_per_minute) || 0), 0);
+                const totalBagsPerMinute = filteredItems.reduce((sum, item) => sum + (parseFloat(item.data['Bolsas por minuto']) || 0), 0);
                 const average = totalBagsPerMinute / filteredItems.length || 0;
                 return average.toFixed(2); // Redondea a dos decimales
             });

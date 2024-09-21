@@ -9,7 +9,7 @@ class MachineVariableController extends Controller
 {
     public function index()
     {
-        $variables = MachineVariable::where('machine_name', 'Robag')->get();
+        $variables = MachineVariable::where('machine_name', 'Robag1')->get();
 
         return inertia('MachineVariable/Index', compact('variables'));
     }
@@ -23,9 +23,9 @@ class MachineVariableController extends Controller
     {
         $validated = $request->validate([
             'machine_name' => 'required|string|max:255',
-            'variable_name' => 'required|string|max:255',
-            'variable_description' => 'nullable|string|max:800',
-            'variable_address' => 'required|numeric|max:65535',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:800',
+            'address' => 'required|numeric|max:65535',
             'type' => 'required|string|max:255',
             'words' => 'required|numeric|min:1',
         ]);
@@ -51,9 +51,9 @@ class MachineVariableController extends Controller
     {
         $validated = $request->validate([
             'machine_name' => 'required|string|max:255',
-            'variable_name' => 'required|string|max:255',
-            'variable_description' => 'nullable|string|max:800',
-            'variable_address' => 'required|numeric|max:65535',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:800',
+            'address' => 'required|numeric|max:65535',
             'type' => 'required|string|max:255',
             'words' => 'required|numeric|min:1',
         ]);
