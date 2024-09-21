@@ -193,10 +193,6 @@ export default {
 
     },
     methods: {
-        getItemsDate() {
-            // return this.items.map(i => i.id)
-            return this.items.map(i => format(i.created_at, "yyyy-MM-dd H:mm"))
-        },
         mapAllVariables() {
             let variablesMapped = {};
 
@@ -244,7 +240,6 @@ export default {
                 return { ...acc, ...curr };
             }, {});
 
-            console.log(mergedData);
             return mergedData;
         },
         generateTimeSlots() {

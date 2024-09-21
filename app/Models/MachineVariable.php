@@ -17,5 +17,6 @@ class MachineVariable extends Model
         'type',
         'words',
         'filters',
+        'is_active',
     ];
 }

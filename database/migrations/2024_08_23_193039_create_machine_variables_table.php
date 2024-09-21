@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('words')->default(2);
             $table->string('type')->default('float');
             $table->string('filters')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
