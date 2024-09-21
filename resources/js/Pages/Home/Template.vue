@@ -63,7 +63,7 @@
             <div class="mt-6 grid grid-cols-3 gap-3">
                 <div v-for="(variable, index2) in selectedVariables" :key="index2">
                     <VariablePanel :variableName="variable" height="180" :class="index2 > 8 && index2 < 12 ? 'mt-16' : null"
-                        :data="mapItemsToTimeSlots(variables.find(v => v.variable_name == variable).variable_original_name)" />
+                        :data="mapItemsToTimeSlots(variables.find(v => v.name == variable).name)" />
                 </div>
             </div>
         </section>
@@ -81,8 +81,8 @@
                         class="*:px-2 *:py-1 *:text-start even:bg-gray-100 last:border-b">
                         <td class="w-[15%]">{{ time }}</td>
                         <td v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">
-                            {{ mapItemsToTimeSlots(variables.find(v => v.variable_name ==
-                                variable).variable_original_name)[time] }}
+                            {{ mapItemsToTimeSlots(variables.find(v => v.name ==
+                                variable).name)[time] }}
                         </td>
                     </tr>
                 </tbody>

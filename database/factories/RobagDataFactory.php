@@ -10,56 +10,52 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class RobagDataFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'status' => (string) $this->faker->randomElement(['1', '5', '10']),
-            'scale_low_product' => (string) $this->faker->randomElement(['0', '1']),
-            'reset_counters' => (string) $this->faker->randomElement(['0', '1']),
-            'scale_internal_status' => (string) $this->faker->randomElement(['200', '404']),
-            'robag_up_time' => (string) $this->faker->numberBetween(30000, 50000 ), //Tiempo en segundos desde que se encendió el Robag o se reinició el software
-            'reason_for_stop_status' => (string) $this->faker->randomElement(['101', '202', '303']),
-            'run_time' => (string) $this->faker->numberBetween(30000, 55000), //Tiempo total de ejecución (ya con pausas) en segundos
-            'paused_time' => (string) $this->faker->numberBetween(700, 3600), //Tiempo en pausa en segundos
-            'fault_time' => (string) $this->faker->numberBetween(700, 3600), //Tiempo de falla en segundos
-            'out_of_film_time' => (string) $this->faker->numberBetween(500, 3600), //Tiempo en estado sin película en segundos
-            'interlock_time' => (string) $this->faker->numberBetween(0, 600), //Tiempo en pausa en segundos
-            'out_of_film_time' => (string) $this->faker->numberBetween(0, 600), //Tiempo en pausa en segundos
-            'last_metal_detect_time' => (string) $this->faker->time(),
-            'bags_this_roll' => (string) $this->faker->numberBetween(0, 10000),
-            'bags_last_roll' => (string) $this->faker->numberBetween(0, 10000),
-            'PISD_reject_count' => (string) $this->faker->numberBetween(0, 1000),
-            'scale_good_bags' => (string) $this->faker->numberBetween(0, 10000),
-            'scale_overweight_bags' => (string) $this->faker->numberBetween(0, 500),
-            'scale_underweight_bags' => (string) $this->faker->numberBetween(0, 500),
-            'scale_overscale_count' => (string) $this->faker->numberBetween(0, 1000),
-            'scale_warnings' => (string) $this->faker->numberBetween(0, 500),
-            'full_bags' => (string) $this->faker->numberBetween(0, 10000),
-            'empty_bags' => (string) $this->faker->numberBetween(0, 500),
-            'setup_bags' => (string) $this->faker->numberBetween(0, 300),
-            'jogged_bags' => (string) $this->faker->numberBetween(0, 600),
-            'efficiency_percentage' => (string) $this->faker->randomFloat(2, 70, 100),
-            'target_weight' => (string) $this->faker->randomFloat(2, 89, 90), //peso establecido por bolsa en gr. se puede ajustar en la vista
-            'total_dump_weight' => (string) $this->faker->randomFloat(2, 1000, 50000),
-            'bags_per_minute' => (string) $this->faker->randomFloat(2, 80, 120), //bolsas por minuto, normalmene de 120
-            'total_giveaway' => (string) $this->faker->randomFloat(2, 0, 100),
-            'giveaway_percentage' => (string) $this->faker->randomFloat(2, 0, 5),
-            'total_waste' => (string) $this->faker->randomFloat(2, 0, 1000), //total de bolsas malas
-            'total_bags' => (string) $this->faker->numberBetween(10000, 100000), //bolsas totales empacadas
-            'mean_weight' => (string) $this->faker->randomFloat(2, 10, 100),
-            'standard_deviation' => (string) $this->faker->randomFloat(2, -4, 4),
-            'total_dumps' => (string) $this->faker->numberBetween(0, 1000),
-            'gas_total' => (string) $this->faker->randomFloat(2, 100, 10000),
-            'scale_bpm' => (string) $this->faker->randomFloat(2, 50, 150),
-            'heads_per_dump' => (string) $this->faker->numberBetween(1, 10),
-            'average_weight_in_ready_heads' => (string) $this->faker->randomFloat(2, 10, 100),
-            'average_weight' => (string) $this->faker->randomFloat(2, 50, 100),
-            'short_term_scale_efficiency_percentage' => (string) $this->faker->randomFloat(2, 70, 100),
+            'data' => [
+                'Estado' => (string) $this->faker->randomElement(['1', '5', '10']),
+                'Cantidad baja de bolsas' => (string) $this->faker->randomElement(['0', '1']),
+                'Restablecer contadores' => (string) $this->faker->randomElement(['0', '1']),
+                'Estado interno de la báscula' => (string) $this->faker->randomElement(['200', '404']),
+                'Tiempo de actividad de Robag' => (string) $this->faker->numberBetween(30000, 50000 ),
+                'Motivo del estado de parada' => (string) $this->faker->randomElement(['101', '202', '303']),
+                'Tiempo de ejecución' => (string) $this->faker->numberBetween(30000, 55000), 
+                'Tiempo pausado' => (string) $this->faker->numberBetween(700, 3600),
+                'Tiempo de falla' => (string) $this->faker->numberBetween(700, 3600), 
+                'Tiempo sin película' => (string) $this->faker->numberBetween(500, 3600), 
+                'Tiempo de interlock' => (string) $this->faker->numberBetween(0, 600),
+                'Última vez de detección de metales' => (string) $this->faker->numberBetween(0, 900),
+                'Bolsas rollo en uso' => (string) $this->faker->numberBetween(0, 10000),
+                'Bolsas último rollo' => (string) $this->faker->numberBetween(0, 10000),
+                'Recuento de rechazos de PISD' => (string) $this->faker->numberBetween(0, 1000),
+                'Bolsas buenas' => (string) $this->faker->numberBetween(0, 10000),
+                'Bolsas con excedente de peso' => (string) $this->faker->numberBetween(0, 500),
+                'Bolsas de peso bajo' => (string) $this->faker->numberBetween(0, 500),
+                'Recuento de sobreescala de báscula' => (string) $this->faker->numberBetween(0, 1000),
+                'Advertencias de báscula' => (string) $this->faker->numberBetween(0, 500),
+                'Bolsas llenas' => (string) $this->faker->numberBetween(0, 10000),
+                'Bolsas vacias' => (string) $this->faker->numberBetween(0, 500),
+                'Bolsas de prueba o de ajuste' => (string) $this->faker->numberBetween(0, 300),
+                'Bolsas movidas' => (string) $this->faker->numberBetween(0, 600),
+                '% Eficiencia de máquina' => (string) $this->faker->randomFloat(2, 70, 100),
+                'Peso objetivo (gramos)' => (string) $this->faker->randomFloat(2, 89, 90), //peso establecido por bolsa en gr. se puede ajustar en la vista
+                'Peso total de descarga' => (string) $this->faker->randomFloat(2, 1000, 50000),
+                'Bolsas por minuto' => (string) $this->faker->randomFloat(2, 80, 120), //bolsas por minuto, normalmene de 120
+                'Total regalado (gramos)' => (string) $this->faker->randomFloat(2, 0, 100),
+                'Producto ragalado %' => (string) $this->faker->randomFloat(2, 0, 5),
+                'Total desechado -recuento-' => (string) $this->faker->randomFloat(2, 0, 1000), //total de bolsas malas
+                'Total de bolsas -recuento-' => (string) $this->faker->numberBetween(10000, 100000), //bolsas totales empacadas
+                'Peso medio' => (string) $this->faker->randomFloat(2, 10, 100),
+                'Desviación estándar' => (string) $this->faker->randomFloat(2, -4, 4),
+                'Volcados totales' => (string) $this->faker->numberBetween(0, 1000),
+                'Gas Total (litros)' => (string) $this->faker->randomFloat(2, 100, 10000),
+                'báscula bpm' => (string) $this->faker->randomFloat(2, 50, 150),
+                'Cabezas por volcado' => (string) $this->faker->numberBetween(1, 10),
+                'Peso medio en cabezas listas' => (string) $this->faker->randomFloat(2, 10, 100),
+                'Peso promedio' => (string) $this->faker->randomFloat(2, 50, 100),
+                'Eficiencia de báscula a corto plazo (%)' => (string) $this->faker->randomFloat(2, 70, 100),
+            ],
             'created_at' => $this->randomDateTimeThisMonth(),
             'updated_at' => $this->randomDateTimeThisMonth(),
         ];

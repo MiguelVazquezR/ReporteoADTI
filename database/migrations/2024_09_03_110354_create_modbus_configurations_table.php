@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('machine');
             $table->unsignedSmallInteger('sampling_minutes')->default(5);
-            $table->string('host')->default('192.168.0.1'); // IP por defecto
+            $table->string('host')->default('127.0.0.1'); // IP por defecto
             $table->integer('port')->default(502); // Puerto por defecto
             $table->timestamps();
         });

@@ -120,8 +120,8 @@
                                     </p>
                                     <select v-model="modbusForm.sampling_minutes" placeholder="Selecciona"
                                         class="col-span-2 border-grayD9 h-9 focus:ring-0 focus:border-primary rounded-[4px] text-secondary text-sm transition-all duration-200">
-                                        <option v-for="item in samplings" :key="item.value" :value="item.value">{{
-                                            item.label }}</option>
+                                        <option v-for="item in samplings" :key="item.value" :value="item.value">
+                                            {{ item.label }}</option>
                                     </select>
                                 </div>
                             </article>
@@ -213,9 +213,9 @@
                         </PrimaryButton>
                         <article v-for="(item, index) in variables" :key="index"
                             class="grid grid-cols-3 gap-x-6 gap-y-1">
-                            <span>{{ item.variable_name }}:</span>
+                            <span>{{ item.name }}:</span>
                             <span class="col-span-2">
-                                {{ applyFilters(modbusData[item.variable_original_name], item.filters) }}
+                                {{ applyFilters(modbusData[item.name], item.filters) }}
                             </span>
                         </article>
                     </div>
@@ -457,7 +457,7 @@ export default {
         exportReport() {
             const url = route('robag.pdf-template', {
                 dates: this.searchDate,
-                bpm: this.bpm, 
+                bpm: this.bpm,
                 date: this.$refs.variables.date,
                 timeSlots: this.$refs.variables.timeSlots,
                 selectedVariables: this.$refs.variables.selectedVariables,

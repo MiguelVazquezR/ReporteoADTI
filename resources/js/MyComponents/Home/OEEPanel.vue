@@ -135,10 +135,10 @@ export default {
 
             if (sameDay) {
                 //si es el mismo dia toma el ultimo valor run_time de los registros obtenidos de ese dia.
-                this.productionTime = parseFloat(this.items[this.items.length - 1].run_time) / 60;
+                this.productionTime = parseFloat(this.items[this.items.length - 1].data['Tiempo de ejecución']) / 60;
             } else {
                 //si son dias distintos en el intervalo de fechas se suman todos los run_time de esos dias para calcular el tiempo de produccion efectivo.
-                this.productionTime = this.items.reduce((total, item) => total + parseFloat(item.run_time), 0) / 60;
+                this.productionTime = this.items.reduce((total, item) => total + parseFloat(item.data['Tiempo de ejecución']), 0) / 60;
             }
 
             this.availabilityPercentage = [((this.productionTime * 100) / this.totalTime).toFixed(1)];
@@ -149,10 +149,10 @@ export default {
 
             if (sameDay) {
                 //si es el mismo dia toma el ultimo valor bags_per_minute (bolsas) de los registros obtenidos de ese dia.
-                this.realProduction = parseFloat(this.items[this.items.length - 1].bags_per_minute);
+                this.realProduction = parseFloat(this.items[this.items.length - 1].data['Bolsas por minuto']);
             } else {
                 //si son dias distintos en el intervalo de fechas se suman todos los bags_per_minute de esos dias para calcular el promedio de bolsas por minuto.
-                this.realProduction = this.items.reduce((total, item) => total + parseFloat(item.bags_per_minute), 0) / this.items.length;
+                this.realProduction = this.items.reduce((total, item) => total + parseFloat(item.data['Bolsas por minuto']), 0) / this.items.length;
             }
 
             this.performancePercentage = [((this.realProduction * 100) / this.teoricProduction).toFixed(1)];
@@ -163,9 +163,9 @@ export default {
 
             if (sameDay) {
                 //si es el mismo dia toma el ultimo valor total_bags (bolsas totales) y total_waste (desperdicio total) de los registros obtenidos de ese dia.
-                this.totalBags = parseFloat(this.items[this.items.length - 1].total_bags);
-                this.totalWasteBags = parseFloat(this.items[this.items.length - 1].total_waste);
-                this.totalGoodBags = parseFloat(this.items[this.items.length - 1].total_bags) - parseFloat(this.items[this.items.length - 1].total_waste);
+                this.totalBags = parseFloat(this.items[this.items.length - 1].data['Total de bolsas']);
+                this.totalWasteBags = parseFloat(this.items[this.items.length - 1].data['Total desechado']);
+                this.totalGoodBags = parseFloat(this.items[this.items.length - 1].data['Total de bolsas']) - parseFloat(this.items[this.items.length - 1].data['Total desechado']);
             } else {
                 //si son dias distintos en el intervalo de fechas se suman todos los total_bags y total_waste del valor maximo de esos dias para calcular el total de bolsas buenas
                 const uniqueDays = [...new Set(this.items.map(item => new Date(item.created_at).toDateString()))];
@@ -173,7 +173,7 @@ export default {
                 this.totalBags = uniqueDays.reduce((total, day) => {
                     const maxBags = Math.max(...this.items
                         .filter(item => new Date(item.created_at).toDateString() === day)
-                        .map(item => parseInt(item.total_bags))
+                        .map(item => parseInt(item.data['Total de bolsas']))
                     );
                     return total + maxBags;
                 }, 0);
@@ -181,7 +181,7 @@ export default {
                 this.totalWasteBags = uniqueDays.reduce((total, day) => {
                     const maxBags = Math.max(...this.items
                         .filter(item => new Date(item.created_at).toDateString() === day)
-                        .map(item => parseInt(item.total_waste))
+                        .map(item => parseInt(item.data['Total desechado']))
                     );
                     return total + maxBags;
                 }, 0);
@@ -237,7 +237,6 @@ export default {
             }
 
             if (this.items?.length) {
-
                 this.calculateAvailability(); //calcula el porcentaje del tiempo disponible
                 this.calculateProductionTime(); //calcula las variables para el tiempo de produccion
                 this.calculateTotalBags(); //calcula las variables para la calidad
