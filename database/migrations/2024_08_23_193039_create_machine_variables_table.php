@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('variable_address')->nullable();
             $table->unsignedTinyInteger('words')->default(2);
             $table->string('type')->default('float');
+            $table->string('filters')->nullable();
             $table->timestamps();
         });
     }

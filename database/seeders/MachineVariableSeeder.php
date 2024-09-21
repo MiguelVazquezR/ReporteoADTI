@@ -204,7 +204,7 @@ class MachineVariableSeeder extends Seeder
                 "type" => "float",
             ],
             [
-                "variable_name" => "% Eficiencia",
+                "variable_name" => "% Eficiencia de máquina",
                 "variable_original_name" => "efficiency_percentage",
                 "variable_description" => "Valor filtrado que representa el número de volcados completos desde la báscula.",
                 "variable_address" => "5008",

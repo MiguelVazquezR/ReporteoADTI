@@ -50,7 +50,7 @@
             </div>
 
             <!-- Tercera fila -->
-            <div class="flex space-x-4 pt-0">
+            <div class="flex space-x-4 pt-36">
                 <!-- PELICULA -->
                 <FilmPanel :items="data" :loading="loading" class="w-[45%]" />
 
@@ -58,11 +58,11 @@
                 <ScalePanel :items="data" :loading="loading" class="w-[55%]" width="65%" />
             </div>
         </section>
-        <section v-if="selectedVariables.length" class="mt-44 space-x-4">
+        <section v-if="selectedVariables.length" class="mt-6 space-x-4">
             <h1 class="font-bold text-lg">Variables</h1>
             <div class="mt-6 grid grid-cols-3 gap-3">
                 <div v-for="(variable, index2) in selectedVariables" :key="index2">
-                    <VariablePanel :variableName="variable" height="180"
+                    <VariablePanel :variableName="variable" height="180" :class="index2 > 8 && index2 < 12 ? 'mt-16' : null"
                         :data="mapItemsToTimeSlots(variables.find(v => v.variable_name == variable).variable_original_name)" />
                 </div>
             </div>
@@ -72,8 +72,8 @@
                 <thead class="*:border">
                     <tr class="*:px-2 *:py-1 *:text-start">
                         <th class="w-[15%]">Tiempo</th>
-                        <th v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">{{
-                            variable }}</th>
+                        <th v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">
+                            {{ variable }}</th>
                     </tr>
                 </thead>
                 <tbody class="*:border-x">
@@ -251,7 +251,7 @@ export default {
                     usedItems.add(closestItem.id); // Marcar el item como usado
                 }
 
-                return { [slot]: closestItem ? parseFloat(closestItem[variable]) : 0 };
+                return { [slot]: closestItem ? parseFloat(parseFloat(closestItem[variable]).toFixed(2)) : 0 };
             });
 
             // Combinar el array de objetos en un solo objeto
@@ -467,9 +467,9 @@ export default {
         },
     },
     async mounted() {
-        await this.fetchMachineVariables();
-        await this.getDataByDateRange(); // Recupera los registros del día de hoy
-        await this.fetchMachineData();
+         this.fetchMachineVariables();
+         this.getDataByDateRange(); // Recupera los registros del día de hoy
+         this.fetchMachineData();
         window.addEventListener('afterprint', this.handleAfterPrint);
     },
     beforeDestroy() {

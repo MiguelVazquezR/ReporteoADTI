@@ -5,7 +5,23 @@
         </div>
 
         <div v-else>
-            <p class="text-[#6D6E72] font-bold text-sm">TIEMPOS</p>
+            <div class="flex items-center space-x-1">
+                <p class="text-[#6D6E72] font-bold text-sm">TIEMPOS</p>
+                <el-tooltip placement="top">
+                    <template #content>
+                        <p>
+                            Tiempos totales acumulados de la maquina (ejecución, pausado, <br>
+                            en falla, sin pelicula e interlock) <br>
+                            de {{ interval[0] }} a {{ interval[1] }}.
+                        </p>
+                    </template>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-4 text-primary">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                    </svg>
+                </el-tooltip>
+            </div>
             <CircleCustomAngle :series="maxTimeTotals.percentage" :chartOptions="chartOptions" :width="width" />
         </div>
     </main>
@@ -13,6 +29,7 @@
 
 <script>
 import { differenceInSeconds, format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import CircleCustomAngle from '@/MyComponents/Chart/RadialBar/CircleCustomAngle.vue';
 
 export default {
@@ -79,6 +96,7 @@ export default {
                     }
                 }]
             },
+            interval: [null, null],
         }
     },
     components: {
@@ -153,6 +171,12 @@ export default {
         }
     },
     methods: {
+        formatInterval() {
+            this.interval = [
+                format(new Date(this.date[0]), "dd MMM yyyy • hh:mm a", { locale: es }),
+                format(new Date(this.date[1]), "dd MMM yyyy • hh:mm a", { locale: es }),
+            ];
+        },
         formatTime(index) {
             const seconds = this.maxTimeTotals.seconds[index];
             const days = Math.floor(seconds / (24 * 3600)); // Un día tiene 86400 segundos
@@ -197,6 +221,7 @@ export default {
     },
     mounted() {
         this.getTotalTime();
+        this.formatInterval();
     }
 }
 </script>

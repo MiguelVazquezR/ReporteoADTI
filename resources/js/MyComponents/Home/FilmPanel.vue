@@ -6,7 +6,7 @@
 
         <div v-else>
             <p class="text-[#6D6E72] font-bold text-sm">USO DE PELÍCULA</p>
-            <SimpleDonut width="400" :series="Object.values(getFilmChartSeries)" :chartOptions="chartOptions" />
+            <SimpleDonut width="400" :series="getFilmChartSeries" :chartOptions="chartOptions" />
         </div>
     </main>
 </template>
@@ -63,11 +63,18 @@ export default {
     },
     computed: {
         getFilmChartSeries() {
-            return this.items.reduce((acc, item) => {
-                acc.full_bags += parseInt(item.full_bags) || 0;
-                acc.total_waste += parseInt(item.total_waste) || 0;
-                return acc;
-            }, { full_bags: 0, total_waste: 0 });
+            // return this.items.reduce((acc, item) => {
+            //     acc.full_bags += parseInt(item.full_bags) || 0;
+            //     acc.total_waste += parseInt(item.total_waste) || 0;
+            //     return acc;
+            // }, { full_bags: 0, total_waste: 0 });
+
+            // delvolver el ultimo registro
+            let lastItem = this.items[this.items.length - 1];
+            const fullBags = parseFloat(lastItem?.full_bags ?? 0.0).toFixed(1);
+            const totalWaste = parseFloat(lastItem?.total_waste ?? 0.0).toFixed(1);
+
+            return [parseFloat(fullBags), parseFloat(totalWaste)];
         }
     }
 }
