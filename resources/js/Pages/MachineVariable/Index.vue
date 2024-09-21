@@ -11,20 +11,18 @@
             </section>
             <section class="flex flex-col items-center">
                 <div class="lg:flex justify-between mb-2 mt-6">
-                    <!-- pagination -->
-                    <div class="flex space-x-5 items-center">
-                        <!-- <el-pagination @current-change="handlePagination" layout="prev, pager, next"
-                                :total="users.length / itemsPerPage" /> -->
-                        <div class="mt-2 lg:mt-0">
-                            <el-popconfirm confirm-button-text="Si" cancel-button-text="No" icon-color="#0355B5"
-                                title="¿Continuar?" @confirm="deleteSelections">
-                                <template #reference>
-                                    <el-button type="danger" plain class="mb-3"
-                                        :disabled="disableMassiveActions">Eliminar</el-button>
-                                </template>
-                            </el-popconfirm>
-                        </div>
-                    </div>
+                    <el-dropdown :disabled="disableMassiveActions" @command="handleCommand">
+                        <el-button type="primary" :disabled="disableMassiveActions">
+                            Acciones masivas
+                            <i class="fa-solid fa-chevron-down ml-2 text-xs"></i>
+                        </el-button>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item command="toggle-status">Cambiar estado</el-dropdown-item>
+                                <el-dropdown-item command="delete">Eliminar</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
                 </div>
                 <el-table :data="variables" @row-click="handleRowClick" max-height="520" style="width: 90%"
                     @selection-change="handleSelectionChange" ref="multipleTableRef"
@@ -35,9 +33,33 @@
                     <el-table-column prop="address" label="Dirección" />
                     <el-table-column prop="words" label="Longitud (palabras)" />
                     <el-table-column prop="type" label="Tipo de dato" />
+                    <el-table-column prop="is_active" label="Estado">
+                        <template #default="scope">
+                            <p :class="scope.row.is_active ? 'text-green-600' : 'text-red-600'">
+                                {{ scope.row.is_active ? 'Lectura activa' : 'Lectura inactiva' }}
+                            </p>
+                        </template>
+                    </el-table-column>
                 </el-table>
             </section>
         </main>
+        <ConfirmationModal :show="showDeleteConfirm" @close="showDeleteConfirm = false">
+            <template #title>
+                <h1>Confirmación de eliminación</h1>
+            </template>
+            <template #content>
+                <p>
+                    Estas a punto de eliminar las variables seleccionadas. Una vez eliminadas ya no se pueden recuperar.
+                    ¿Continuar?
+                </p>
+            </template>
+            <template #footer>
+                <div class="flex items-center space-x-1">
+                    <CancelButton @click="showDeleteConfirm = false">Cancelar</CancelButton>
+                    <PrimaryButton>Eliminar</PrimaryButton>
+                </div>
+            </template>
+        </ConfirmationModal>
     </PublicLayout>
 </template>
 
@@ -45,6 +67,8 @@
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { Link } from '@inertiajs/vue3';
+import ConfirmationModal from '@/Components/ConfirmationModal.vue';
+import CancelButton from '@/Components/CancelButton.vue';
 
 export default {
     data() {
@@ -53,17 +77,15 @@ export default {
             // tabla
             disableMassiveActions: true,
             search: '',
-
-            // pagination
-            itemsPerPage: 50,
-            start: 0,
-            end: 50,
+            showDeleteConfirm: false,
         }
     },
     components: {
         PublicLayout,
         PrimaryButton,
-        Link
+        Link,
+        ConfirmationModal,
+        CancelButton,
     },
     props: {
         variables: Array,
@@ -83,6 +105,13 @@ export default {
         }
     },
     methods: {
+        handleCommand(command) {
+            if (command == 'delete') {
+                this.showDeleteConfirm = true;
+            } else if (command == 'toggle-status') {
+
+            }
+        },
         handleRowClick(row) {
             this.$inertia.visit(route('machine-variables.edit', row));
         },

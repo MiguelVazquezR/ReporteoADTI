@@ -2,18 +2,18 @@
 
     <Head title="Reporte Robag" />
     <div v-if="!loading && !printing" class="flex space-x-3 justify-end mx-20 mt-5">
-            <el-dropdown split-button type="primary" @click="generatePdf" @command="handleDropdownCommand">
-                Descargar PDF
-                <template #dropdown>
-                    <el-dropdown-menu>
-                        <el-dropdown-item @click="showEmailModal = true">Enviar por correo</el-dropdown-item>
-                    </el-dropdown-menu>
-                </template>
-            </el-dropdown>
-            <!-- <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
-            <!-- <button :disabled="loadingPDF" v-if="!loading && !printing" @click="generatePdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar PDF</button>
+        <el-dropdown split-button type="primary" @click="generatePdf" @command="handleDropdownCommand">
+            Descargar PDF
+            <template #dropdown>
+                <el-dropdown-menu>
+                    <el-dropdown-item @click="showEmailModal = true">Enviar por correo</el-dropdown-item>
+                </el-dropdown-menu>
+            </template>
+        </el-dropdown>
+        <!-- <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
+        <!-- <button :disabled="loadingPDF" v-if="!loading && !printing" @click="generatePdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar PDF</button>
             <button :disabled="loadingPDF" v-if="!loading && !printing" @click="showEmailModal = true" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Enviar por correo</button> -->
-        </div>
+    </div>
     <div class="text-center mt-4">
         <i v-if="loadingPDF" class="fa-solid fa-circle-notch fa-spin text-xl mr-2"></i>
     </div>
@@ -61,9 +61,14 @@
         <section v-if="selectedVariables.length" class="mt-6 space-x-4">
             <h1 class="font-bold text-lg">Variables</h1>
             <div class="mt-6 grid grid-cols-3 gap-3">
-                <div v-for="(variable, index2) in selectedVariables" :key="index2">
-                    <VariablePanel :variableName="variable" height="180" :class="index2 > 8 && index2 < 12 ? 'mt-16' : null"
+                <!-- <div v-for="(variable, index2) in selectedVariables" :key="index2">
+                    <VariablePanel :variableName="variable" height="180"
+                        :class="index2 > 8 && index2 < 12 ? 'mt-16' : null"
                         :data="mapItemsToTimeSlots(variables.find(v => v.name == variable).name)" />
+                </div> -->
+                <div v-for="(variable, index) in selectedVariables" :key="index">
+                    <VariablePanel :variableName="variable" height="180" :data="variablesMapped[variable]"
+                        :class="index > 8 && index < 12 ? 'mt-16' : null" />
                 </div>
             </div>
         </section>
@@ -73,16 +78,16 @@
                     <tr class="*:px-2 *:py-1 *:text-start">
                         <th class="w-[15%]">Tiempo</th>
                         <th v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">
-                            {{ variable }}</th>
+                            {{ variable }}
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="*:border-x">
                     <tr v-for="(time, index) in timeSlots" :key="index"
                         class="*:px-2 *:py-1 *:text-start even:bg-gray-100 last:border-b">
-                        <td class="w-[15%]">{{ time }}</td>
+                        <td class="w-[15%]">{{ time.split(' ')[1] }}</td>
                         <td v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">
-                            {{ mapItemsToTimeSlots(variables.find(v => v.name ==
-                                variable).name)[time] }}
+                            {{ variablesMapped[variable][time.split(' ')[1]] }}
                         </td>
                     </tr>
                 </tbody>
@@ -182,6 +187,7 @@ export default {
             panelLoading: true,
             items: [],
             variables: [],
+            variablesMapped: null,
         }
     },
     components: {
@@ -212,45 +218,58 @@ export default {
         selectedVariables: Array,
     },
     methods: {
-        mapItemsToTimeSlots(variable) {
-            const usedItems = new Set(); // Para almacenar los IDs de los items ya utilizados
-
-            const mappedData = this.timeSlots.map(slot => {
-                const slotTime = parse(slot, "HH:mm", new Date());
-                let closestItem = null;
-                let minDifference = Infinity;
-
-                this.items.forEach(item => {
-                    const itemDate = parseISO(item.created_at);
-                    const difference = differenceInMinutes(slotTime, itemDate);
-
-                    // Considerar solo los items dentro del rango de 10 minutos hacia arriba y hacia abajo
-                    if (Math.abs(difference) <= 10 && !usedItems.has(item.id)) {
-                        // Verificar si es el más cercano hasta ahora
-                        if (Math.abs(difference) < Math.abs(minDifference)) {
-                            minDifference = difference;
-                            closestItem = item;
-                        }
-                    }
-                });
-
-                // Si hay un item cercano dentro de los 5 minutos, se usa, de lo contrario, se usa 0
-                if (closestItem) {
-                    usedItems.add(closestItem.id); // Marcar el item como usado
-                }
-
-                return { [slot]: closestItem ? parseFloat(parseFloat(closestItem[variable]).toFixed(2)) : 0 };
-            });
-
-            // Combinar el array de objetos en un solo objeto
-            const mergedData = mappedData.reduce((acc, curr) => {
-                return { ...acc, ...curr };
-            }, {});
-
-            return mergedData;
-        },
         downloadPdf() {
             window.location.href = '/download-pdf'; // Redirige a la ruta para descargar el PDF
+        },
+        print() {
+            this.printing = true;
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        },
+        handleAfterPrint() {
+            this.printing = false;
+        },
+        sendEmail(pdfPath) {
+            this.emailForm.transform(data => ({
+                ...data,
+                dates: this.searchDate,
+                pdf_path: pdfPath // Incluir la ruta del PDF en la petición
+            })).post(route('robag.email-report'), {
+                onSuccess: () => {
+                    this.showEmailModal = false;
+                    this.emailForm.reset();
+                    this.$notify({
+                        title: 'Correo enviado',
+                        message: '',
+                        type: 'success'
+                    });
+                },
+                onError: (error) => {
+                    console.log(error);
+                },
+            });
+        },
+        formatDateTime(dateTime) {
+            return format(dateTime, "dd MMM, yyyy - H:mm a");
+        },
+        async getDataByDateRange() {
+            this.loading = true;
+            try {
+                const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.dates });
+                if (response.status === 200) {
+                    this.data = response.data.data;
+                    this.$emit(
+                        'updated-dates',
+                        this.data.length ? this.dates : []
+                    );
+                }
+
+            } catch (error) {
+                console.log(error)
+            } finally {
+                // this.loading = false;
+            }
         },
         async generatePdf() {
             this.loadingPDF = true;
@@ -369,53 +388,61 @@ export default {
                 this.loadingPDF = false;
             }
         },
-        sendEmail(pdfPath) {
-            this.emailForm.transform(data => ({
-                ...data,
-                dates: this.searchDate,
-                pdf_path: pdfPath // Incluir la ruta del PDF en la petición
-            })).post(route('robag.email-report'), {
-                onSuccess: () => {
-                    this.showEmailModal = false;
-                    this.emailForm.reset();
-                    this.$notify({
-                        title: 'Correo enviado',
-                        message: '',
-                        type: 'success'
-                    });
-                },
-                onError: (error) => {
-                    console.log(error);
-                },
+        // variables independientes
+        mapAllVariables() {
+            let variablesMapped = {};
+
+            this.variables.forEach(variable => {
+                const variableName = variable.name;
+                variablesMapped[variableName] = this.mapItemsToTimeSlots(variableName);
             });
+
+            this.variablesMapped = variablesMapped;
         },
-        formatDateTime(dateTime) {
-            return format(dateTime, "dd MMM, yyyy - H:mm a");
-        },
-        async getDataByDateRange() {
-            this.loading = true;
-            try {
-                const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.dates });
-                if (response.status === 200) {
-                    this.data = response.data.data;
-                    this.$emit(
-                        'updated-dates',
-                        this.data.length ? this.dates : []
-                    );
+        mapItemsToTimeSlots(variable) {
+            const usedItems = new Set(); // Para almacenar los IDs de los items ya utilizados
+
+            const mappedData = this.timeSlots.map(slot => {
+                // Convertir el slot en una fecha completa (fecha + hora)
+                const slotTime = parse(slot, "yyyy-MM-dd H:mm", new Date());
+                let closestItem = null;
+                let minDifference = Infinity;
+
+                this.items.forEach(item => {
+                    // Asegúrate de que la fecha de 'item.created_at' también incluya la fecha
+                    const itemDate = parseISO(item.created_at);
+                    const difference = differenceInMinutes(slotTime, itemDate);
+
+                    // Considerar solo los items dentro del rango de 10 minutos hacia arriba y hacia abajo
+                    if (Math.abs(difference) <= 10 && !usedItems.has(item.id)) {
+                        // Verificar si es el más cercano hasta ahora
+                        if (Math.abs(difference) < Math.abs(minDifference)) {
+                            minDifference = difference;
+                            closestItem = item;
+                        }
+                    }
+                });
+
+                // Si hay un item cercano dentro de los 10 minutos, se usa, de lo contrario, se usa 0
+                if (closestItem) {
+                    usedItems.add(closestItem.id); // Marcar el item como usado
                 }
 
-            } catch (error) {
-                console.log(error)
-            } finally {
-                // this.loading = false;
-            }
+                return { [slot.split(' ')[1]]: closestItem ? parseFloat(parseFloat(closestItem.data[variable]).toFixed(2)) : 0 };
+            });
+
+            // Combinar el array de objetos en un solo objeto
+            const mergedData = mappedData.reduce((acc, curr) => {
+                return { ...acc, ...curr };
+            }, {});
+
+            return mergedData;
         },
-        // variables independientes
         async fetchMachineVariables() {
             try {
                 this.loading = true;
 
-                const response = await axios.get(route('machine-variables.get-variables', 'Robag'));
+                const response = await axios.get(route('machine-variables.get-variables', 'Robag1'));
 
                 if (response.status === 200) {
                     this.variables = response.data.items;
@@ -428,36 +455,29 @@ export default {
         },
         async fetchMachineData() {
             try {
-                this.loading = true;
+                this.panelLoading = true;
 
+                // Enviar el rango de fechas correctamente
                 const response = await axios.post(route('robag.get-data-by-date-range', {
-                    date: [`${this.date} ${this.timeSlots[0]}`, `${this.date} ${this.timeSlots[this.timeSlots.length - 1]}`],
+                    date: [`${this.date} ${this.timeSlots[0].split(' ')[1]}`, `${this.date} ${this.timeSlots[this.timeSlots.length - 1].split(' ')[1]}`],
                     subHours: 0,
                 }));
 
                 if (response.status === 200) {
                     this.items = response.data.data;
+                    this.mapAllVariables();
                 }
             } catch (error) {
                 console.log(error);
             } finally {
-                this.loading = false;
+                this.panelLoading = false;
             }
-        },
-        print() {
-            this.printing = true;
-            setTimeout(() => {
-                window.print();
-            }, 100);
-        },
-        handleAfterPrint() {
-            this.printing = false;
         },
     },
     async mounted() {
-         this.fetchMachineVariables();
-         this.getDataByDateRange(); // Recupera los registros del día de hoy
-         this.fetchMachineData();
+        this.fetchMachineVariables();
+        this.getDataByDateRange(); // Recupera los registros del día de hoy
+        this.fetchMachineData();
         window.addEventListener('afterprint', this.handleAfterPrint);
     },
     beforeDestroy() {
