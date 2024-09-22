@@ -55,8 +55,8 @@
             </template>
             <template #footer>
                 <div class="flex items-center space-x-1">
-                    <CancelButton @click="showDeleteConfirm = false">Cancelar</CancelButton>
-                    <PrimaryButton>Eliminar</PrimaryButton>
+                    <CancelButton @click="showDeleteConfirm = false" :disabled="deleting">Cancelar</CancelButton>
+                    <PrimaryButton @click="deleteSelections" :disabled="deleting">Eliminar</PrimaryButton>
                 </div>
             </template>
         </ConfirmationModal>
@@ -78,6 +78,7 @@ export default {
             disableMassiveActions: true,
             search: '',
             showDeleteConfirm: false,
+            deleting: false,
         }
     },
     components: {
@@ -109,7 +110,7 @@ export default {
             if (command == 'delete') {
                 this.showDeleteConfirm = true;
             } else if (command == 'toggle-status') {
-
+                this.toggleStatus();
             }
         },
         handleRowClick(row) {
@@ -128,9 +129,54 @@ export default {
             }
         },
         async deleteSelections() {
+            this.deleting = true;
             try {
                 const items_ids = this.$refs.multipleTableRef.value.map(item => item.id);
                 const response = await axios.post(route('machine-variables.massive-delete', {
+                    items_ids
+                }));
+
+                if (response.status === 200) {
+                    this.showDeleteConfirm = false;
+                    this.$notify({
+                        title: 'Correcto',
+                        message: '',
+                        type: 'success',
+                        position: "bottom-right",
+                    });
+                    
+                    // update list
+                    let deletedIndexes = [];
+                    this.variables.forEach((variable, index) => {
+                        if (items_ids.includes(variable.id)) {
+                            deletedIndexes.push(index);
+                        }
+                    });
+
+                    // Ordenar los índices de forma descendente para evitar problemas de desplazamiento al eliminar elementos
+                    deletedIndexes.sort((a, b) => b - a);
+                    
+                    // Eliminar cotizaciones por índice
+                    for (const index of deletedIndexes) {
+                        this.variables.splice(index, 1);
+                    }
+                }
+            } catch (err) {
+                this.$notify({
+                    title: 'No se pudo completar la solicitud',
+                    message: '',
+                    type: 'error',
+                    position: "bottom-right",
+                });
+                console.log(err);
+            } finally {
+                this.deleting = false;
+            }
+        },
+        async toggleStatus() {
+            try {
+                const items_ids = this.$refs.multipleTableRef.value.map(item => item.id);
+                const response = await axios.post(route('machine-variables.massive-toggle-status', {
                     items_ids
                 }));
 
@@ -143,19 +189,21 @@ export default {
                     });
 
                     // update list
-                    let deletedIndexes = [];
+                    let updatedIndex = [];
                     this.variables.forEach((variable, index) => {
                         if (items_ids.includes(variable.id)) {
-                            deletedIndexes.push(index);
+                            updatedIndex.push(index);
                         }
                     });
 
-                    // Ordenar los índices de forma descendente para evitar problemas de desplazamiento al eliminar elementos
-                    deletedIndexes.sort((a, b) => b - a);
+                    updatedIndex.forEach(element => {
+                        this.variables[element].is_active = !this.variables[element].is_active;
+                    });
 
-                    // Eliminar cotizaciones por índice
-                    for (const index of deletedIndexes) {
-                        this.variables.splice(index, 1);
+                    // Limpiar selecciones de la tabla
+                    if (this.$refs.multipleTableRef) {
+                        // Si quieres limpiar todas las selecciones
+                        this.$refs.multipleTableRef.clearSelection();
                     }
                 }
             } catch (err) {

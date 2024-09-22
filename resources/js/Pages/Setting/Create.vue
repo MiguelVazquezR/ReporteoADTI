@@ -74,7 +74,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 export default {
     data() {
         const form = useForm({
-            machine: 'Robag',
+            machine: 'Robag1',
             main_email: null,
             cco: [],
             subject: null,

@@ -15,16 +15,20 @@
                     </div>
                     <div class="mt-2">
                         <InputLabel value="Descripción" />
-                        <el-input v-model="form.description" :autosize="{ minRows: 3, maxRows: 5 }"
-                            type="textarea" placeholder="Escribe una descripción para entender más la variable"
-                            clearable />
+                        <el-input v-model="form.description" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
+                            placeholder="Escribe una descripción para entender más la variable" clearable />
                         <InputError :message="form.errors.description" />
                     </div>
-                    <div class="grid grid-cols-3 gap-3 mt-2">
+                    <div class="grid grid-cols-4 gap-3 mt-2">
+                        <div class="text-center">
+                            <InputLabel value="Estado *" />
+                            <el-switch v-model="form.is_active" active-text="Leer variable" inactive-text="No leer" />
+                        </div>
                         <div>
                             <InputLabel value="Tipo de dato *" />
                             <el-select v-model="form.type" placeholder="Selecciona">
-                                <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value" />
+                                <el-option v-for="item in types" :key="item.value" :label="item.label"
+                                    :value="item.value" />
                             </el-select>
                             <InputError :message="form.errors.type" />
                         </div>
@@ -68,6 +72,7 @@ export default {
             address: this.variable.address,
             words: this.variable.words,
             type: this.variable.type,
+            is_active: Boolean(this.variable.is_active),
         });
 
         return {
@@ -107,7 +112,7 @@ export default {
     },
     methods: {
         update() {
-            this.form.put(route('machine-variables.update',this.variable), {
+            this.form.put(route('machine-variables.update', this.variable), {
                 onSuccess: () => {
                     this.$notify({
                         title: 'Correcto',

@@ -43,6 +43,7 @@ Route::post('/save-pdf', [PdfController::class, 'savePdf'])->name('save.pdf');
 // ------- maquinas y sus variables rutas --------
 Route::resource('machine-variables', MachineVariableController::class);
 Route::post('machine-variables/massive-delete', [MachineVariableController::class, 'massiveDelete'])->name('machine-variables.massive-delete');
+Route::post('machine-variables/massive-toggle-status', [MachineVariableController::class, 'massiveToggleStatus'])->name('machine-variables.massive-toggle-status');
 Route::get('machine-variables-get-variables/{machine}', [MachineVariableController::class, 'getVariables'])->name('machine-variables.get-variables');
 
 
