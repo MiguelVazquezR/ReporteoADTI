@@ -789,7 +789,7 @@ class RobagDataController extends Controller
 
     public function getModbusRegisters()
     {
-        $modbuService = new ModbusService('Robag');
+        $modbuService = new ModbusService('Robag1');
         $data = $modbuService->getMachineData();
         
         return response()->json(compact('data'));

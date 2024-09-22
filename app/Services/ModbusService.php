@@ -63,18 +63,28 @@ class ModbusService
     public function getMachineData()
     {
         try {
-            $variables = MachineVariable::where('machine_name', $this->machine)->get();
+            $variables = MachineVariable::where([
+                'machine_name' => $this->machine,
+                'is_active' => true,
+            ])->get();
+
             $data = [];
 
             $this->connection->connect();
 
             foreach ($variables as $variable) {
-                $startAddress = $variable->address - 1;
-                $packet = new ReadHoldingRegistersRequest($startAddress, $variable->words, 1);
-                $binaryData = $this->connection->sendAndReceive($packet);
-                $response = ResponseFactory::parseResponseOrThrow($binaryData);
+                try {
+                    $startAddress = $variable->address - 1;
+                    $packet = new ReadHoldingRegistersRequest($startAddress, $variable->words, 1);
+                    $binaryData = $this->connection->sendAndReceive($packet);
+                    $response = ResponseFactory::parseResponseOrThrow($binaryData);
 
-                $data[$variable->name] = $this->parseVariable($response, $variable);
+                    // Si todo va bien, procesamos la variable y la almacenamos en el array $data
+                    $data[$variable->name] = $this->parseVariable($response, $variable);
+                } catch (ModbusException $e) {
+                    // Si ocurre un error con esta variable, asignamos '??'
+                    $data[$variable->name] = '??';
+                }
             }
 
             return $data;
