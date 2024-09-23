@@ -13,7 +13,7 @@ if ($samplingMinutes == 1) {
     Schedule::call(function () {
         $modbuService = new ModbusService('Robag1');
         $data = $modbuService->getMachineData();
-        if ($data) {
+        if ($data && !array_key_exists('error', $data)) {
             RobagData::create([
                 'data' => $data
             ]);
@@ -23,7 +23,7 @@ if ($samplingMinutes == 1) {
     Schedule::call(function () {
         $modbuService = new ModbusService('Robag1');
         $data = $modbuService->getMachineData();
-        if ($data) {
+        if ($data && !array_key_exists('error', $data)) {
             RobagData::create([
                 'data' => $data
             ]);
@@ -33,7 +33,7 @@ if ($samplingMinutes == 1) {
     Schedule::call(function () {
         $modbuService = new ModbusService('Robag1');
         $data = $modbuService->getMachineData();
-        if ($data) {
+        if ($data && !array_key_exists('error', $data)) {
             RobagData::create([
                 'data' => $data
             ]);
@@ -43,7 +43,7 @@ if ($samplingMinutes == 1) {
     Schedule::call(function () {
         $modbuService = new ModbusService('Robag1');
         $data = $modbuService->getMachineData();
-        if ($data) {
+        if ($data && !array_key_exists('error', $data)) {
             RobagData::create([
                 'data' => $data
             ]);
