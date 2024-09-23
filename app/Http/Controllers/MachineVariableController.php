@@ -33,6 +33,9 @@ class MachineVariableController extends Controller
 
         MachineVariable::create($validated);
 
+        // Limpiar la caché relacionada con las variables de esta máquina
+        cache()->forget('modbus_variables_' . $validated['machine_name']);
+
         return to_route('machine-variables.index');
     }
 
@@ -92,7 +95,9 @@ class MachineVariableController extends Controller
             $machineVariable->update($validated);
         }
 
-        // Redirigir de vuelta al índice
+        // Limpiar la caché relacionada con las variables de esta máquina
+        cache()->forget('modbus_variables_' . $machineVariable->machine_name);
+
         return to_route('machine-variables.index');
     }
 
@@ -110,14 +115,20 @@ class MachineVariableController extends Controller
                 $item?->delete();
             }
         }
-    }
 
+        // Limpiar la caché relacionada con las variables de esta máquina
+        cache()->forget('modbus_variables_' . $item->machine_name);
+    }
+    
     public function massiveToggleStatus(Request $request)
     {
         foreach ($request->items_ids as $id) {
             $item = MachineVariable::find($id);
             $item?->update(['is_active' => !$item->is_active]);
         }
+        
+        // Limpiar la caché relacionada con las variables de esta máquina
+        cache()->forget('modbus_variables_' . $item->machine_name);
     }
 
     public function getVariables($machine)

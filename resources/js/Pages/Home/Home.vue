@@ -10,7 +10,7 @@
                         <el-dropdown-item command="email">Enviar por correo</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
-            </el-dropdown> -->
+</el-dropdown> -->
             <PrimaryButton :disabled="!searchDate.length" @click="exportReport">Generar reporte</PrimaryButton>
             <el-dropdown trigger="click">
                 <button
@@ -193,10 +193,13 @@
                 <section v-if="modbusData !== null" class="mt-5">
                     <div v-if="Object.keys(modbusData)[0] == 'error'"
                         class="flex flex-col items-center justify-center space-y-3 py-10">
-                        <p class="text-center">
-                            Error al intentar establecer conexión con {{ this.modbus_configurations.host }}:{{
-                                this.modbus_configurations.port }}. <br>
-                            Revisa que la IP y el puerto sean correctos. También que la red no presente ninguna falla
+                        <p class="">
+                            Error al intentar establecer conexión con
+                            <b class="">
+                                {{ this.modbus_configurations.host }}:{{ this.modbus_configurations.port }}. <br>
+                            </b>
+                            • Revisa que la IP y el puerto registrados en el sistema sean correctos. <br>
+                            • Revisa que la red no presente ninguna falla.
                         </p>
                         <!-- <i class="fa-solid fa-network-wired text-4xl"></i> -->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
