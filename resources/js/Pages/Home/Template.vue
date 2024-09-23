@@ -21,43 +21,45 @@
     <main v-else class="px-10 min-h-screen my-4" id="pdf-content">
         <header class="text-center font-bold">
             <p>
-                Reporte de Robag: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? '' }}
+                Reporte de Robag 1: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? '' }}
             </p>
         </header>
         <section class="space-y-4">
             <!-- graficas en rectangulo negro -->
-            <OEEPanel ref="oeePanel" :date="dates" :items="data" :loading="loading" :teoricProduction="bpm"
-                width="65%" />
+            <OEEPanel ref="oeePanel" :date="dates" :items="data" :loading="loading" :teoricProduction="bpm" />
 
             <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
             <!-- primer fila -->
-            <div class="grid grid-cols-3 gap-x-4 mb-10">
+            <div class="mt-4 grid grid-cols-3 gap-4">
                 <!-- Tiempos -->
-                <TimePanel :date="dates" :items="data" :loading="loading" width="65%" />
+                <TimePanel :date="dates" :items="data" :loading="loading" />
 
                 <!-- PRODUCCIÓN DIARIA -->
-                <ProductionPanel :items="data" :loading="loading" width="65%" class="col-span-2" />
-            </div>
-        </section>
-        <section class="space-y-4">
-            <!-- Segunda fila -->
-            <div class="flex space-x-4 mt-4">
+                <ProductionPanel :items="data" :loading="loading" />
+
                 <!-- Velocidad -->
-                <VelocityPanel :items="data" :loading="loading" class="w-1/2" width="65%" />
+                <VelocityPanel :items="data" :loading="loading" />
 
                 <!-- HISTOGRAMA -->
-                <DesviacionPanel :items="data" :loading="loading" class="w-1/2" width="65%" />
-            </div>
+                <DesviacionPanel :items="data" :loading="loading" />
 
-            <!-- Tercera fila -->
-            <div class="flex space-x-4 pt-36">
                 <!-- PELICULA -->
-                <FilmPanel :items="data" :loading="loading" class="w-[45%]" />
+                <FilmPanel :items="data" :loading="loading" />
 
                 <!-- BASCULA -->
-                <ScalePanel :items="data" :loading="loading" class="w-[55%]" width="65%" />
+                <ScalePanel :items="data" :loading="loading" />
             </div>
         </section>
+        <!-- <section class="space-y-4">
+            <div class="flex space-x-4 mt-4">
+                <VelocityPanel :items="data" :loading="loading" class="w-1/2" />
+                <DesviacionPanel :items="data" :loading="loading" class="w-1/2" />
+            </div>
+            <div class="flex space-x-4 pt-36">
+                <FilmPanel :items="data" :loading="loading" class="w-[45%]" />
+                <ScalePanel :items="data" :loading="loading" class="w-[55%]" />
+            </div>
+        </section> -->
         <section v-if="selectedVariables.length" class="mt-6 space-x-4">
             <h1 class="font-bold text-lg">Variables</h1>
             <div class="mt-6 grid grid-cols-3 gap-3">
