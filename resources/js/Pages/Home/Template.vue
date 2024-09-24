@@ -1,8 +1,16 @@
 <template>
+    <!-- Estado de carga de pdf -->
+    <div v-if="loadingPDF" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+        <div class="flex flex-col justify-center items-center text-center">
+            <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mb-4"></div>
+            <h2 class="text-white text-2xl font-semibold">Generando PDF...</h2>
+            <p class="text-white text-lg mt-2">Por favor espera un momento</p>
+        </div>
+    </div>
 
     <Head title="Reporte Robag" />
-    <div v-if="!loading && !printing" class="flex space-x-3 justify-end mx-20 mt-5">
-        <el-dropdown split-button type="primary" @click="generatePdf" @command="handleDropdownCommand">
+    <div v-if="!loadingTemplate && !printing" class="flex space-x-3 justify-end mx-20 mt-5">
+        <el-dropdown split-button type="primary" @click="handleActionPdf('download')">
             Descargar PDF
             <template #dropdown>
                 <el-dropdown-menu>
@@ -11,13 +19,13 @@
             </template>
         </el-dropdown>
         <!-- <button v-if="!loading && !printing" @click="print" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3">Descargar PDF</button> -->
-        <!-- <button :disabled="loadingPDF" v-if="!loading && !printing" @click="generatePdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar PDF</button>
-            <button :disabled="loadingPDF" v-if="!loading && !printing" @click="showEmailModal = true" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Enviar por correo</button> -->
+        <!-- <button :disabled="loadingPDF" v-if="!loadingTemplate && !printing" @click="generatePdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar PDF</button>
+            <button :disabled="loadingPDF" v-if="!loadingTemplate && !printing" @click="showEmailModal = true" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Enviar por correo</button> -->
     </div>
     <div class="text-center mt-4">
         <i v-if="loadingPDF" class="fa-solid fa-circle-notch fa-spin text-xl mr-2"></i>
     </div>
-    <Loading v-if="loading" class="mt-16" />
+    <Loading v-if="loadingTemplate" class="mt-16" />
     <main v-else class="px-10 min-h-screen my-4" id="pdf-content">
         <header class="text-center font-bold">
             <p>
@@ -26,38 +34,38 @@
         </header>
         <section class="space-y-4">
             <!-- graficas en rectangulo negro -->
-            <OEEPanel ref="oeePanel" :date="dates" :items="data" :loading="loading" :teoricProduction="bpm" />
+            <OEEPanel ref="oeePanel" :date="dates" :items="data" :loading="loadingCharts" :teoricProduction="bpm" />
 
             <!-- Contenedor de gráficas parte inferior (debajo de rectangulo negro) -->
             <!-- primer fila -->
             <div class="mt-4 grid grid-cols-3 gap-4">
                 <!-- Tiempos -->
-                <TimePanel :date="dates" :items="data" :loading="loading" />
+                <TimePanel :date="dates" :items="data" :loading="loadingCharts" />
 
                 <!-- PRODUCCIÓN DIARIA -->
-                <ProductionPanel :items="data" :loading="loading" />
+                <ProductionPanel :items="data" :loading="loadingCharts" />
 
                 <!-- Velocidad -->
-                <VelocityPanel :items="data" :loading="loading" />
+                <VelocityPanel :items="data" :loading="loadingCharts" />
 
                 <!-- HISTOGRAMA -->
-                <DesviacionPanel :items="data" :loading="loading" />
+                <DesviacionPanel :items="data" :loading="loadingCharts" />
 
                 <!-- PELICULA -->
-                <FilmPanel :items="data" :loading="loading" />
+                <FilmPanel :items="data" :loading="loadingCharts" />
 
                 <!-- BASCULA -->
-                <ScalePanel :items="data" :loading="loading" />
+                <ScalePanel :items="data" :loading="loadingCharts" />
             </div>
         </section>
         <!-- <section class="space-y-4">
             <div class="flex space-x-4 mt-4">
-                <VelocityPanel :items="data" :loading="loading" class="w-1/2" />
-                <DesviacionPanel :items="data" :loading="loading" class="w-1/2" />
+                <VelocityPanel :items="data" :loading="loadingCharts" class="w-1/2" />
+                <DesviacionPanel :items="data" :loading="loadingCharts" class="w-1/2" />
             </div>
             <div class="flex space-x-4 pt-36">
-                <FilmPanel :items="data" :loading="loading" class="w-[45%]" />
-                <ScalePanel :items="data" :loading="loading" class="w-[55%]" />
+                <FilmPanel :items="data" :loading="loadingCharts" class="w-[45%]" />
+                <ScalePanel :items="data" :loading="loadingCharts" class="w-[55%]" />
             </div>
         </section> -->
         <section v-if="selectedVariables.length" class="mt-6 space-x-4">
@@ -137,7 +145,7 @@
             </form>
         </template>
         <template #footer>
-            <PrimaryButton @click="savePdfInProjectAndSend" :disabled="emailForm.processing || loadingPDF">
+            <PrimaryButton @click="handleActionPdf('email')" :disabled="emailForm.processing || loadingPDF">
                 <i v-if="emailForm.processing" class="fa-solid fa-circle-notch fa-spin mr-2"></i>
                 Enviar correo
             </PrimaryButton>
@@ -179,14 +187,14 @@ export default {
             // modales
             showEmailModal: false,
             // cargas
-            loading: true,
+            loadingTemplate: true,
+            loadingCharts: false,
             loadingPDF: false,
             // general
             editModbusConfig: false,
             data: [],
             printing: false,
             // para graficas de variables
-            panelLoading: true,
             items: [],
             variables: [],
             variablesMapped: null,
@@ -220,17 +228,27 @@ export default {
         selectedVariables: Array,
     },
     methods: {
-        downloadPdf() {
-            window.location.href = '/download-pdf'; // Redirige a la ruta para descargar el PDF
-        },
-        print() {
-            this.printing = true;
-            setTimeout(() => {
-                window.print();
-            }, 100);
-        },
-        handleAfterPrint() {
-            this.printing = false;
+        // downloadPdf() {
+        //     window.location.href = '/download-pdf'; // Redirige a la ruta para descargar el PDF
+        // },
+        // print() {
+        //     this.printing = true;
+        //     setTimeout(() => {
+        //         window.print();
+        //     }, 100);
+        // },
+        // handleAfterPrint() {
+        //     this.printing = false;
+        // },
+        async handleActionPdf(action) {
+            this.loadingPDF = true;
+            if ( action === 'download' ) {
+                await this.generatePdf();
+            } else if ( action === 'email' ) {
+                this.showEmailModal = false;
+                await this.savePdfInProjectAndSend();
+            }
+            this.loadingPDF = false;
         },
         sendEmail(pdfPath) {
             this.emailForm.transform(data => ({
@@ -256,7 +274,7 @@ export default {
             return format(dateTime, "dd MMM, yyyy - H:mm a");
         },
         async getDataByDateRange() {
-            this.loading = true;
+            this.loadingCharts = true;
             try {
                 const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.dates });
                 if (response.status === 200) {
@@ -269,12 +287,11 @@ export default {
 
             } catch (error) {
                 console.log(error)
-            } finally {
-                // this.loading = false;
+            } finally { 
+                this.loadingCharts = false;
             }
         },
         async generatePdf() {
-            this.loadingPDF = true;
             const content = document.getElementById('pdf-content');
 
             // Capturar el contenido con html2canvas
@@ -317,12 +334,10 @@ export default {
                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, '', 'FAST'); // FAST usa compresión
                 }
             }
-            this.loadingPDF = false;
             // Descargar el PDF generado
             pdf.save('example.pdf');
         },
         async savePdfInProjectAndSend() {
-            this.loadingPDF = true;
             const content = document.getElementById('pdf-content');
 
             // Capturar el contenido con html2canvas
@@ -386,8 +401,6 @@ export default {
 
             } catch (error) {
                 console.error("Error guardando el PDF:", error);
-            } finally {
-                this.loadingPDF = false;
             }
         },
         // variables independientes
@@ -442,7 +455,7 @@ export default {
         },
         async fetchMachineVariables() {
             try {
-                this.loading = true;
+                this.loadingTemplate = true;
 
                 const response = await axios.get(route('machine-variables.get-variables', 'Robag1'));
 
@@ -452,12 +465,12 @@ export default {
             } catch (error) {
                 console.log(error);
             } finally {
-                this.loading = false;
+                this.loadingTemplate = false;
             }
         },
         async fetchMachineData() {
             try {
-                this.panelLoading = true;
+                this.loadingCharts = true;
 
                 // Enviar el rango de fechas correctamente
                 const response = await axios.post(route('robag.get-data-by-date-range', {
@@ -472,18 +485,34 @@ export default {
             } catch (error) {
                 console.log(error);
             } finally {
-                this.panelLoading = false;
+                this.loadingCharts = false;
             }
         },
     },
     async mounted() {
         this.fetchMachineVariables();
-        this.getDataByDateRange(); // Recupera los registros del día de hoy
-        this.fetchMachineData();
-        window.addEventListener('afterprint', this.handleAfterPrint);
+        await this.getDataByDateRange(); // Recupera los registros del día de hoy
+        await this.fetchMachineData();
+        // window.addEventListener('afterprint', this.handleAfterPrint);
     },
     beforeDestroy() {
-        window.removeEventListener('afterprint', this.handleAfterPrint);
+        // window.removeEventListener('afterprint', this.handleAfterPrint);
     }
 }
 </script>
+
+<style>
+.loader {
+    border-top-color: #1676A2; /* Cambia el color del spinner aquí */
+    animation: spinner 1.5s infinite linear;
+}
+
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+</style>
