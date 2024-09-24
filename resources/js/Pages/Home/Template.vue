@@ -77,7 +77,7 @@
                         :data="mapItemsToTimeSlots(variables.find(v => v.name == variable).name)" />
                 </div> -->
                 <div v-for="(variable, index) in selectedVariables" :key="index">
-                    <VariablePanel :variableName="variable" height="180" :data="variablesMapped[variable]"
+                    <VariablePanel :variableName="variable" height="180" :data="variablesMapped ? variablesMapped[variable] : {}"
                         :class="index > 8 && index < 12 ? 'mt-16' : null" />
                 </div>
             </div>
@@ -97,7 +97,7 @@
                         class="*:px-2 *:py-1 *:text-start even:bg-gray-100 last:border-b">
                         <td class="w-[15%]">{{ time.split(' ')[1] }}</td>
                         <td v-for="(variable, index) in selectedVariables" :key="index" class="w-[15%]">
-                            {{ variablesMapped[variable][time.split(' ')[1]] }}
+                            {{ variablesMapped ? variablesMapped[variable][time.split(' ')[1]] : '' }}
                         </td>
                     </tr>
                 </tbody>
