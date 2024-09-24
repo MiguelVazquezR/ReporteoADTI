@@ -3,6 +3,7 @@
         <apexchart type="radialBar" height="150" :width="width" :options="chartOptions" :series="series"></apexchart>
     </div>
 </template>
+
 <script>
 export default {
     data() {
