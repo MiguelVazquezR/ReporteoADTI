@@ -11,12 +11,12 @@ class MachineVariable extends Model
 
     protected $fillable = [
         'machine_name',
-        'variable_name',
-        'variable_original_name',
-        'variable_description',
-        'variable_address',
+        'name',
+        'description',
+        'address',
         'type',
         'words',
         'filters',
+        'is_active',
     ];
 }

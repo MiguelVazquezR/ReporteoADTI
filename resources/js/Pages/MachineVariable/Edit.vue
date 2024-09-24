@@ -10,28 +10,32 @@
                     <h1 class="font-bold">Editar variable</h1>
                     <div class="mt-3">
                         <InputLabel value="Nombre *" />
-                        <el-input v-model="form.variable_name" placeholder="Ej. Tiempo de trabajo" clearable />
-                        <InputError :message="form.errors.variable_name" />
+                        <el-input v-model="form.name" placeholder="Ej. Tiempo de trabajo" clearable />
+                        <InputError :message="form.errors.name" />
                     </div>
                     <div class="mt-2">
                         <InputLabel value="Descripción" />
-                        <el-input v-model="form.variable_description" :autosize="{ minRows: 3, maxRows: 5 }"
-                            type="textarea" placeholder="Escribe una descripción para entender más la variable"
-                            clearable />
-                        <InputError :message="form.errors.variable_description" />
+                        <el-input v-model="form.description" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
+                            placeholder="Escribe una descripción para entender más la variable" clearable />
+                        <InputError :message="form.errors.description" />
                     </div>
-                    <div class="grid grid-cols-3 gap-3 mt-2">
+                    <div class="grid grid-cols-4 gap-3 mt-2">
+                        <div class="text-center">
+                            <InputLabel value="Estado *" />
+                            <el-switch v-model="form.is_active" active-text="Leer variable" inactive-text="No leer" />
+                        </div>
                         <div>
                             <InputLabel value="Tipo de dato *" />
                             <el-select v-model="form.type" placeholder="Selecciona">
-                                <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value" />
+                                <el-option v-for="item in types" :key="item.value" :label="item.label"
+                                    :value="item.value" />
                             </el-select>
                             <InputError :message="form.errors.type" />
                         </div>
                         <div class="text-center">
                             <InputLabel value="Dirección *" />
-                            <el-input-number v-model="form.variable_address" :min="0" />
-                            <InputError :message="form.errors.variable_address" />
+                            <el-input-number v-model="form.address" :min="0" />
+                            <InputError :message="form.errors.address" />
                         </div>
                         <div class="text-center">
                             <InputLabel value="Longitud (palabras) *" />
@@ -62,12 +66,13 @@ import InputLabel from '@/Components/InputLabel.vue';
 export default {
     data() {
         const form = useForm({
-            machine_name: 'Robag',
-            variable_name: this.variable.variable_name,
-            variable_description: this.variable.variable_description,
-            variable_address: this.variable.variable_address,
+            machine_name: 'Robag1',
+            name: this.variable.name,
+            description: this.variable.description,
+            address: this.variable.address,
             words: this.variable.words,
             type: this.variable.type,
+            is_active: Boolean(this.variable.is_active),
         });
 
         return {
@@ -107,7 +112,7 @@ export default {
     },
     methods: {
         update() {
-            this.form.put(route('machine-variables.update',this.variable), {
+            this.form.put(route('machine-variables.update', this.variable), {
                 onSuccess: () => {
                     this.$notify({
                         title: 'Correcto',

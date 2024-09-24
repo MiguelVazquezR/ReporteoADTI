@@ -32,26 +32,26 @@ export default {
             const itemCount = items.length;
 
             const totals = items.reduce((acc, item) => {
-                acc.mean_weight += parseFloat(item.mean_weight) || 0;
-                acc.standard_deviation += parseFloat(item.standard_deviation) || 0;
-                acc.total_dump_weight += parseFloat(item.total_dump_weight) || 0;
-                acc.total_giveaway += parseFloat(item.total_giveaway) || 0;
-                acc.giveaway_percentage += parseFloat(item.giveaway_percentage) || 0;
+                acc.mean_weight += parseFloat(item.data['Peso medio']) || 0;
+                acc.standard_deviation += parseFloat(item.data['Desviación estándar']) || 0;
+                acc.total_dump_weight += parseFloat(item.data['Peso total de descarga']) || 0;
+                // acc.total_giveaway += parseFloat(item.total_giveaway) || 0;
+                // acc.giveaway_percentage += parseFloat(item.giveaway_percentage) || 0;
                 return acc;
             }, {
                 mean_weight: 0,
                 standard_deviation: 0,
                 total_dump_weight: 0,
-                total_giveaway: 0,
-                giveaway_percentage: 0
+                // total_giveaway: 0,
+                // giveaway_percentage: 0
             });
 
             const averages = {
                 mean_weight: itemCount ? (totals.mean_weight / itemCount).toFixed(2) + ' g' : 'Sin datos',
                 standard_deviation: itemCount ? (totals.standard_deviation / itemCount).toFixed(2) : 'Sin datos',
                 total_dump_weight: itemCount ? (totals.total_dump_weight / itemCount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,",") + ' g' : 'Sin datos',
-                total_giveaway: itemCount ? (totals.total_giveaway / itemCount).toFixed(2) + ' g' : 'Sin datos',
-                giveaway_percentage: itemCount ? (totals.giveaway_percentage / itemCount).toFixed(2) + '%' : 'Sin datos'
+                // total_giveaway: itemCount ? (totals.total_giveaway / itemCount).toFixed(2) + ' g' : 'Sin datos',
+                // giveaway_percentage: itemCount ? (totals.giveaway_percentage / itemCount).toFixed(2) + '%' : 'Sin datos'
             };
 
             return [

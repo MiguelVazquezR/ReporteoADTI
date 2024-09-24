@@ -1,5 +1,5 @@
 <template>
-    <main class="rounded-[20px] border border-grayD9 p-4 h-[350px]">
+    <main class="rounded-[20px] border border-grayD9 p-4">
         <div v-if="loading" class="text-xs my-4 text-center">
             Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
         </div>
@@ -134,7 +134,7 @@ export default {
             // Recorrer todos los elementos
             this.items.forEach(item => {
                 // Redondear la desviación estándar
-                const roundedDeviation = Math.round(item.standard_deviation);
+                const roundedDeviation = Math.round(item.data['Desviación estándar']);
 
                 // Si la desviación redondeada ya existe en deviationCounts, aumentar el conteo
                 // Si no, inicializar el conteo en 1

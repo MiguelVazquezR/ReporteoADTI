@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\ModbusConfiguration;
 use App\Models\RobagData;
 use App\Models\User;
-use Carbon\Carbon;
-use Database\Factories\RobagDataFactory;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -24,11 +23,19 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         // ejecutar seeders
-        // $this->call([
-        //     MachineVariableSeeder::class,
-        // ]);
-
-        RobagData::factory()->count(500)->create();
+        
+        $this->call([
+            MachineVariableSeeder::class,
+        ]);
+        
+        RobagData::factory()->count(300)->create();
+        
+        ModbusConfiguration::create([
+            'host' => '127.0.0.1',
+            'port' => 502,
+            'machine' => 'Robag1',
+            'sampling_minutes' => 5,
+        ]);
     }
     
 }

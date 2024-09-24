@@ -10,7 +10,7 @@
                         <el-dropdown-item command="email">Enviar por correo</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
-            </el-dropdown> -->
+</el-dropdown> -->
             <PrimaryButton :disabled="!searchDate.length" @click="exportReport">Generar reporte</PrimaryButton>
             <el-dropdown trigger="click">
                 <button
@@ -120,8 +120,8 @@
                                     </p>
                                     <select v-model="modbusForm.sampling_minutes" placeholder="Selecciona"
                                         class="col-span-2 border-grayD9 h-9 focus:ring-0 focus:border-primary rounded-[4px] text-secondary text-sm transition-all duration-200">
-                                        <option v-for="item in samplings" :key="item.value" :value="item.value">{{
-                                            item.label }}</option>
+                                        <option v-for="item in samplings" :key="item.value" :value="item.value">
+                                            {{ item.label }}</option>
                                     </select>
                                 </div>
                             </article>
@@ -193,10 +193,13 @@
                 <section v-if="modbusData !== null" class="mt-5">
                     <div v-if="Object.keys(modbusData)[0] == 'error'"
                         class="flex flex-col items-center justify-center space-y-3 py-10">
-                        <p class="text-center">
-                            Error al intentar establecer conexión con {{ this.modbus_configurations.host }}:{{
-                                this.modbus_configurations.port }}. <br>
-                            Revisa que la IP y el puerto sean correctos. También que la red no presente ninguna falla
+                        <p class="">
+                            Error al intentar establecer conexión con
+                            <b class="">
+                                {{ this.modbus_configurations.host }}:{{ this.modbus_configurations.port }}. <br>
+                            </b>
+                            • Revisa que la IP y el puerto registrados en el sistema sean correctos. <br>
+                            • Revisa que la red no presente ninguna falla.
                         </p>
                         <!-- <i class="fa-solid fa-network-wired text-4xl"></i> -->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -213,9 +216,9 @@
                         </PrimaryButton>
                         <article v-for="(item, index) in variables" :key="index"
                             class="grid grid-cols-3 gap-x-6 gap-y-1">
-                            <span>{{ item.variable_name }}:</span>
+                            <span>{{ item.name }}:</span>
                             <span class="col-span-2">
-                                {{ applyFilters(modbusData[item.variable_original_name], item.filters) }}
+                                {{ applyFilters(modbusData[item.name], item.filters) }}
                             </span>
                         </article>
                     </div>
@@ -310,7 +313,7 @@ export default {
             host: this.modbus_configurations?.host,
             port: this.modbus_configurations?.port,
             sampling_minutes: this.modbus_configurations?.sampling_minutes,
-            machine: 'Robag',
+            machine: 'Robag1',
         });
 
         return {
@@ -457,7 +460,7 @@ export default {
         exportReport() {
             const url = route('robag.pdf-template', {
                 dates: this.searchDate,
-                bpm: this.bpm, 
+                bpm: this.bpm,
                 date: this.$refs.variables.date,
                 timeSlots: this.$refs.variables.timeSlots,
                 selectedVariables: this.$refs.variables.selectedVariables,

@@ -71,8 +71,8 @@ export default {
 
             // delvolver el ultimo registro
             let lastItem = this.items[this.items.length - 1];
-            const fullBags = parseFloat(lastItem?.full_bags ?? 0.0).toFixed(1);
-            const totalWaste = parseFloat(lastItem?.total_waste ?? 0.0).toFixed(1);
+            const fullBags = parseFloat(lastItem?.data['Bolsas llenas'] ?? 0.0).toFixed(1);
+            const totalWaste = parseFloat(lastItem?.data['Total desechado'] ?? 0.0).toFixed(1);
 
             return [parseFloat(fullBags), parseFloat(totalWaste)];
         }

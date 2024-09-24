@@ -87,7 +87,7 @@ export default {
         maxFullBagsData() {
             return this.uniqueFormattedDates.map(date => {
                 const filteredItems = this.items.filter(item => format(new Date(item.created_at), 'yyyy-MM-dd') === date);
-                const maxFullBags = Math.max(...filteredItems.map(item => parseFloat(item.full_bags) || 0));
+                const maxFullBags = Math.max(...filteredItems.map(item => parseFloat(item.data['Bolsas llenas']) || 0));
 
                 return {
                     x: format(new Date(date), "dd MMM yy", { locale: es }), // Formato con el mes en español

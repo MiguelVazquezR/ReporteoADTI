@@ -46,9 +46,14 @@ class ModbusService
 
         // Procesar variables en función del número de palabras y tipo de variable
         if ($variable->words == 1) {
-            return $variable->type == 'uint'
-                ? $response->getWordAt($address)->getUInt16()
-                : $response->getWordAt($address)->getInt16();
+            if ($variable->type == 'uint') {
+                return $response->getWordAt($address)->getUInt16();
+            } elseif ($variable->type == 'int') {
+                return $response->getWordAt($address)->getInt16();
+            } elseif ($variable->type == 'byte') {
+                return $response->getWordAt($address)->getLowByteAsInt();
+                // return $response->getWordAt($address)->getHighByteAsInt();
+            }
         }
 
         if ($variable->type == 'float') {
@@ -63,18 +68,27 @@ class ModbusService
     public function getMachineData()
     {
         try {
-            $variables = MachineVariable::where('machine_name', $this->machine)->get();
-            $data = [];
+            // Obtener las variables de caché, si no están, consultarlas y almacenarlas
+            $variables = cache()->remember('modbus_variables_' . $this->machine, 3600, function () {
+                return MachineVariable::where([
+                    'machine_name' => $this->machine,
+                    'is_active' => true,
+                ])->get();
+            });
 
+            $data = [];
             $this->connection->connect();
 
             foreach ($variables as $variable) {
-                $startAddress = $variable->variable_address - 1;
-                $packet = new ReadHoldingRegistersRequest($startAddress, $variable->words, 1);
-                $binaryData = $this->connection->sendAndReceive($packet);
-                $response = ResponseFactory::parseResponseOrThrow($binaryData);
-
-                $data[$variable->variable_original_name] = $this->parseVariable($response, $variable);
+                try {
+                    $startAddress = $variable->address - 1;
+                    $packet = new ReadHoldingRegistersRequest($startAddress, $variable->words, 1);
+                    $binaryData = $this->connection->sendAndReceive($packet);
+                    $response = ResponseFactory::parseResponseOrThrow($binaryData);
+                    $data[$variable->name] = $this->parseVariable($response, $variable);
+                } catch (ModbusException $e) {
+                    $data[$variable->name] = '??';
+                }
             }
 
             return $data;

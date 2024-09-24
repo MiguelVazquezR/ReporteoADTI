@@ -9,5 +9,10 @@ class ModbusConfiguration extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['host', 'port', 'machine', 'sampling_minutes'];
+    protected $fillable = [
+        'host',
+        'port',
+        'machine',
+        'sampling_minutes'
+    ];
 }
