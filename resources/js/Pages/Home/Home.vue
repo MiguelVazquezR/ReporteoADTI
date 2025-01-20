@@ -11,6 +11,20 @@
                     </el-dropdown-menu>
                 </template>
 </el-dropdown> -->
+            <el-dropdown trigger="click" class="mr-6">
+                <button class="flex items-center space-x-2 text-black focus:border-0 focus:outline-none">
+                    <h1 class="font-bold text-2xl">{{ machines.find(m => m.in_view).name }}</h1>
+                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                </button>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item v-for="machine in machines" @click="changeMachineInView(machine)"
+                            :key="machine.id" :class="machines.find(m => m.in_view).name === machine.name ? '!text-primary font-bold' : ''">
+                            {{ machine.name }}
+                        </el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
             <PrimaryButton :disabled="!searchDate.length" @click="exportReport">Generar reporte</PrimaryButton>
             <el-dropdown trigger="click">
                 <button
@@ -174,7 +188,7 @@
                     <template #label>
                         <span>Reporte general</span>
                     </template>
-                    <General @updated-dates="searchDate = $event" :bpm="bpm" />
+                    <General @updated-dates="searchDate = $event" :bpm="bpm" :machine="machines.find(m => m.in_view)" />
                 </el-tab-pane>
                 <el-tab-pane name="2">
                     <template #label>
@@ -207,7 +221,6 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M13.181 8.68a4.503 4.503 0 0 1 1.903 6.405m-9.768-2.782L3.56 14.06a4.5 4.5 0 0 0 6.364 6.365l3.129-3.129m5.614-5.615 1.757-1.757a4.5 4.5 0 0 0-6.364-6.365l-4.5 4.5c-.258.26-.479.541-.661.84m1.903 6.405a4.495 4.495 0 0 1-1.242-.88 4.483 4.483 0 0 1-1.062-1.683m6.587 2.345 5.907 5.907m-5.907-5.907L8.898 8.898M2.991 2.99 8.898 8.9" />
                         </svg>
-
                     </div>
                     <div v-else>
                         <PrimaryButton @click="pausedMonitor = !pausedMonitor" class="mb-3"
@@ -371,8 +384,23 @@ export default {
         },
         modbus_configurations: Object,
         variables: Array,
+        machines: Array,
     },
     methods: {
+        changeMachineInView(machine) {
+            if (machine.in_view) {
+                return;
+            }
+
+            this.emailForm.put(route('machines.update-in-view', machine), {
+                onSuccess: () => {
+                    this.$notify({
+                        title: "Máquina cambiada",
+                        type: "success"
+                    })
+                }
+            });
+        },
         applyFilters(val, filters) {
             if (!filters) {
                 return val;

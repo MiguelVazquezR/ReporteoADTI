@@ -2,11 +2,9 @@
     <section class="flex space-x-4 w-full min-h-screen mb-10">
         <!-- Imagen de la maquina -->
         <figure class="w-1/4">
-            <h1 class="font-bold text-xl mb-6 ml-4">ROBAG</h1>
-            <img class="rounded-[20px] border border-grayD9 p-4 w-full" src="@/../../public/images/machine_1.png"
-                alt="">
+            <img class="rounded-[20px] border border-grayD9 p-4 w-full " :src="'http://localhost:8000/storage/'+machine.image"
+                :alt="machine.name">
         </figure>
-
         <!-- graficas -->
         <article class="w-3/4">
             <div class="flex items-center justify-between space-x-3">
@@ -85,6 +83,7 @@ export default {
     emits: ['updated-dates'],
     props: {
         bpm: Number,
+        machine: Object,
     },
     watch: {
         bpm() {

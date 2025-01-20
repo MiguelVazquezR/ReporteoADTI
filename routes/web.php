@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\MachineVariableController;
+use App\Http\Controllers\MachineController;
 use App\Http\Controllers\ModbusConfigurationController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\RobagDataController;
 use App\Http\Controllers\ScheduleEmailController;
+use App\Models\Machine;
 use App\Models\MachineVariable;
 use App\Models\ModbusConfiguration;
 use App\Models\ScheduleEmail;
@@ -12,14 +14,17 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    $machineInView = Machine::firstWhere('in_view', true);
     $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag1');
     $modbus_configurations = ModbusConfiguration::firstWhere('machine', 'Robag1');
-    $variables = MachineVariable::where('machine_name', 'Robag1')->get();
+    // $variables = MachineVariable::where('machine_name', 'Robag1')->get();
+    $variables = MachineVariable::where('machine_id', $machineInView->id)->get();
 
     return Inertia::render('Home/Home', [
         'schedule_settings' => $schedule_settings,
         'modbus_configurations' => $modbus_configurations,
         'variables' => $variables,
+        'machines' => Machine::all(),
     ]);
 })->name('home');
 
@@ -45,6 +50,11 @@ Route::resource('machine-variables', MachineVariableController::class);
 Route::post('machine-variables/massive-delete', [MachineVariableController::class, 'massiveDelete'])->name('machine-variables.massive-delete');
 Route::post('machine-variables/massive-toggle-status', [MachineVariableController::class, 'massiveToggleStatus'])->name('machine-variables.massive-toggle-status');
 Route::get('machine-variables-get-variables/{machine}', [MachineVariableController::class, 'getVariables'])->name('machine-variables.get-variables');
+
+
+// ------- maquinas rutas --------
+Route::resource('machines', MachineController::class);
+Route::put('machines/update-in-view/{machine}', [MachineController::class, 'updateInView'])->name('machines.update-in-view');
 
 
 //--------------- robag data routes ------------------

@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('machine_variables', function (Blueprint $table) {
             $table->id();
-            $table->string('machine_name');
+            $table->foreignId('machine_id')->constrained()->cascadeOnDelete();
+            $table->string('original_name');
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('address')->nullable();
