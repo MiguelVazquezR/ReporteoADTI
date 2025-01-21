@@ -189,7 +189,7 @@
                     <template #label>
                         <span>Reporte general</span>
                     </template>
-                    <General @updated-dates="searchDate = $event" :bpm="bpm" :machine="machines.find(m => m.in_view)" />
+                    <General ref="general" @updated-dates="searchDate = $event" :bpm="bpm" :machine="machines.find(m => m.in_view)" />
                 </el-tab-pane>
                 <el-tab-pane name="2">
                     <template #label>
@@ -403,6 +403,7 @@ export default {
                     this.$refs.variables.fetchMachineVariables();
                     this.$refs.variables.generateTimeSlots();
                     this.$refs.variables.fetchMachineData();
+                    this.$refs.general.getDataByDateRange();
                 }
             });
         },

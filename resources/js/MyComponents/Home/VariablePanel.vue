@@ -5,7 +5,6 @@
             <BasicArea :series="series" :chartOptions="chartOptions" :width="width" :height="height" />
         </div>
     </main>
-    {{data}}
 </template>
 
 <script>

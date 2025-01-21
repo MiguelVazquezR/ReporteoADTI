@@ -198,7 +198,7 @@ export default {
 
             this.variables.forEach(variable => {
                 const variableName = variable.name;
-                variablesMapped[variableName] = this.mapItemsToTimeSlots(variableName);
+                variablesMapped[variableName] = this.mapItemsToTimeSlots(variable.original_name);
             });
 
             this.variablesMapped = variablesMapped;
@@ -232,7 +232,11 @@ export default {
                     usedItems.add(closestItem.id); // Marcar el item como usado
                 }
 
-                return { [slot.split(' ')[1]]: closestItem ? parseFloat(parseFloat(closestItem.data[variable]).toFixed(2)) : 0 };
+                if (closestItem) {
+                    return { [slot.split(' ')[1]]: parseFloat(parseFloat(closestItem[variable]).toFixed(2)) };
+                }
+
+                return { [slot.split(' ')[1]]: 0 };
             });
 
             // Combinar el array de objetos en un solo objeto
@@ -280,7 +284,7 @@ export default {
                 this.panelLoading = true;
 
                 // Enviar el rango de fechas correctamente
-                const response = await axios.post(route('robag.get-data-by-date-range', {
+                const response = await axios.post(route('machine-data.get-data-by-date-range', {
                     date: [`${this.date} ${this.timeSlots[0].split(' ')[1]}`, `${this.date} ${this.timeSlots[this.timeSlots.length - 1].split(' ')[1]}`],
                     subHours: 0,
                 }));
