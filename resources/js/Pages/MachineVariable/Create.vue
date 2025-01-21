@@ -13,6 +13,11 @@
                         <el-input v-model="form.name" placeholder="Ej. Tiempo de trabajo" clearable />
                         <InputError :message="form.errors.name" />
                     </div>
+                    <div class="mt-3">
+                        <InputLabel value="Nombre en inglés (snake_case)*" />
+                        <el-input v-model="form.original_name" placeholder="Ej. run_time" clearable />
+                        <InputError :message="form.errors.original_name" />
+                    </div>
                     <div class="mt-2">
                         <InputLabel value="Descripción" />
                         <el-input v-model="form.description" :autosize="{ minRows: 3, maxRows: 5 }"
@@ -62,8 +67,9 @@ import InputLabel from '@/Components/InputLabel.vue';
 export default {
     data() {
         const form = useForm({
-            machine_name: 'Robag1',
+            machine_id: null,
             name: null,
+            original_name: null,
             description: null,
             address: null,
             words: null,

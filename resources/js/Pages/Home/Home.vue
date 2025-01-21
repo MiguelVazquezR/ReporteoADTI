@@ -19,7 +19,8 @@
                 <template #dropdown>
                     <el-dropdown-menu>
                         <el-dropdown-item v-for="machine in machines" @click="changeMachineInView(machine)"
-                            :key="machine.id" :class="machines.find(m => m.in_view).name === machine.name ? '!text-primary font-bold' : ''">
+                            :key="machine.id"
+                            :class="machines.find(m => m.in_view).name === machine.name ? '!text-primary font-bold' : ''">
                             {{ machine.name }}
                         </el-dropdown-item>
                     </el-dropdown-menu>
@@ -397,7 +398,11 @@ export default {
                     this.$notify({
                         title: "Máquina cambiada",
                         type: "success"
-                    })
+                    });
+
+                    this.$refs.variables.fetchMachineVariables();
+                    this.$refs.variables.generateTimeSlots();
+                    this.$refs.variables.fetchMachineData();
                 }
             });
         },

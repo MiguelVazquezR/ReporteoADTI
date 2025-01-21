@@ -18,7 +18,7 @@ Route::get('/', function () {
     $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag1');
     $modbus_configurations = ModbusConfiguration::firstWhere('machine', 'Robag1');
     // $variables = MachineVariable::where('machine_name', 'Robag1')->get();
-    $variables = MachineVariable::where('machine_id', $machineInView->id)->get();
+    $variables = MachineVariable::where('machine_id', $machineInView?->id)->get();
 
     return Inertia::render('Home/Home', [
         'schedule_settings' => $schedule_settings,
@@ -49,7 +49,7 @@ Route::post('/save-pdf', [PdfController::class, 'savePdf'])->name('save.pdf');
 Route::resource('machine-variables', MachineVariableController::class);
 Route::post('machine-variables/massive-delete', [MachineVariableController::class, 'massiveDelete'])->name('machine-variables.massive-delete');
 Route::post('machine-variables/massive-toggle-status', [MachineVariableController::class, 'massiveToggleStatus'])->name('machine-variables.massive-toggle-status');
-Route::get('machine-variables-get-variables/{machine}', [MachineVariableController::class, 'getVariables'])->name('machine-variables.get-variables');
+Route::get('machine-variables-get-variables', [MachineVariableController::class, 'getVariables'])->name('machine-variables.get-variables');
 
 
 // ------- maquinas rutas --------

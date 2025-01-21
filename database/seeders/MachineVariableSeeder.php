@@ -367,8 +367,9 @@ class MachineVariableSeeder extends Seeder
             ],
         ];
 
+
         foreach ($robagVariables as $value) {
-            MachineVariable::create($value + ['machine_name' => 'Robag1']);
+            MachineVariable::create($value + ['machine_id' => 1]);
         }
     }
 }

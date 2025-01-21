@@ -457,7 +457,7 @@ export default {
             try {
                 this.loadingTemplate = true;
 
-                const response = await axios.get(route('machine-variables.get-variables', 'Robag1'));
+                const response = await axios.get(route('machine-variables.get-variables'));
 
                 if (response.status === 200) {
                     this.variables = response.data.items;
