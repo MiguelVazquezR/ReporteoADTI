@@ -45,6 +45,8 @@ class MachineController extends Controller
                 $machine->variables()->create($variable->toArray());
             });
         }
+
+        return to_route('home');
     }
 
     public function show(Machine $machine)

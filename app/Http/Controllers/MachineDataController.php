@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ReportEmail;
 use Illuminate\Http\Request;
 use App\Models\Machine;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class MachineDataController extends Controller
 {
@@ -43,5 +45,31 @@ class MachineDataController extends Controller
             ->get();
 
         return $items;
+    }
+
+    public function emailReport(Request $request)
+    {
+        $validatedData = $request->validate([
+            'main_email' => 'required|email',
+            'cco' => 'nullable|array',
+            'cco.*' => 'nullable|email', // Cada CCO debe ser un correo válido
+            'subject' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        // Recoger los datos validados
+        $mainEmail = $validatedData['main_email'];
+        $cco = $validatedData['cco'] ?? [];
+        $subject = $validatedData['subject'];
+        $description = $validatedData['description'] ?? '';
+
+        // Generar el reporte excel y guardar en storage
+        // $filePath = $this->generateReport(true, $request->dates); // Guardar el archivo y obtener la ruta
+
+        $filePath = $request->pdf_path;
+        // Enviar el correo con el archivo adjunto
+        Mail::to($mainEmail)
+            ->cc($cco)
+            ->send(new ReportEmail($subject, $description, $filePath));
     }
 }

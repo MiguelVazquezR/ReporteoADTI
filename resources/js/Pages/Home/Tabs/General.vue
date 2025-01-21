@@ -25,8 +25,10 @@
                 </div>
             </div>
 
-            <h1 v-if="!data.length" class="text-blue-600 font-bold text-sm text-center py-1 mt-2 bg-blue-100">
-                *No hay datos para este intervalo de tiempo
+            <h1 v-if="!data.length" class="text-yellow-600 font-bold text-sm py-1 px-3 mt-2 bg-yellow-100">
+                <i class="fa-regular fa-hand-point-up mr-3"></i>
+                No hay datos para este intervalo de tiempo
+                <i class="fa-regular fa-hand-point-up ml-3"></i>
             </h1>
 
             <OEEPanel ref="oeePanel" :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm" />

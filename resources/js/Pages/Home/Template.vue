@@ -1,10 +1,12 @@
 <template>
     <!-- Estado de carga de pdf -->
-    <div v-if="loadingPDF" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    <div v-if="loadingPDF || sendingEmail" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
         <div class="flex flex-col justify-center items-center text-center">
             <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mb-4"></div>
-            <h2 class="text-white text-2xl font-semibold">Generando PDF...</h2>
-            <p class="text-white text-lg mt-2">Por favor espera un momento</p>
+            <h2 class="text-white text-2xl font-semibold">
+                {{ sendingEmail ? 'Enviando correo' : 'Generando PDF...' }}
+            </h2>
+            <p class="text-white text-lg mt-2">Por favor espera un momento. No cierres esta pestaña</p>
         </div>
     </div>
 
@@ -113,7 +115,7 @@
         <template #content>
             <form @submit.prevent="sendEmail">
                 <div>
-                    <InputLabel value="Correo electrónico detinatario*" />
+                    <InputLabel value="Correo electrónico destinatario*" />
                     <el-input v-model="emailForm.main_email" placeholder="Ej. admin@gmail.com" clearable />
                     <InputError :message="emailForm.errors.main_email" />
                 </div>
@@ -190,6 +192,7 @@ export default {
             loadingTemplate: true,
             loadingCharts: false,
             loadingPDF: false,
+            sendingEmail: false,
             // general
             editModbusConfig: false,
             data: [],
@@ -256,7 +259,10 @@ export default {
                 ...data,
                 dates: this.searchDate,
                 pdf_path: pdfPath // Incluir la ruta del PDF en la petición
-            })).post(route('robag.email-report'), {
+            })).post(route('machine-data.email-report'), {
+                onStart: () => {
+                    this.sendingEmail = true;
+                },
                 onSuccess: () => {
                     this.showEmailModal = false;
                     this.emailForm.reset();
@@ -269,6 +275,9 @@ export default {
                 onError: (error) => {
                     console.log(error);
                 },
+                onFinish: () => {
+                    this.sendingEmail = false;
+                }
             });
         },
         formatDateTime(dateTime) {

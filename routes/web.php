@@ -59,11 +59,11 @@ Route::put('machines/update-in-view/{machine}', [MachineController::class, 'upda
 
 
 //--------------- robag data routes ------------------
-Route::get('robag-export-report', [RobagDataController::class, 'generateReport'])->name('robag.export-report');
-Route::get('robag-get-variable-data', [RobagDataController::class, 'getVariableData'])->name('robag.get-variable-data');
-Route::post('robag-get-data-by-date-range', [RobagDataController::class, 'getDataByDateRange'])->name('robag.get-data-by-date-range');
-Route::post('robag-email-report', [RobagDataController::class, 'emailReport'])->name('robag.email-report');
-Route::get('/robag-get-modbus-registers', [RobagDataController::class, 'getModbusRegisters'])->name('robag.get-modbus-registers');
+// Route::get('robag-export-report', [RobagDataController::class, 'generateReport'])->name('robag.export-report');
+// Route::get('robag-get-variable-data', [RobagDataController::class, 'getVariableData'])->name('robag.get-variable-data');
+// Route::post('robag-get-data-by-date-range', [RobagDataController::class, 'getDataByDateRange'])->name('robag.get-data-by-date-range');
+// Route::post('robag-email-report', [RobagDataController::class, 'emailReport'])->name('robag.email-report');
+// Route::get('/robag-get-modbus-registers', [RobagDataController::class, 'getModbusRegisters'])->name('robag.get-modbus-registers');
 
 
 //--------------- machines data routes ------------------
@@ -71,7 +71,7 @@ Route::get('/robag-get-modbus-registers', [RobagDataController::class, 'getModbu
 // Route::get('machine-data-get-variable-data', [RobagDataController::class, 'getVariableData'])->name('machine-data.get-variable-data');
 Route::post('machine-data-get-data-by-date-range', [MachineDataController::class, 'getDataByDateRange'])->name('machine-data.get-data-by-date-range');
 Route::get('/machine-data-pdf-template', [MachineDataController::class, 'pdfTemplate'])->name('machine-data.pdf-template');
-// Route::post('machine-data-email-report', [RobagDataController::class, 'emailReport'])->name('machine-data.email-report');
+Route::post('machine-data-email-report', [MachineDataController::class, 'emailReport'])->name('machine-data.email-report');
 // Route::get('machine-data-get-modbus-registers', [RobagDataController::class, 'getModbusRegisters'])->name('machine-data.get-modbus-registers');
 
 

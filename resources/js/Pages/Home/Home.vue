@@ -50,13 +50,13 @@
                             <span>Configuraciones</span>
                         </h2>
                         <div class="mx-3 mt-4">
-                            <h3 class="font-bold mx-3">
+                            <h3 class="font-bold mx-3 w-72">
                                 Producción teórica ({{ bpm }} BPM)
                             </h3>
                             <el-slider v-model="bpm" :min="50" :max="150" :step="5" show-stops
                                 :disabled="!searchDate.length" />
                         </div>
-                        <h2 class="flex items-center space-x-2 font-bold mt-2 mx-6">
+                        <!-- <h2 class="flex items-center space-x-2 font-bold mt-2 mx-6">
                             Envio de reporte automático
                         </h2>
                         <section @click="openScheduleSettings"
@@ -89,8 +89,8 @@
                                 class="text-center flex items-center justify-end transform transition-transform group-hover:scale-110 group-hover:translate-x-1">
                                 <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
                             </article>
-                        </section>
-                        <h2 class="flex items-center justify-between mt-2 mx-6">
+                        </section> -->
+                        <!-- <h2 class="flex items-center justify-between mt-2 mx-6">
                             <span class="font-bold">Configuración de Modbus</span>
                             <div v-if="editModbusConfig" class="flex items-center space-x-1">
                                 <PrimaryButton @click="calncelEditingModbusConf"
@@ -108,8 +108,8 @@
                                         d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                 </svg>
                             </button>
-                        </h2>
-                        <section v-if="editModbusConfig" class=" mx-3 mb-2 px-4">
+                        </h2> -->
+                        <!-- <section v-if="editModbusConfig" class=" mx-3 mb-2 px-4">
                             <article class="*:grid *:grid-cols-3 *:mb-1 mt-2">
                                 <div>
                                     <span>IP</span>
@@ -167,17 +167,22 @@
                                     <span>Cada {{ modbusForm.sampling_minutes }} minutos</span>
                                 </div>
                             </article>
-                        </section>
+                        </section> -->
                         <div @click="$inertia.visit(route('machine-variables.index'))"
                             class="flex items-center justify-between mx-3 mb-2 px-4 border-t border-grayD9 pt-1 cursor-pointer">
                             <span>Variables</span>
                             <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
                         </div>
-                        <div @click="openModbusMonitor"
+                        <div @click="openMetabase()"
+                            class="flex items-center justify-between mx-3 mb-2 px-4 border-t border-grayD9 pt-1 cursor-pointer">
+                            <span>Ir a análisis de datos en Metabase</span>
+                            <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
+                        </div>
+                        <!-- <div @click="openModbusMonitor"
                             class="flex items-center justify-between mx-3 mb-2 px-4 border-t border-grayD9 pt-1 cursor-pointer">
                             <span>Lectura tiempo real</span>
                             <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
-                        </div>
+                        </div> -->
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -199,8 +204,7 @@
                 </el-tab-pane>
             </el-tabs>
         </main>
-
-        <DialogModal :show="showRealTimeModbusMonitor" @close="closeModbusMonitor">
+        <!-- <DialogModal :show="showRealTimeModbusMonitor" @close="closeModbusMonitor">
             <template #title>
                 <h1>Monitor de registros en tiempo real</h1>
             </template>
@@ -216,7 +220,6 @@
                             • Revisa que la IP y el puerto registrados en el sistema sean correctos. <br>
                             • Revisa que la red no presente ninguna falla.
                         </p>
-                        <!-- <i class="fa-solid fa-network-wired text-4xl"></i> -->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-10">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -243,9 +246,8 @@
             </template>
             <template #footer>
             </template>
-        </DialogModal>
-
-        <DialogModal :show="showEmailModal" @close="showEmailModal = false">
+        </DialogModal> -->
+        <!-- <DialogModal :show="showEmailModal" @close="showEmailModal = false">
             <template #title>
                 <h1>Enviar reporte por correo</h1>
             </template>
@@ -300,7 +302,7 @@
                     Enviar correo
                 </PrimaryButton>
             </template>
-        </DialogModal>
+        </DialogModal> -->
     </PublicLayout>
 </template>
 
@@ -316,56 +318,56 @@ import Variables from './Tabs/Variables.vue';
 
 export default {
     data() {
-        const emailForm = useForm({
-            main_email: null,
-            cco: [],
-            subject: null,
-            description: null,
-        });
+        // const emailForm = useForm({
+        //     main_email: null,
+        //     cco: [],
+        //     subject: null,
+        //     description: null,
+        // });
 
-        const modbusForm = useForm({
-            host: this.modbus_configurations?.host,
-            port: this.modbus_configurations?.port,
-            sampling_minutes: this.modbus_configurations?.sampling_minutes,
-            machine: 'Robag1',
-        });
+        // const modbusForm = useForm({
+        //     host: this.modbus_configurations?.host,
+        //     port: this.modbus_configurations?.port,
+        //     sampling_minutes: this.modbus_configurations?.sampling_minutes,
+        //     machine: 'Robag1',
+        // });
 
         return {
             // formularios
-            emailForm,
-            modbusForm,
+            // emailForm,
+            // modbusForm,
             bpm: 120, //bpm a maxima velocidad ajustable
             // modales
-            showEmailModal: false,
-            showRealTimeModbusMonitor: false,
+            // showEmailModal: false,
+            // showRealTimeModbusMonitor: false,
             // cargas
             loading: false,
             // general
-            editModbusConfig: false,
+            // editModbusConfig: false,
             searchDate: [],
             activeTab: '1',
-            samplings: [
-                {
-                    label: "Cada minuto",
-                    value: 1,
-                },
-                {
-                    label: "Cada 2 minutos",
-                    value: 2,
-                },
-                {
-                    label: "Cada 5 minutos",
-                    value: 5,
-                },
-                {
-                    label: "Cada 10 minutos",
-                    value: 10,
-                },
-            ],
+            // samplings: [
+            //     {
+            //         label: "Cada minuto",
+            //         value: 1,
+            //     },
+            //     {
+            //         label: "Cada 2 minutos",
+            //         value: 2,
+            //     },
+            //     {
+            //         label: "Cada 5 minutos",
+            //         value: 5,
+            //     },
+            //     {
+            //         label: "Cada 10 minutos",
+            //         value: 10,
+            //     },
+            // ],
             // monitor de modbus
-            modbusData: null,
-            intervalId: null,
-            pausedMonitor: false,
+            // modbusData: null,
+            // intervalId: null,
+            // pausedMonitor: false,
         }
     },
     components: {
@@ -388,6 +390,9 @@ export default {
         machines: Array,
     },
     methods: {
+        openMetabase() {
+            window.open('http://localhost:3000', '_blank');
+        },
         changeMachineInView(machine) {
             if (machine.in_view) {
                 return;
