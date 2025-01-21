@@ -112,7 +112,7 @@ export default {
         getChartSeries() {
             const averages = this.uniqueFormattedDates.map(date => {
                 const filteredItems = this.items.filter(item => format(new Date(item.created_at), 'yyyy-MM-dd') === date);
-                const totalBagsPerMinute = filteredItems.reduce((sum, item) => sum + (parseFloat(item.data['Bolsas por minuto']) || 0), 0);
+                const totalBagsPerMinute = filteredItems.reduce((sum, item) => sum + (parseFloat(item?.bags_per_minute) || 0), 0);
                 const average = totalBagsPerMinute / filteredItems.length || 0;
                 return average.toFixed(2); // Redondea a dos decimales
             });

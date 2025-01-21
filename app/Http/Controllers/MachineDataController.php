@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Machine;
+use Carbon\Carbon;
 
 class MachineDataController extends Controller
 {

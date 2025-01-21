@@ -120,7 +120,7 @@ export default {
         async getDataByDateRange() {
             this.loading = true;
             try {
-                const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.searchDate });
+                const response = await axios.post(route('machine-data.get-data-by-date-range'), { date: this.searchDate });
                 if (response.status === 200) {
                     this.data = response.data.data;
                     this.$emit(

@@ -32,9 +32,9 @@ export default {
             const itemCount = items.length;
 
             const totals = items.reduce((acc, item) => {
-                acc.mean_weight += parseFloat(item.data['Peso medio']) || 0;
-                acc.standard_deviation += parseFloat(item.data['Desviación estándar']) || 0;
-                acc.total_dump_weight += parseFloat(item.data['Peso total de descarga']) || 0;
+                acc.mean_weight += parseFloat(item?.mean_weight) || 0;
+                acc.standard_deviation += parseFloat(item?.standard_deviation) || 0;
+                acc.total_dump_weight += parseFloat(item?.total_dump_weight) || 0;
                 // acc.total_giveaway += parseFloat(item.total_giveaway) || 0;
                 // acc.giveaway_percentage += parseFloat(item.giveaway_percentage) || 0;
                 return acc;

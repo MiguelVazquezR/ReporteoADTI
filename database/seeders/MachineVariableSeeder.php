@@ -243,7 +243,6 @@ class MachineVariableSeeder extends Seeder
                 "address" => "5012",
                 "words" => 2,
                 "type" => "float",
-                "is_active" => false
             ],
             [
                 "name" => "Bolsas por minuto",
