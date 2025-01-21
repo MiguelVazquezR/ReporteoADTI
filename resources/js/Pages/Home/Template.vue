@@ -8,7 +8,7 @@
         </div>
     </div>
 
-    <Head title="Reporte Robag" />
+    <Head :title="'Reporte'+machine.name" />
     <div v-if="!loadingTemplate && !printing" class="flex space-x-3 justify-end mx-20 mt-5">
         <el-dropdown split-button type="primary" @click="handleActionPdf('download')">
             Descargar PDF
@@ -29,7 +29,7 @@
     <main v-else class="px-10 min-h-screen my-4" id="pdf-content">
         <header class="text-center font-bold">
             <p>
-                Reporte de Robag 1: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? '' }}
+                Reporte de {{ machine.name }}: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? '' }}
             </p>
         </header>
         <section class="space-y-4">
@@ -226,6 +226,7 @@ export default {
         date: String,
         timeSlots: Array,
         selectedVariables: Array,
+        machine: Object,
     },
     methods: {
         // downloadPdf() {
@@ -276,7 +277,7 @@ export default {
         async getDataByDateRange() {
             this.loadingCharts = true;
             try {
-                const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.dates });
+                const response = await axios.post(route('machine-data.get-data-by-date-range'), { date: this.dates });
                 if (response.status === 200) {
                     this.data = response.data.data;
                     this.$emit(
@@ -409,13 +410,13 @@ export default {
 
             this.variables.forEach(variable => {
                 const variableName = variable.name;
-                variablesMapped[variableName] = this.mapItemsToTimeSlots(variableName);
+                variablesMapped[variableName] = this.mapItemsToTimeSlots(variable.original_name);
             });
 
             this.variablesMapped = variablesMapped;
         },
         mapItemsToTimeSlots(variable) {
-            const usedItems = new Set(); // Para almacenar los IDs de los items ya utilizados
+            const usedItems = new Set(); // Para almacenar las fechas de creación de los items ya utilizados
 
             const mappedData = this.timeSlots.map(slot => {
                 // Convertir el slot en una fecha completa (fecha + hora)
@@ -427,9 +428,10 @@ export default {
                     // Asegúrate de que la fecha de 'item.created_at' también incluya la fecha
                     const itemDate = parseISO(item.created_at);
                     const difference = differenceInMinutes(slotTime, itemDate);
+                    // console.log(Math.abs(difference) <= 10 && !usedItems.has(item.created_at));
 
                     // Considerar solo los items dentro del rango de 10 minutos hacia arriba y hacia abajo
-                    if (Math.abs(difference) <= 10 && !usedItems.has(item.id)) {
+                    if (Math.abs(difference) <= 10 && !usedItems.has(item.created_at)) {
                         // Verificar si es el más cercano hasta ahora
                         if (Math.abs(difference) < Math.abs(minDifference)) {
                             minDifference = difference;
@@ -440,10 +442,11 @@ export default {
 
                 // Si hay un item cercano dentro de los 10 minutos, se usa, de lo contrario, se usa 0
                 if (closestItem) {
-                    usedItems.add(closestItem.id); // Marcar el item como usado
+                    usedItems.add(closestItem.created_at); // Marcar el item como usado
+                    return { [slot.split(' ')[1]]: parseFloat(parseFloat(closestItem[variable]).toFixed(2)) };
                 }
 
-                return { [slot.split(' ')[1]]: closestItem ? parseFloat(parseFloat(closestItem.data[variable]).toFixed(2)) : 0 };
+                return { [slot.split(' ')[1]]: 0 };
             });
 
             // Combinar el array de objetos en un solo objeto
@@ -473,7 +476,7 @@ export default {
                 this.loadingCharts = true;
 
                 // Enviar el rango de fechas correctamente
-                const response = await axios.post(route('robag.get-data-by-date-range', {
+                const response = await axios.post(route('machine-data.get-data-by-date-range', {
                     date: [`${this.date} ${this.timeSlots[0].split(' ')[1]}`, `${this.date} ${this.timeSlots[this.timeSlots.length - 1].split(' ')[1]}`],
                     subHours: 0,
                 }));

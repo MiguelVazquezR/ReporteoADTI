@@ -204,7 +204,7 @@ export default {
             this.variablesMapped = variablesMapped;
         },
         mapItemsToTimeSlots(variable) {
-            const usedItems = new Set(); // Para almacenar los IDs de los items ya utilizados
+            const usedItems = new Set(); // Para almacenar las fechas de creación de los items ya utilizados
 
             const mappedData = this.timeSlots.map(slot => {
                 // Convertir el slot en una fecha completa (fecha + hora)
@@ -216,9 +216,10 @@ export default {
                     // Asegúrate de que la fecha de 'item.created_at' también incluya la fecha
                     const itemDate = parseISO(item.created_at);
                     const difference = differenceInMinutes(slotTime, itemDate);
+                    // console.log(Math.abs(difference) <= 10 && !usedItems.has(item.created_at));
 
                     // Considerar solo los items dentro del rango de 10 minutos hacia arriba y hacia abajo
-                    if (Math.abs(difference) <= 10 && !usedItems.has(item.id)) {
+                    if (Math.abs(difference) <= 10 && !usedItems.has(item.created_at)) {
                         // Verificar si es el más cercano hasta ahora
                         if (Math.abs(difference) < Math.abs(minDifference)) {
                             minDifference = difference;
@@ -229,10 +230,7 @@ export default {
 
                 // Si hay un item cercano dentro de los 10 minutos, se usa, de lo contrario, se usa 0
                 if (closestItem) {
-                    usedItems.add(closestItem.id); // Marcar el item como usado
-                }
-
-                if (closestItem) {
+                    usedItems.add(closestItem.created_at); // Marcar el item como usado
                     return { [slot.split(' ')[1]]: parseFloat(parseFloat(closestItem[variable]).toFixed(2)) };
                 }
 

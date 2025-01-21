@@ -14,7 +14,8 @@ class MachineController extends Controller
 
     public function create()
     {
-        return inertia('Machines/Create');
+        $machines = Machine::all();
+        return inertia('Machines/Create', compact('machines'));
     }
 
     public function store(Request $request)
@@ -37,7 +38,13 @@ class MachineController extends Controller
         $validatedData['class_name'] = "App\Models\\{$validatedData['class_name']}";
         $machine = Machine::create($validatedData);
 
-        return to_route('home');
+        // clonar las variables de la máquina seleccionada si se ha seleccionado
+        if ($request->machine_id_to_clone_vars) {
+            $machineToClone = Machine::find($request->machine_id_to_clone_vars);
+            $machineToClone->variables->each(function ($variable) use ($machine) {
+                $machine->variables()->create($variable->toArray());
+            });
+        }
     }
 
     public function show(Machine $machine)

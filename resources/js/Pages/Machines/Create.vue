@@ -20,6 +20,15 @@
                             <InputError :message="form.errors.class_name" />
                         </div>
                         <div>
+                            <InputLabel value="Clonar variables" />
+                            <el-select v-model="form.machine_id_to_clone_vars" placeholder="Selecciona">
+                                <el-option label="No clonar variables de otra máquina" :value="0" />
+                                <el-option v-for="item in machines" :key="item.id" :label="item.name"
+                                    :value="item.id" />
+                            </el-select>
+                            <InputError :message="form.errors.class_name" />
+                        </div>
+                        <div>
                             <InputLabel value="Imagen *" />
                             <input type="file" accept="image/*" @change="onFileChanged($event)" />
                             <InputError :message="form.errors.image" />
@@ -49,11 +58,18 @@ export default {
         const form = useForm({
             name: null,
             class_name: null,
+            machine_id_to_clone_vars: 0,
             image: null,
         });
 
         return {
             form,
+        }
+    },
+    props: {
+        machines: {
+            type: Array,
+            required: true
         }
     },
     components: {

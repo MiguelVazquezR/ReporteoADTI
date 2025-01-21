@@ -26,7 +26,7 @@
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
-            <PrimaryButton :disabled="!searchDate.length" @click="exportReport">Generar reporte</PrimaryButton>
+            <PrimaryButton :disabled="!searchDate.length" @click="openReport">Generar reporte</PrimaryButton>
             <el-dropdown trigger="click">
                 <button
                     class="flex items-center justify-center text-secondary rounded-full bg-grayED size-8 focus:border-0 focus:outline-none">
@@ -491,8 +491,8 @@ export default {
                 this.showEmailModal = true;
             }
         },
-        exportReport() {
-            const url = route('robag.pdf-template', {
+        openReport() {
+            const url = route('machine-data.pdf-template', {
                 dates: this.searchDate,
                 bpm: this.bpm,
                 date: this.$refs.variables.date,

@@ -70,6 +70,7 @@ Route::get('/robag-get-modbus-registers', [RobagDataController::class, 'getModbu
 // Route::get('machine-data-export-report', [RobagDataController::class, 'generateReport'])->name('machine-data.export-report');
 // Route::get('machine-data-get-variable-data', [RobagDataController::class, 'getVariableData'])->name('machine-data.get-variable-data');
 Route::post('machine-data-get-data-by-date-range', [MachineDataController::class, 'getDataByDateRange'])->name('machine-data.get-data-by-date-range');
+Route::get('/machine-data-pdf-template', [MachineDataController::class, 'pdfTemplate'])->name('machine-data.pdf-template');
 // Route::post('machine-data-email-report', [RobagDataController::class, 'emailReport'])->name('machine-data.email-report');
 // Route::get('machine-data-get-modbus-registers', [RobagDataController::class, 'getModbusRegisters'])->name('machine-data.get-modbus-registers');
 
@@ -83,18 +84,17 @@ Route::resource('/modbus-configuration', ModbusConfigurationController::class);
 // Route::get('/modbus-configuration-test', [ModbusConfigurationController::class, 'readModbusData']);//**// PRUEBAS DE LECTURA */
 
 
-Route::get('/pdf-template', function () {
-    $bpm = intval(request('bpm'));
-    $dates = request('dates');
-    $date = request('date');
-    $timeSlots = request('timeSlots');
-    $selectedVariables = request('selectedVariables') ?? [];
-    // return compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'); 
-    return inertia('Home/Template', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'));
-})->name('robag.pdf-template');
+// Route::get('/pdf-template', function () {
+//     $bpm = intval(request('bpm'));
+//     $dates = request('dates');
+//     $date = request('date');
+//     $timeSlots = request('timeSlots');
+//     $selectedVariables = request('selectedVariables') ?? [];
+//     // return compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'); 
+//     return inertia('Home/Template', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'));
+// })->name('robag.pdf-template');
 
 
 Route::get('/pdf-example', function () {
     return inertia('Home/ExamplePdf');
 })->name('pdf.example');
-

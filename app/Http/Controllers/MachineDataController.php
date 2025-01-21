@@ -16,6 +16,18 @@ class MachineDataController extends Controller
 
         return response()->json(compact('data'));
     }
+    
+    public function pdfTemplate(Request $request)
+    {
+        $bpm = intval(request('bpm'));
+        $dates = request('dates');
+        $date = request('date');
+        $timeSlots = request('timeSlots');
+        $selectedVariables = request('selectedVariables') ?? [];
+        $machine = Machine::firstWhere('in_view', true);
+        // return compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'); 
+        return inertia('Home/Template', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables', 'machine'));
+    }
 
     // funciones privadas
     private function getItemsByDateRange($dates, $subHours = 6)

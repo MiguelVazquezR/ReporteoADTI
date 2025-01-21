@@ -26,7 +26,7 @@ class MachineVariableController extends Controller
     {
         $validated = $request->validate([
             // 'machine_id' => 'required|numeric|exists:machines,id',
-            'name' => 'required|string|max:255|unique:machine_variables',
+            'name' => 'required|string|max:255',
             'original_name' => 'required|string|max:255|unique:machine_variables',
             'description' => 'nullable|string|max:800',
             'address' => 'required|numeric|max:65535',
@@ -61,7 +61,7 @@ class MachineVariableController extends Controller
         // Validar los datos recibidos
         $validated = $request->validate([
             // 'machine_id' => 'required|string|max:255',
-            'name' => 'required|string|max:255|unique:machine_variables,name,' . $machineVariable->id,
+            'name' => 'required|string|max:255',
             'original_name' => 'required|string|max:255|unique:machine_variables,original_name,' . $machineVariable->id,
             'description' => 'nullable|string|max:800',
             'address' => 'required|numeric|max:65535',

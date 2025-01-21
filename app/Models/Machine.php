@@ -15,4 +15,10 @@ class Machine extends Model
         'image',
         'in_view',
     ];
+
+    // relaciones 
+    public function variables()
+    {
+        return $this->hasMany(MachineVariable::class);
+    }
 }
