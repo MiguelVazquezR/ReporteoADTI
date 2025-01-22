@@ -318,12 +318,12 @@ import Variables from './Tabs/Variables.vue';
 
 export default {
     data() {
-        // const emailForm = useForm({
-        //     main_email: null,
-        //     cco: [],
-        //     subject: null,
-        //     description: null,
-        // });
+        const emailForm = useForm({
+            main_email: null,
+            cco: [],
+            subject: null,
+            description: null,
+        });
 
         // const modbusForm = useForm({
         //     host: this.modbus_configurations?.host,
@@ -334,7 +334,7 @@ export default {
 
         return {
             // formularios
-            // emailForm,
+            emailForm,
             // modbusForm,
             bpm: 120, //bpm a maxima velocidad ajustable
             // modales
@@ -397,7 +397,6 @@ export default {
             if (machine.in_view) {
                 return;
             }
-
             this.emailForm.put(route('machines.update-in-view', machine), {
                 onSuccess: () => {
                     this.$notify({
@@ -412,34 +411,34 @@ export default {
                 }
             });
         },
-        applyFilters(val, filters) {
-            if (!filters) {
-                return val;
-            }
+        // applyFilters(val, filters) {
+        //     if (!filters) {
+        //         return val;
+        //     }
 
-            if (filters = 'porcentaje') {
-                return (val * 100) + '%';
-            }
-        },
-        openModbusMonitor() {
-            this.showRealTimeModbusMonitor = true;
+        //     if (filters = 'porcentaje') {
+        //         return (val * 100) + '%';
+        //     }
+        // },
+        // openModbusMonitor() {
+        //     this.showRealTimeModbusMonitor = true;
 
-            // Ejecutar fetchMachineModbusRegisters cada x mili segundos
-            this.intervalId = setInterval(async () => {
-                if (!this.pausedMonitor) {
-                    await this.fetchMachineModbusRegisters();
-                }
-            }, 2000);
-        },
-        closeModbusMonitor() {
-            this.showRealTimeModbusMonitor = false;
-            this.pausedMonitor = false;
+        //     // Ejecutar fetchMachineModbusRegisters cada x mili segundos
+        //     this.intervalId = setInterval(async () => {
+        //         if (!this.pausedMonitor) {
+        //             await this.fetchMachineModbusRegisters();
+        //         }
+        //     }, 2000);
+        // },
+        // closeModbusMonitor() {
+        //     this.showRealTimeModbusMonitor = false;
+        //     this.pausedMonitor = false;
 
-            // Limpiar el intervalo cuando se cierra el modal
-            if (this.intervalId) {
-                clearInterval(this.intervalId);
-            }
-        },
+        //     // Limpiar el intervalo cuando se cierra el modal
+        //     if (this.intervalId) {
+        //         clearInterval(this.intervalId);
+        //     }
+        // },
         handleClick(tab) {
             // Agrega la variable currentTab=tab.props.name a la URL para mejorar la navegacion al actalizar o cambiar de pagina
             const currentURL = new URL(window.location.href);
@@ -447,55 +446,55 @@ export default {
             // Actualiza la URL
             window.history.replaceState({}, document.title, currentURL.href);
         },
-        calncelEditingModbusConf() {
-            this.editModbusConfig = false;
-            this.modbusForm.reset();
-        },
-        updateModbusConf() {
-            this.modbusForm.put(route('modbus-configuration.update', this.modbus_configurations), {
-                onSuccess: () => {
-                    this.$notify({
-                        title: "Configuraciones de modbus actualizadas",
-                        message: "",
-                        type: "success"
-                    })
-                },
-                onFinish: () => {
-                    this.editModbusConfig = false;
-                }
-            });
-        },
-        openScheduleSettings() {
-            if (this.schedule_settings === null) {
-                this.$inertia.get(route('schedule-email-settings.create'));
-            } else {
-                this.$inertia.get(route('schedule-email-settings.edit', this.schedule_settings));
-            }
-        },
-        sendEmail() {
-            this.emailForm.transform(data => ({
-                ...data,
-                dates: this.searchDate,
-            })).post(route('robag.email-report'), {
-                onSuccess: () => {
-                    this.showEmailModal = false;
-                    this.emailForm.reset();
-                    this.$notify({
-                        title: 'Correo enviado',
-                        message: '',
-                        type: 'success'
-                    })
-                },
-                onError: (error) => {
-                    console.log(error);
-                },
-            });
-        },
-        handleDropdownCommand(command) {
-            if (command == 'email') {
-                this.showEmailModal = true;
-            }
-        },
+        // calncelEditingModbusConf() {
+        //     this.editModbusConfig = false;
+        //     this.modbusForm.reset();
+        // },
+        // updateModbusConf() {
+        //     this.modbusForm.put(route('modbus-configuration.update', this.modbus_configurations), {
+        //         onSuccess: () => {
+        //             this.$notify({
+        //                 title: "Configuraciones de modbus actualizadas",
+        //                 message: "",
+        //                 type: "success"
+        //             })
+        //         },
+        //         onFinish: () => {
+        //             this.editModbusConfig = false;
+        //         }
+        //     });
+        // },
+        // openScheduleSettings() {
+        //     if (this.schedule_settings === null) {
+        //         this.$inertia.get(route('schedule-email-settings.create'));
+        //     } else {
+        //         this.$inertia.get(route('schedule-email-settings.edit', this.schedule_settings));
+        //     }
+        // },
+        // sendEmail() {
+        //     this.emailForm.transform(data => ({
+        //         ...data,
+        //         dates: this.searchDate,
+        //     })).post(route('robag.email-report'), {
+        //         onSuccess: () => {
+        //             this.showEmailModal = false;
+        //             this.emailForm.reset();
+        //             this.$notify({
+        //                 title: 'Correo enviado',
+        //                 message: '',
+        //                 type: 'success'
+        //             })
+        //         },
+        //         onError: (error) => {
+        //             console.log(error);
+        //         },
+        //     });
+        // },
+        // handleDropdownCommand(command) {
+        //     if (command == 'email') {
+        //         this.showEmailModal = true;
+        //     }
+        // },
         openReport() {
             const url = route('machine-data.pdf-template', {
                 dates: this.searchDate,
@@ -504,20 +503,20 @@ export default {
                 timeSlots: this.$refs.variables.timeSlots,
                 selectedVariables: this.$refs.variables.selectedVariables,
             });
-            window.open(url, '_blank');
-            // this.$inertia.visit(route('pdf.example'));
+            // window.open(url, '_blank');
+            this.$inertia.visit(url);
         },
-        async fetchMachineModbusRegisters() {
-            try {
-                const response = await axios.get(route('robag.get-modbus-registers'));
+        // async fetchMachineModbusRegisters() {
+        //     try {
+        //         const response = await axios.get(route('robag.get-modbus-registers'));
 
-                if (response.status === 200) {
-                    this.modbusData = response.data.data;
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        }
+        //         if (response.status === 200) {
+        //             this.modbusData = response.data.data;
+        //         }
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        // }
     },
     computed: {
         isMobile() {

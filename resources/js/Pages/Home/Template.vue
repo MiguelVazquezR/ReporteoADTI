@@ -1,6 +1,7 @@
 <template>
     <!-- Estado de carga de pdf -->
-    <div v-if="loadingPDF || sendingEmail" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    <div v-if="loadingPDF || sendingEmail"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
         <div class="flex flex-col justify-center items-center text-center">
             <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mb-4"></div>
             <h2 class="text-white text-2xl font-semibold">
@@ -10,8 +11,12 @@
         </div>
     </div>
 
-    <Head :title="'Reporte'+machine.name" />
-    <div v-if="!loadingTemplate && !printing" class="flex space-x-3 justify-end mx-20 mt-5">
+    <Head :title="'Reporte' + machine.name" />
+    <div v-if="!loadingTemplate && !printing" class="flex justify-between mx-20 mt-5">
+        <Link :href="route('home')"
+            class="bg-grayED text-secondary rounded-full size-6 text-xs flex items-center justify-center">
+        <i class="fa-solid fa-chevron-left"></i>
+        </Link>
         <el-dropdown split-button type="primary" @click="handleActionPdf('download')">
             Descargar PDF
             <template #dropdown>
@@ -31,7 +36,8 @@
     <main v-else class="px-10 min-h-screen my-4" id="pdf-content">
         <header class="text-center font-bold">
             <p>
-                Reporte de {{ machine.name }}: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? '' }}
+                Reporte de {{ machine.name }}: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? ''
+                }}
             </p>
         </header>
         <section class="space-y-4">
@@ -79,7 +85,8 @@
                         :data="mapItemsToTimeSlots(variables.find(v => v.name == variable).name)" />
                 </div> -->
                 <div v-for="(variable, index) in selectedVariables" :key="index">
-                    <VariablePanel :variableName="variable" height="180" :data="variablesMapped ? variablesMapped[variable] : {}"
+                    <VariablePanel :variableName="variable" height="180"
+                        :data="variablesMapped ? variablesMapped[variable] : {}"
                         :class="index > 8 && index < 12 ? 'mt-16' : null" />
                 </div>
             </div>
@@ -163,8 +170,7 @@ import VelocityPanel from '@/MyComponents/Home/VelocityPanel.vue';
 import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
 import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
 import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
-import { Head } from '@inertiajs/vue3';
-import { useForm } from '@inertiajs/vue3';
+import { Head, useForm, Link } from '@inertiajs/vue3';
 import { format, parse, parseISO, differenceInMinutes } from "date-fns";
 import Loading from '@/Components/MyComponents/Loading.vue';
 import VariablePanel from '@/MyComponents/Home/VariablePanel.vue';
@@ -218,6 +224,7 @@ export default {
         DialogModal,
         InputError,
         InputLabel,
+        Link,
     },
     emits: ['updated-dates'],
     props: {
@@ -246,9 +253,9 @@ export default {
         // },
         async handleActionPdf(action) {
             this.loadingPDF = true;
-            if ( action === 'download' ) {
+            if (action === 'download') {
                 await this.generatePdf();
-            } else if ( action === 'email' ) {
+            } else if (action === 'email') {
                 this.showEmailModal = false;
                 await this.savePdfInProjectAndSend();
             }
@@ -297,7 +304,7 @@ export default {
 
             } catch (error) {
                 console.log(error)
-            } finally { 
+            } finally {
                 this.loadingCharts = false;
             }
         },
@@ -515,7 +522,8 @@ export default {
 
 <style>
 .loader {
-    border-top-color: #1676A2; /* Cambia el color del spinner aquí */
+    border-top-color: #1676A2;
+    /* Cambia el color del spinner aquí */
     animation: spinner 1.5s infinite linear;
 }
 
@@ -523,6 +531,7 @@ export default {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }

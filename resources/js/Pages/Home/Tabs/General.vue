@@ -2,7 +2,7 @@
     <section class="flex space-x-4 w-full min-h-screen mb-10">
         <!-- Imagen de la maquina -->
         <figure class="w-1/4">
-            <img class="rounded-[20px] border border-grayD9 p-4 w-full " :src="'http://localhost:8000/storage/'+machine.image"
+            <img class="rounded-[20px] border border-grayD9 p-4 w-full " :src="'http://reporteo.local/storage/'+machine.image"
                 :alt="machine.name">
         </figure>
         <!-- graficas -->
