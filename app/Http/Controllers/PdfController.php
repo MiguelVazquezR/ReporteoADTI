@@ -12,7 +12,8 @@ class PdfController extends Controller
     {   
         // Abrir pdf desde una vista sin descargar. -------------------------------------
         // $html = inertia('Home/Template');
-        $pdf = Browsershot::url('http://reporteo.local/pdf-template')
+        $url = env('APP_URL') . '/pdf-template';
+        $pdf = Browsershot::url($url)
             ->format('A4')
             ->landscape()
             ->showBackground()

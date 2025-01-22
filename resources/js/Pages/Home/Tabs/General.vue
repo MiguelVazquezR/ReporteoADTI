@@ -2,7 +2,7 @@
     <section class="flex space-x-4 w-full min-h-screen mb-10">
         <!-- Imagen de la maquina -->
         <figure class="w-1/4">
-            <img class="rounded-[20px] border border-grayD9 p-4 w-full " :src="'http://reporteo.local/storage/'+machine.image"
+            <img class="rounded-[20px] border border-grayD9 p-4 w-full " :src="getAppUrl()+'/storage/'+machine.image"
                 :alt="machine.name">
         </figure>
         <!-- graficas -->
@@ -93,6 +93,9 @@ export default {
         }
     },
     methods: {
+        getAppUrl() {
+            return window.location.origin;
+        },
         handleStartDateChange(value) {
             this.startDate = value;
             // Si finishDate es nulo, aplica la regla de deshabilitación
