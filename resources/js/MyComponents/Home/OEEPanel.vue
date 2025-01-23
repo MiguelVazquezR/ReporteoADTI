@@ -133,12 +133,13 @@ export default {
             //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
             const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString();
 
+            const itemsWithNoNullRunTime = this.items.filter(item => item.run_time !== null);
             if (sameDay) {
-                //si es el mismo dia toma el ultimo valor run_time de los registros obtenidos de ese dia.
-                this.productionTime = parseFloat(this.items[this.items.length - 1]?.run_time) / 60;
+                //si es el mismo dia toma el ultimo valor run_time de items no nulos
+                this.productionTime = parseFloat(itemsWithNoNullRunTime[itemsWithNoNullRunTime.length - 1]?.run_time) / 60;
             } else {
-                //si son dias distintos en el intervalo de fechas se suman todos los run_time de esos dias para calcular el tiempo de produccion efectivo.
-                this.productionTime = this.items.reduce((total, item) => total + parseFloat(item?.run_time), 0) / 60;
+                //si son dias distintos en el intervalo de fechas se suman todos los run_time no nulos para calcular el tiempo de produccion efectivo.
+                this.productionTime = itemsWithNoNullRunTime.reduce((total, item) => total + parseFloat(item?.run_time ?? 0), 0) / 60;
             }
 
             this.availabilityPercentage = [((this.productionTime * 100) / this.totalTime).toFixed(1)];
@@ -147,12 +148,13 @@ export default {
             //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
             const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString();
 
-            if (sameDay) {
-                //si es el mismo dia toma el ultimo valor bags_per_minute (bolsas) de los registros obtenidos de ese dia.
-                this.realProduction = parseFloat(this.items[this.items.length - 1]?.bags_per_minute) ?? 0;
-            } else {
-                //si son dias distintos en el intervalo de fechas se suman todos los bags_per_minute de esos dias para calcular el promedio de bolsas por minuto.
-                this.realProduction = this.items.reduce((total, item) => total + parseFloat(item?.bags_per_minute), 0) ?? 0 / this.items.length;
+            const itemsWithNoNullBagsPerMinute = this.items.filter(item => item.bags_per_minute !== null);
+            if (sameDay) { //si es el mismo dia
+                //si es el mismo dia toma el ultimo valor bags_per_minute de items no nulos
+                this.realProduction = parseFloat(itemsWithNoNullBagsPerMinute[itemsWithNoNullBagsPerMinute.length - 1]?.bags_per_minute) ?? 0;
+            } else { //si son dias distintos en el intervalo de fechas
+                // calcular promedio de bags_per_minute sin tomar en cuenta los valores nulos.
+                this.realProduction = itemsWithNoNullBagsPerMinute.reduce((total, item) => total + parseFloat(item?.bags_per_minute ?? 0), 0) / itemsWithNoNullBagsPerMinute.length;
             }
 
             this.performancePercentage = [((this.realProduction * 100) / this.teoricProduction).toFixed(1)];
@@ -160,26 +162,27 @@ export default {
         calculateTotalBags() {
             //revisa si el intervalo de fechas seleccionadas corresponde al mismo dia
             const sameDay = new Date(this.date[0]).toDateString() === new Date(this.date[1]).toDateString();
-            
-            if (sameDay) {
-                //si es el mismo dia toma el ultimo valor total_bags (bolsas totales) y total_waste (desperdicio total) de los registros obtenidos de ese dia.
-                this.totalBags = parseFloat(this.items[this.items.length - 1]?.total_bags) ?? 0;
-                this.totalWasteBags = parseFloat(this.items[this.items.length - 1]?.total_waste) ?? 0;
-                this.totalGoodBags = parseFloat(this.items[this.items.length - 1]?.total_bags) ?? 0 - parseFloat(this.items[this.items.length - 1]?.total_waste) ?? 0;
+
+            const itemsWithNoNullTotalBagsAndWaste = this.items.filter(item => item.total_bags !== null && item.total_waste !== null);            
+            if (sameDay) { //si es el mismo dia toma el ultimo valor
+                //si es el mismo dia toma el ultimo valor total_bags y total_waste de items no nulos
+                this.totalBags = parseFloat(itemsWithNoNullTotalBagsAndWaste[itemsWithNoNullTotalBagsAndWaste.length - 1]?.total_bags) ?? 0;
+                this.totalWasteBags = parseFloat(itemsWithNoNullTotalBagsAndWaste[itemsWithNoNullTotalBagsAndWaste.length - 1]?.total_waste) ?? 0;
+                this.totalGoodBags = this.totalBags - this.totalWasteBags ?? 0;
             } else {
                 //si son dias distintos en el intervalo de fechas se suman todos los total_bags y total_waste del valor maximo de esos dias para calcular el total de bolsas buenas
-                const uniqueDays = [...new Set(this.items.map(item => new Date(item.created_at).toDateString()))];
-                
+                const uniqueDays = [...new Set(itemsWithNoNullTotalBagsAndWaste.map(item => new Date(item.created_at).toDateString()))];
+
                 this.totalBags = uniqueDays.reduce((total, day) => {
-                    const maxBags = Math.max(...this.items
+                    const maxBags = Math.max(...itemsWithNoNullTotalBagsAndWaste
                         .filter(item => new Date(item.created_at).toDateString() === day)
                         .map(item => parseInt(item?.total_bags) ?? 0)
                     );
                     return total + maxBags;
                 }, 0);
-                
+
                 this.totalWasteBags = uniqueDays.reduce((total, day) => {
-                    const maxBags = Math.max(...this.items
+                    const maxBags = Math.max(...itemsWithNoNullTotalBagsAndWaste
                         .filter(item => new Date(item.created_at).toDateString() === day)
                         .map(item => parseInt(item?.total_waste) ?? 0)
                     );
