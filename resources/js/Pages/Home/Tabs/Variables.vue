@@ -198,13 +198,13 @@ export default {
 
             this.variables.forEach(variable => {
                 const variableName = variable.name;
-                variablesMapped[variableName] = this.mapItemsToTimeSlots(variableName);
+                variablesMapped[variableName] = this.mapItemsToTimeSlots(variable.original_name);
             });
 
             this.variablesMapped = variablesMapped;
         },
         mapItemsToTimeSlots(variable) {
-            const usedItems = new Set(); // Para almacenar los IDs de los items ya utilizados
+            const usedItems = new Set(); // Para almacenar las fechas de creación de los items ya utilizados
 
             const mappedData = this.timeSlots.map(slot => {
                 // Convertir el slot en una fecha completa (fecha + hora)
@@ -216,9 +216,10 @@ export default {
                     // Asegúrate de que la fecha de 'item.created_at' también incluya la fecha
                     const itemDate = parseISO(item.created_at);
                     const difference = differenceInMinutes(slotTime, itemDate);
+                    // console.log(Math.abs(difference) <= 10 && !usedItems.has(item.created_at));
 
                     // Considerar solo los items dentro del rango de 10 minutos hacia arriba y hacia abajo
-                    if (Math.abs(difference) <= 10 && !usedItems.has(item.id)) {
+                    if (Math.abs(difference) <= 10 && !usedItems.has(item.created_at)) {
                         // Verificar si es el más cercano hasta ahora
                         if (Math.abs(difference) < Math.abs(minDifference)) {
                             minDifference = difference;
@@ -229,10 +230,11 @@ export default {
 
                 // Si hay un item cercano dentro de los 10 minutos, se usa, de lo contrario, se usa 0
                 if (closestItem) {
-                    usedItems.add(closestItem.id); // Marcar el item como usado
+                    usedItems.add(closestItem.created_at); // Marcar el item como usado
+                    return { [slot.split(' ')[1]]: parseFloat(parseFloat(closestItem[variable]).toFixed(2)) };
                 }
 
-                return { [slot.split(' ')[1]]: closestItem ? parseFloat(parseFloat(closestItem.data[variable]).toFixed(2)) : 0 };
+                return { [slot.split(' ')[1]]: 0 };
             });
 
             // Combinar el array de objetos en un solo objeto
@@ -264,7 +266,7 @@ export default {
             try {
                 this.loading = true;
 
-                const response = await axios.get(route('machine-variables.get-variables', 'Robag1'));
+                const response = await axios.get(route('machine-variables.get-variables'));
 
                 if (response.status === 200) {
                     this.variables = response.data.items;
@@ -280,7 +282,7 @@ export default {
                 this.panelLoading = true;
 
                 // Enviar el rango de fechas correctamente
-                const response = await axios.post(route('robag.get-data-by-date-range', {
+                const response = await axios.post(route('machine-data.get-data-by-date-range', {
                     date: [`${this.date} ${this.timeSlots[0].split(' ')[1]}`, `${this.date} ${this.timeSlots[this.timeSlots.length - 1].split(' ')[1]}`],
                     subHours: 0,
                 }));

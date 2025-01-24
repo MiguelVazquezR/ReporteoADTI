@@ -69,10 +69,11 @@ export default {
             //     return acc;
             // }, { full_bags: 0, total_waste: 0 });
 
-            // delvolver el ultimo registro
-            let lastItem = this.items[this.items.length - 1];
-            const fullBags = parseFloat(lastItem?.data['Bolsas llenas'] ?? 0.0).toFixed(1);
-            const totalWaste = parseFloat(lastItem?.data['Total desechado'] ?? 0.0).toFixed(1);
+            // delvolver el ultimo registro de los items no nulos
+            const itemsWithNoNullFullBagsAndTotalWate = this.items.filter(item => item.full_bags !== null && item.total_waste !== null);
+            let lastItem = itemsWithNoNullFullBagsAndTotalWate[itemsWithNoNullFullBagsAndTotalWate.length - 1];
+            const fullBags = parseFloat(lastItem?.full_bags ?? 0.0).toFixed(1);
+            const totalWaste = parseFloat(lastItem?.total_waste ?? 0.0).toFixed(1);
 
             return [parseFloat(fullBags), parseFloat(totalWaste)];
         }

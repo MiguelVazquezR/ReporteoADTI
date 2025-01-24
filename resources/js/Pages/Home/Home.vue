@@ -11,7 +11,22 @@
                     </el-dropdown-menu>
                 </template>
 </el-dropdown> -->
-            <PrimaryButton :disabled="!searchDate.length" @click="exportReport">Generar reporte</PrimaryButton>
+            <el-dropdown trigger="click" class="mr-6">
+                <button class="flex items-center space-x-2 text-black focus:border-0 focus:outline-none">
+                    <h1 class="font-bold text-2xl">{{ machines.find(m => m.in_view).name }}</h1>
+                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                </button>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item v-for="machine in machines" @click="changeMachineInView(machine)"
+                            :key="machine.id"
+                            :class="machines.find(m => m.in_view).name === machine.name ? '!text-primary font-bold' : ''">
+                            {{ machine.name }}
+                        </el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+            <PrimaryButton :disabled="!searchDate.length" @click="openReport">Generar reporte</PrimaryButton>
             <el-dropdown trigger="click">
                 <button
                     class="flex items-center justify-center text-secondary rounded-full bg-grayED size-8 focus:border-0 focus:outline-none">
@@ -35,13 +50,13 @@
                             <span>Configuraciones</span>
                         </h2>
                         <div class="mx-3 mt-4">
-                            <h3 class="font-bold mx-3">
+                            <h3 class="font-bold mx-3 w-72">
                                 Producción teórica ({{ bpm }} BPM)
                             </h3>
                             <el-slider v-model="bpm" :min="50" :max="150" :step="5" show-stops
                                 :disabled="!searchDate.length" />
                         </div>
-                        <h2 class="flex items-center space-x-2 font-bold mt-2 mx-6">
+                        <!-- <h2 class="flex items-center space-x-2 font-bold mt-2 mx-6">
                             Envio de reporte automático
                         </h2>
                         <section @click="openScheduleSettings"
@@ -74,8 +89,8 @@
                                 class="text-center flex items-center justify-end transform transition-transform group-hover:scale-110 group-hover:translate-x-1">
                                 <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
                             </article>
-                        </section>
-                        <h2 class="flex items-center justify-between mt-2 mx-6">
+                        </section> -->
+                        <!-- <h2 class="flex items-center justify-between mt-2 mx-6">
                             <span class="font-bold">Configuración de Modbus</span>
                             <div v-if="editModbusConfig" class="flex items-center space-x-1">
                                 <PrimaryButton @click="calncelEditingModbusConf"
@@ -93,8 +108,8 @@
                                         d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                 </svg>
                             </button>
-                        </h2>
-                        <section v-if="editModbusConfig" class=" mx-3 mb-2 px-4">
+                        </h2> -->
+                        <!-- <section v-if="editModbusConfig" class=" mx-3 mb-2 px-4">
                             <article class="*:grid *:grid-cols-3 *:mb-1 mt-2">
                                 <div>
                                     <span>IP</span>
@@ -152,17 +167,22 @@
                                     <span>Cada {{ modbusForm.sampling_minutes }} minutos</span>
                                 </div>
                             </article>
-                        </section>
+                        </section> -->
                         <div @click="$inertia.visit(route('machine-variables.index'))"
                             class="flex items-center justify-between mx-3 mb-2 px-4 border-t border-grayD9 pt-1 cursor-pointer">
                             <span>Variables</span>
                             <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
                         </div>
-                        <div @click="openModbusMonitor"
+                        <div @click="openMetabase()"
+                            class="flex items-center justify-between mx-3 mb-2 px-4 border-t border-grayD9 pt-1 cursor-pointer">
+                            <span>Ir a análisis de datos en Metabase</span>
+                            <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
+                        </div>
+                        <!-- <div @click="openModbusMonitor"
                             class="flex items-center justify-between mx-3 mb-2 px-4 border-t border-grayD9 pt-1 cursor-pointer">
                             <span>Lectura tiempo real</span>
                             <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
-                        </div>
+                        </div> -->
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -174,7 +194,7 @@
                     <template #label>
                         <span>Reporte general</span>
                     </template>
-                    <General @updated-dates="searchDate = $event" :bpm="bpm" />
+                    <General ref="general" @updated-dates="searchDate = $event" :bpm="bpm" :machine="machines.find(m => m.in_view)" />
                 </el-tab-pane>
                 <el-tab-pane name="2">
                     <template #label>
@@ -184,8 +204,7 @@
                 </el-tab-pane>
             </el-tabs>
         </main>
-
-        <DialogModal :show="showRealTimeModbusMonitor" @close="closeModbusMonitor">
+        <!-- <DialogModal :show="showRealTimeModbusMonitor" @close="closeModbusMonitor">
             <template #title>
                 <h1>Monitor de registros en tiempo real</h1>
             </template>
@@ -201,13 +220,11 @@
                             • Revisa que la IP y el puerto registrados en el sistema sean correctos. <br>
                             • Revisa que la red no presente ninguna falla.
                         </p>
-                        <!-- <i class="fa-solid fa-network-wired text-4xl"></i> -->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-10">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M13.181 8.68a4.503 4.503 0 0 1 1.903 6.405m-9.768-2.782L3.56 14.06a4.5 4.5 0 0 0 6.364 6.365l3.129-3.129m5.614-5.615 1.757-1.757a4.5 4.5 0 0 0-6.364-6.365l-4.5 4.5c-.258.26-.479.541-.661.84m1.903 6.405a4.495 4.495 0 0 1-1.242-.88 4.483 4.483 0 0 1-1.062-1.683m6.587 2.345 5.907 5.907m-5.907-5.907L8.898 8.898M2.991 2.99 8.898 8.9" />
                         </svg>
-
                     </div>
                     <div v-else>
                         <PrimaryButton @click="pausedMonitor = !pausedMonitor" class="mb-3"
@@ -229,9 +246,8 @@
             </template>
             <template #footer>
             </template>
-        </DialogModal>
-
-        <DialogModal :show="showEmailModal" @close="showEmailModal = false">
+        </DialogModal> -->
+        <!-- <DialogModal :show="showEmailModal" @close="showEmailModal = false">
             <template #title>
                 <h1>Enviar reporte por correo</h1>
             </template>
@@ -286,7 +302,7 @@
                     Enviar correo
                 </PrimaryButton>
             </template>
-        </DialogModal>
+        </DialogModal> -->
     </PublicLayout>
 </template>
 
@@ -309,49 +325,49 @@ export default {
             description: null,
         });
 
-        const modbusForm = useForm({
-            host: this.modbus_configurations?.host,
-            port: this.modbus_configurations?.port,
-            sampling_minutes: this.modbus_configurations?.sampling_minutes,
-            machine: 'Robag1',
-        });
+        // const modbusForm = useForm({
+        //     host: this.modbus_configurations?.host,
+        //     port: this.modbus_configurations?.port,
+        //     sampling_minutes: this.modbus_configurations?.sampling_minutes,
+        //     machine: 'Robag1',
+        // });
 
         return {
             // formularios
             emailForm,
-            modbusForm,
+            // modbusForm,
             bpm: 120, //bpm a maxima velocidad ajustable
             // modales
-            showEmailModal: false,
-            showRealTimeModbusMonitor: false,
+            // showEmailModal: false,
+            // showRealTimeModbusMonitor: false,
             // cargas
             loading: false,
             // general
-            editModbusConfig: false,
+            // editModbusConfig: false,
             searchDate: [],
             activeTab: '1',
-            samplings: [
-                {
-                    label: "Cada minuto",
-                    value: 1,
-                },
-                {
-                    label: "Cada 2 minutos",
-                    value: 2,
-                },
-                {
-                    label: "Cada 5 minutos",
-                    value: 5,
-                },
-                {
-                    label: "Cada 10 minutos",
-                    value: 10,
-                },
-            ],
+            // samplings: [
+            //     {
+            //         label: "Cada minuto",
+            //         value: 1,
+            //     },
+            //     {
+            //         label: "Cada 2 minutos",
+            //         value: 2,
+            //     },
+            //     {
+            //         label: "Cada 5 minutos",
+            //         value: 5,
+            //     },
+            //     {
+            //         label: "Cada 10 minutos",
+            //         value: 10,
+            //     },
+            // ],
             // monitor de modbus
-            modbusData: null,
-            intervalId: null,
-            pausedMonitor: false,
+            // modbusData: null,
+            // intervalId: null,
+            // pausedMonitor: false,
         }
     },
     components: {
@@ -371,36 +387,58 @@ export default {
         },
         modbus_configurations: Object,
         variables: Array,
+        machines: Array,
     },
     methods: {
-        applyFilters(val, filters) {
-            if (!filters) {
-                return val;
-            }
-
-            if (filters = 'porcentaje') {
-                return (val * 100) + '%';
-            }
+        openMetabase() {
+            window.open('http://localhost:3000', '_blank');
         },
-        openModbusMonitor() {
-            this.showRealTimeModbusMonitor = true;
+        changeMachineInView(machine) {
+            if (machine.in_view) {
+                return;
+            }
+            this.emailForm.put(route('machines.update-in-view', machine), {
+                onSuccess: () => {
+                    this.$notify({
+                        title: "Máquina cambiada",
+                        type: "success"
+                    });
 
-            // Ejecutar fetchMachineModbusRegisters cada x mili segundos
-            this.intervalId = setInterval(async () => {
-                if (!this.pausedMonitor) {
-                    await this.fetchMachineModbusRegisters();
+                    this.$refs.variables.fetchMachineVariables();
+                    this.$refs.variables.generateTimeSlots();
+                    this.$refs.variables.fetchMachineData();
+                    this.$refs.general.getDataByDateRange();
                 }
-            }, 2000);
+            });
         },
-        closeModbusMonitor() {
-            this.showRealTimeModbusMonitor = false;
-            this.pausedMonitor = false;
+        // applyFilters(val, filters) {
+        //     if (!filters) {
+        //         return val;
+        //     }
 
-            // Limpiar el intervalo cuando se cierra el modal
-            if (this.intervalId) {
-                clearInterval(this.intervalId);
-            }
-        },
+        //     if (filters = 'porcentaje') {
+        //         return (val * 100) + '%';
+        //     }
+        // },
+        // openModbusMonitor() {
+        //     this.showRealTimeModbusMonitor = true;
+
+        //     // Ejecutar fetchMachineModbusRegisters cada x mili segundos
+        //     this.intervalId = setInterval(async () => {
+        //         if (!this.pausedMonitor) {
+        //             await this.fetchMachineModbusRegisters();
+        //         }
+        //     }, 2000);
+        // },
+        // closeModbusMonitor() {
+        //     this.showRealTimeModbusMonitor = false;
+        //     this.pausedMonitor = false;
+
+        //     // Limpiar el intervalo cuando se cierra el modal
+        //     if (this.intervalId) {
+        //         clearInterval(this.intervalId);
+        //     }
+        // },
         handleClick(tab) {
             // Agrega la variable currentTab=tab.props.name a la URL para mejorar la navegacion al actalizar o cambiar de pagina
             const currentURL = new URL(window.location.href);
@@ -408,77 +446,77 @@ export default {
             // Actualiza la URL
             window.history.replaceState({}, document.title, currentURL.href);
         },
-        calncelEditingModbusConf() {
-            this.editModbusConfig = false;
-            this.modbusForm.reset();
-        },
-        updateModbusConf() {
-            this.modbusForm.put(route('modbus-configuration.update', this.modbus_configurations), {
-                onSuccess: () => {
-                    this.$notify({
-                        title: "Configuraciones de modbus actualizadas",
-                        message: "",
-                        type: "success"
-                    })
-                },
-                onFinish: () => {
-                    this.editModbusConfig = false;
-                }
-            });
-        },
-        openScheduleSettings() {
-            if (this.schedule_settings === null) {
-                this.$inertia.get(route('schedule-email-settings.create'));
-            } else {
-                this.$inertia.get(route('schedule-email-settings.edit', this.schedule_settings));
-            }
-        },
-        sendEmail() {
-            this.emailForm.transform(data => ({
-                ...data,
-                dates: this.searchDate,
-            })).post(route('robag.email-report'), {
-                onSuccess: () => {
-                    this.showEmailModal = false;
-                    this.emailForm.reset();
-                    this.$notify({
-                        title: 'Correo enviado',
-                        message: '',
-                        type: 'success'
-                    })
-                },
-                onError: (error) => {
-                    console.log(error);
-                },
-            });
-        },
-        handleDropdownCommand(command) {
-            if (command == 'email') {
-                this.showEmailModal = true;
-            }
-        },
-        exportReport() {
-            const url = route('robag.pdf-template', {
+        // calncelEditingModbusConf() {
+        //     this.editModbusConfig = false;
+        //     this.modbusForm.reset();
+        // },
+        // updateModbusConf() {
+        //     this.modbusForm.put(route('modbus-configuration.update', this.modbus_configurations), {
+        //         onSuccess: () => {
+        //             this.$notify({
+        //                 title: "Configuraciones de modbus actualizadas",
+        //                 message: "",
+        //                 type: "success"
+        //             })
+        //         },
+        //         onFinish: () => {
+        //             this.editModbusConfig = false;
+        //         }
+        //     });
+        // },
+        // openScheduleSettings() {
+        //     if (this.schedule_settings === null) {
+        //         this.$inertia.get(route('schedule-email-settings.create'));
+        //     } else {
+        //         this.$inertia.get(route('schedule-email-settings.edit', this.schedule_settings));
+        //     }
+        // },
+        // sendEmail() {
+        //     this.emailForm.transform(data => ({
+        //         ...data,
+        //         dates: this.searchDate,
+        //     })).post(route('robag.email-report'), {
+        //         onSuccess: () => {
+        //             this.showEmailModal = false;
+        //             this.emailForm.reset();
+        //             this.$notify({
+        //                 title: 'Correo enviado',
+        //                 message: '',
+        //                 type: 'success'
+        //             })
+        //         },
+        //         onError: (error) => {
+        //             console.log(error);
+        //         },
+        //     });
+        // },
+        // handleDropdownCommand(command) {
+        //     if (command == 'email') {
+        //         this.showEmailModal = true;
+        //     }
+        // },
+        openReport() {
+            const url = route('machine-data.pdf-template', {
                 dates: this.searchDate,
                 bpm: this.bpm,
                 date: this.$refs.variables.date,
                 timeSlots: this.$refs.variables.timeSlots,
                 selectedVariables: this.$refs.variables.selectedVariables,
             });
-            window.open(url, '_blank');
-            // this.$inertia.visit(route('pdf.example'));
+            // window.open(url, '_blank');
+            this.$inertia.visit(url);
         },
-        async fetchMachineModbusRegisters() {
-            try {
-                const response = await axios.get(route('robag.get-modbus-registers'));
+        // async fetchMachineModbusRegisters() {
+        //     try {
+        //         const response = await axios.get(route('robag.get-modbus-registers'));
 
-                if (response.status === 200) {
-                    this.modbusData = response.data.data;
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        }
+        //         if (response.status === 200) {
+        //             this.modbusData = response.data.data;
+        //         }
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        // }
     },
     computed: {
         isMobile() {
