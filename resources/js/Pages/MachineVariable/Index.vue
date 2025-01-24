@@ -7,6 +7,7 @@
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
                 </Link>
+                <h1 class="text-2xl font-bold">Variables (tags) de {{ machine_in_view.name }}</h1>
                 <PrimaryButton @click="$inertia.visit(route('machine-variables.create'))">Crear nuevo</PrimaryButton>
             </section>
             <section class="flex flex-col items-center">
@@ -90,6 +91,7 @@ export default {
     },
     props: {
         variables: Array,
+        machine_in_view: Object,
     },
     computed: {
         filteredTableData() {

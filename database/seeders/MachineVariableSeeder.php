@@ -13,127 +13,136 @@ class MachineVariableSeeder extends Seeder
         $robagVariables = [
             [
                 "name" => "Estado de la máquina",
-                // "original_name" => "status",
+                "original_name" => "status",
                 "description" => "Estado",
                 "address" => "500",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Cantidad baja de bolsas",
-                // "original_name" => "scale_low_product",
+                "original_name" => "scale_low_product",
                 "description" => "0-normal/1-baja señal de producto desde la báscula",
                 "address" => "502",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Restablecer contadores",
-                // "original_name" => "reset_counters",
+                "original_name" => "reset_counters",
                 "description" => "Parámetro grabable para restablecer contadores",
                 "address" => "504",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Estado interno de la báscula",
-                // "original_name" => "scale_internal_status",
+                "original_name" => "scale_internal_status",
                 "description" => "Estado de la báscula Selección de información",
                 "address" => "511",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Tiempo de actividad de Robag",
-                // "original_name" => "robag_up_time",
+                "original_name" => "robag_up_time",
                 "description" => "Tiempo en segundos desde que se encendió el Robag o se reinició el software",
                 "address" => "3004",
                 "words" => 2,
-                "type" => "float",
+                "type" => "int",
             ],
             [
                 "name" => "Motivo del estado de parada",
-                // "original_name" => "reason_for_stop_status",
+                "original_name" => "reason_for_stop_status",
                 "description" => "Requiere configuración adicional en Robag / El código de motivo se coloca en este registro",
                 "address" => "3006",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Tiempo de interlock",
-                // "original_name" => "interlock_time",
+                "original_name" => "interlock_time",
                 "description" => "Tiempo en funcionamiento pero pausa porque un usuario esta manipulando la máquina",
                 "address" => "3008",
                 "words" => 2,
-                "type" => "uint",
+                "type" => "int",
             ],
             [
                 "name" => "Tiempo de ejecución",
-                // "original_name" => "run_time",
+                "original_name" => "run_time",
                 "description" => "Tiempo en ejecución",
                 "address" => "3010",
                 "words" => 2,
-                "type" => "uint",
+                "type" => "int",
             ],
             [
                 "name" => "Tiempo pausado",
-                // "original_name" => "paused_time",
+                "original_name" => "paused_time",
                 "description" => "Tiempo pausado",
                 "address" => "3012",
                 "words" => 2,
-                "type" => "uint",
+                "type" => "int",
             ],
             [
                 "name" => "Tiempo de falla",
-                // "original_name" => "fault_time",
+                "original_name" => "fault_time",
                 "description" => "Tiempo de falla",
                 "address" => "3014",
                 "words" => 2,
-                "type" => "uint",
+                "type" => "int",
             ],
             [
                 "name" => "Tiempo sin película",
-                // "original_name" => "out_of_film_time",
+                "original_name" => "out_of_film_time",
                 "description" => "Tiempo en estado sin película",
                 "address" => "3016",
                 "words" => 2,
-                "type" => "uint",
+                "type" => "int",
             ],
             [
                 "name" => "Última vez de detección de metales",
-                // "original_name" => "last_metal_detect_time",
+                "original_name" => "last_metal_detect_time",
                 "description" => "El tiempo de espera por detección de metales activado. Esto muestra cuánto tiempo ha pasado desde la última detección de metales.",
                 "address" => "3018",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Bolsas rollo en uso",
-                // "original_name" => "bags_this_roll",
+                "original_name" => "bags_this_roll",
                 "description" => "Bolsas hechas desde el último cambio de película.",
                 "address" => "3020",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Bolsas último rollo",
-                // "original_name" => "bags_last_roll",
+                "original_name" => "bags_last_roll",
                 "description" => "Bolsas hechas con el último rollo de película.",
                 "address" => "3022",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Recuento de rechazos de PISD",
-                // "original_name" => "PISD_reject_count",
+                "original_name" => "PISD_reject_count",
                 "description" => "Número de bolsas llenas rechazadas por Producto en Detector de Sello (PISD)",
                 "address" => "3032",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Bolsas buenas",
-                // "original_name" => "scale_good_bags",
+                "original_name" => "scale_good_bags",
                 "description" => "Ciclos de creación de bolsas",
                 "address" => "3040",
                 "words" => 2,
@@ -141,39 +150,43 @@ class MachineVariableSeeder extends Seeder
             ],
             [
                 "name" => "Bolsas con excedente de peso",
-                // "original_name" => "scale_overweight_bags",
+                "original_name" => "scale_overweight_bags",
                 "description" => "Ciclos perdidos debido al exceso de peso",
                 "address" => "3042",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Bolsas de peso bajo",
-                // "original_name" => "scale_underweight_bags",
+                "original_name" => "scale_underweight_bags",
                 "description" => "Ciclos perdidos debido a la falta de peso",
                 "address" => "3044",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Recuento de sobreescala de báscula",
-                // "original_name" => "scale_overscale_count",
+                "original_name" => "scale_overscale_count",
                 "description" => "Volcado hecho.  1 cubeta > Objetivo + Límite alto",
                 "address" => "3046",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Advertencias de báscula",
-                // "original_name" => "scale_warnings",
+                "original_name" => "scale_warnings",
                 "description" => "Advertencias de báscula bit a bit",
                 "address" => "3052",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Bolsas llenas",
-                // "original_name" => "full_bags",
+                "original_name" => "full_bags",
                 "description" => "Número de bolsas llenas",
                 "address" => "5000",
                 "words" => 2,
@@ -181,7 +194,7 @@ class MachineVariableSeeder extends Seeder
             ],
             [
                 "name" => "Bolsas vacias",
-                // "original_name" => "empty_bags",
+                "original_name" => "empty_bags",
                 "description" => "Número de bolsas vacias",
                 "address" => "5002",
                 "words" => 2,
@@ -189,39 +202,43 @@ class MachineVariableSeeder extends Seeder
             ],
             [
                 "name" => "Bolsas de prueba o de ajuste",
-                // "original_name" => "setup_bags",
+                "original_name" => "setup_bags",
                 "description" => "Una bolsa de prueba es cuando la película es movida a una posición correcta",
                 "address" => "5004",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Bolsas movidas",
-                // "original_name" => "jogged_bags",
+                "original_name" => "jogged_bags",
                 "description" => "Número de bolsas movidas",
                 "address" => "5006",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "% Eficiencia de máquina",
-                // "original_name" => "efficiency_percentage",
+                "original_name" => "efficiency_percentage",
                 "description" => "Valor filtrado que representa el número de volcados completos desde la báscula.",
                 "address" => "5008",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Peso objetivo",
-                // "original_name" => "target_weight",
+                "original_name" => "target_weight",
                 "description" => "Configuración del peso del paquete",
                 "address" => "5010",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Peso total de descarga",
-                // "original_name" => "total_dump_weight",
+                "original_name" => "total_dump_weight",
                 "description" => "Peso total de todos los volcados de bolsas llenas desde que Robag se enciende o se limpian los contadores",
                 "address" => "5012",
                 "words" => 2,
@@ -229,7 +246,7 @@ class MachineVariableSeeder extends Seeder
             ],
             [
                 "name" => "Bolsas por minuto",
-                // "original_name" => "bags_per_minute",
+                "original_name" => "bags_per_minute",
                 "description" => "Punto de ajuste de las bolsas por minuto",
                 "address" => "5016",
                 "words" => 2,
@@ -237,23 +254,25 @@ class MachineVariableSeeder extends Seeder
             ],
             [
                 "name" => "Total regalado",
-                // "original_name" => "total_giveaway",
+                "original_name" => "total_giveaway",
                 "description" => "Peso total regalado desde que Robag enciende o limpia los contadores. (producto regalado porque excede el peso objetivo)",
                 "address" => "5022",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Producto ragalado %",
-                // "original_name" => "giveaway_percentage",
+                "original_name" => "giveaway_percentage",
                 "description" => "Total regalado / Peso total de descarga",
                 "address" => "5024",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Total desechado",
-                // "original_name" => "total_waste",
+                "original_name" => "total_waste",
                 "description" => "Número total de bolsas desperdiciadas.   movidas + Vacias + Bolsas de configuración inicial o de prueba",
                 "address" => "5038",
                 "words" => 2,
@@ -261,7 +280,7 @@ class MachineVariableSeeder extends Seeder
             ],
             [
                 "name" => "Total de bolsas",
-                // "original_name" => "total_bags",
+                "original_name" => "total_bags",
                 "description" => "Número total de bolsas fabricadas.   Bolsas llenas + bolsas desperdiciadas",
                 "address" => "5040",
                 "words" => 2,
@@ -269,7 +288,7 @@ class MachineVariableSeeder extends Seeder
             ],
             [
                 "name" => "Peso medio",
-                // "original_name" => "mean_weight",
+                "original_name" => "mean_weight",
                 "description" => "Peso medio de las bolsas realizadas desde la última puesta a cero de los contadores",
                 "address" => "5042",
                 "words" => 2,
@@ -277,7 +296,7 @@ class MachineVariableSeeder extends Seeder
             ],
             [
                 "name" => "Desviación estándar",
-                // "original_name" => "standard_deviation",
+                "original_name" => "standard_deviation",
                 "description" => "La desviación estándar de los pesos de los productos descartados de la báscula desde el último reinicio de los contadores.",
                 "address" => "5044",
                 "words" => 2,
@@ -285,47 +304,52 @@ class MachineVariableSeeder extends Seeder
             ],
             [
                 "name" => "Volcados totales",
-                // "original_name" => "total_dumps",
+                "original_name" => "total_dumps",
                 "description" => "El número total de volcados de la báscula.",
                 "address" => "5046",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Gas Total (litros)",
-                // "original_name" => "gas_total",
+                "original_name" => "gas_total",
                 "description" => "Control de flujo de gas. Litros totales de nitrógeno utilizados",
                 "address" => "5080",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "báscula bpm",
-                // "original_name" => "scale_bpm",
+                "original_name" => "scale_bpm",
                 "description" => "bolsas por minuto",
                 "address" => "5086",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Cabezas por volcado",
-                // "original_name" => "heads_per_dump",
+                "original_name" => "heads_per_dump",
                 "description" => "Número promedio de cabezas por volcado",
                 "address" => "5116",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Peso medio en cabezas listas",
-                // "original_name" => "average_weight_in_ready_heads",
+                "original_name" => "average_weight_in_ready_heads",
                 "description" => "Peso medio en las cubetas disponibles para combinaciones.",
                 "address" => "5112",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
             [
                 "name" => "Peso promedio",
-                // "original_name" => "average_weight",
+                "original_name" => "average_weight",
                 "description" => "Peso promedio en las cubetas disponible para combinaciones",
                 "address" => "5122",
                 "words" => 2,
@@ -333,16 +357,18 @@ class MachineVariableSeeder extends Seeder
             ],
             [
                 "name" => "Eficiencia de báscula a corto plazo (%)",
-                // "original_name" => "short_term_scale_efficiency_percentage",
+                "original_name" => "short_term_scale_efficiency_percentage",
                 "description" => "Eficiencia en una escala de tiempo más corta",
                 "address" => "5124",
                 "words" => 2,
                 "type" => "float",
+                "is_active" => false
             ],
         ];
 
+
         foreach ($robagVariables as $value) {
-            MachineVariable::create($value + ['machine_name' => 'Robag1']);
+            MachineVariable::create($value + ['machine_id' => 1]);
         }
     }
 }

@@ -10,8 +10,9 @@ class MachineVariable extends Model
     use HasFactory;
 
     protected $fillable = [
-        'machine_name',
+        'machine_id',
         'name',
+        'original_name',
         'description',
         'address',
         'type',

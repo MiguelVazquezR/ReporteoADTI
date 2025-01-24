@@ -1,15 +1,22 @@
 <template>
     <!-- Estado de carga de pdf -->
-    <div v-if="loadingPDF" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    <div v-if="loadingPDF || sendingEmail"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
         <div class="flex flex-col justify-center items-center text-center">
             <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mb-4"></div>
-            <h2 class="text-white text-2xl font-semibold">Generando PDF...</h2>
-            <p class="text-white text-lg mt-2">Por favor espera un momento</p>
+            <h2 class="text-white text-2xl font-semibold">
+                {{ sendingEmail ? 'Enviando correo' : 'Generando PDF...' }}
+            </h2>
+            <p class="text-white text-lg mt-2">Por favor espera un momento. No cierres esta pestaña</p>
         </div>
     </div>
 
-    <Head title="Reporte Robag" />
-    <div v-if="!loadingTemplate && !printing" class="flex space-x-3 justify-end mx-20 mt-5">
+    <Head :title="'Reporte' + machine.name" />
+    <div v-if="!loadingTemplate && !printing" class="flex justify-between mx-20 mt-5">
+        <Link :href="route('home')"
+            class="bg-grayED text-secondary rounded-full size-6 text-xs flex items-center justify-center">
+        <i class="fa-solid fa-chevron-left"></i>
+        </Link>
         <el-dropdown split-button type="primary" @click="handleActionPdf('download')">
             Descargar PDF
             <template #dropdown>
@@ -29,7 +36,8 @@
     <main v-else class="px-10 min-h-screen my-4" id="pdf-content">
         <header class="text-center font-bold">
             <p>
-                Reporte de Robag 1: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? '' }}
+                Reporte de {{ machine.name }}: {{ formatDateTime(dates[0]) ?? '' }} a {{ formatDateTime(dates[1]) ?? ''
+                }}
             </p>
         </header>
         <section class="space-y-4">
@@ -77,7 +85,8 @@
                         :data="mapItemsToTimeSlots(variables.find(v => v.name == variable).name)" />
                 </div> -->
                 <div v-for="(variable, index) in selectedVariables" :key="index">
-                    <VariablePanel :variableName="variable" height="180" :data="variablesMapped ? variablesMapped[variable] : {}"
+                    <VariablePanel :variableName="variable" height="180"
+                        :data="variablesMapped ? variablesMapped[variable] : {}"
                         :class="index > 8 && index < 12 ? 'mt-16' : null" />
                 </div>
             </div>
@@ -113,7 +122,7 @@
         <template #content>
             <form @submit.prevent="sendEmail">
                 <div>
-                    <InputLabel value="Correo electrónico detinatario*" />
+                    <InputLabel value="Correo electrónico destinatario*" />
                     <el-input v-model="emailForm.main_email" placeholder="Ej. admin@gmail.com" clearable />
                     <InputError :message="emailForm.errors.main_email" />
                 </div>
@@ -161,8 +170,7 @@ import VelocityPanel from '@/MyComponents/Home/VelocityPanel.vue';
 import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
 import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
 import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
-import { Head } from '@inertiajs/vue3';
-import { useForm } from '@inertiajs/vue3';
+import { Head, useForm, Link } from '@inertiajs/vue3';
 import { format, parse, parseISO, differenceInMinutes } from "date-fns";
 import Loading from '@/Components/MyComponents/Loading.vue';
 import VariablePanel from '@/MyComponents/Home/VariablePanel.vue';
@@ -190,6 +198,7 @@ export default {
             loadingTemplate: true,
             loadingCharts: false,
             loadingPDF: false,
+            sendingEmail: false,
             // general
             editModbusConfig: false,
             data: [],
@@ -215,6 +224,7 @@ export default {
         DialogModal,
         InputError,
         InputLabel,
+        Link,
     },
     emits: ['updated-dates'],
     props: {
@@ -226,6 +236,7 @@ export default {
         date: String,
         timeSlots: Array,
         selectedVariables: Array,
+        machine: Object,
     },
     methods: {
         // downloadPdf() {
@@ -242,9 +253,9 @@ export default {
         // },
         async handleActionPdf(action) {
             this.loadingPDF = true;
-            if ( action === 'download' ) {
+            if (action === 'download') {
                 await this.generatePdf();
-            } else if ( action === 'email' ) {
+            } else if (action === 'email') {
                 this.showEmailModal = false;
                 await this.savePdfInProjectAndSend();
             }
@@ -255,7 +266,10 @@ export default {
                 ...data,
                 dates: this.searchDate,
                 pdf_path: pdfPath // Incluir la ruta del PDF en la petición
-            })).post(route('robag.email-report'), {
+            })).post(route('machine-data.email-report'), {
+                onStart: () => {
+                    this.sendingEmail = true;
+                },
                 onSuccess: () => {
                     this.showEmailModal = false;
                     this.emailForm.reset();
@@ -268,6 +282,9 @@ export default {
                 onError: (error) => {
                     console.log(error);
                 },
+                onFinish: () => {
+                    this.sendingEmail = false;
+                }
             });
         },
         formatDateTime(dateTime) {
@@ -276,7 +293,7 @@ export default {
         async getDataByDateRange() {
             this.loadingCharts = true;
             try {
-                const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.dates });
+                const response = await axios.post(route('machine-data.get-data-by-date-range'), { date: this.dates });
                 if (response.status === 200) {
                     this.data = response.data.data;
                     this.$emit(
@@ -287,7 +304,7 @@ export default {
 
             } catch (error) {
                 console.log(error)
-            } finally { 
+            } finally {
                 this.loadingCharts = false;
             }
         },
@@ -409,13 +426,13 @@ export default {
 
             this.variables.forEach(variable => {
                 const variableName = variable.name;
-                variablesMapped[variableName] = this.mapItemsToTimeSlots(variableName);
+                variablesMapped[variableName] = this.mapItemsToTimeSlots(variable.original_name);
             });
 
             this.variablesMapped = variablesMapped;
         },
         mapItemsToTimeSlots(variable) {
-            const usedItems = new Set(); // Para almacenar los IDs de los items ya utilizados
+            const usedItems = new Set(); // Para almacenar las fechas de creación de los items ya utilizados
 
             const mappedData = this.timeSlots.map(slot => {
                 // Convertir el slot en una fecha completa (fecha + hora)
@@ -427,9 +444,10 @@ export default {
                     // Asegúrate de que la fecha de 'item.created_at' también incluya la fecha
                     const itemDate = parseISO(item.created_at);
                     const difference = differenceInMinutes(slotTime, itemDate);
+                    // console.log(Math.abs(difference) <= 10 && !usedItems.has(item.created_at));
 
                     // Considerar solo los items dentro del rango de 10 minutos hacia arriba y hacia abajo
-                    if (Math.abs(difference) <= 10 && !usedItems.has(item.id)) {
+                    if (Math.abs(difference) <= 10 && !usedItems.has(item.created_at)) {
                         // Verificar si es el más cercano hasta ahora
                         if (Math.abs(difference) < Math.abs(minDifference)) {
                             minDifference = difference;
@@ -440,10 +458,11 @@ export default {
 
                 // Si hay un item cercano dentro de los 10 minutos, se usa, de lo contrario, se usa 0
                 if (closestItem) {
-                    usedItems.add(closestItem.id); // Marcar el item como usado
+                    usedItems.add(closestItem.created_at); // Marcar el item como usado
+                    return { [slot.split(' ')[1]]: parseFloat(parseFloat(closestItem[variable]).toFixed(2)) };
                 }
 
-                return { [slot.split(' ')[1]]: closestItem ? parseFloat(parseFloat(closestItem.data[variable]).toFixed(2)) : 0 };
+                return { [slot.split(' ')[1]]: 0 };
             });
 
             // Combinar el array de objetos en un solo objeto
@@ -457,7 +476,7 @@ export default {
             try {
                 this.loadingTemplate = true;
 
-                const response = await axios.get(route('machine-variables.get-variables', 'Robag1'));
+                const response = await axios.get(route('machine-variables.get-variables'));
 
                 if (response.status === 200) {
                     this.variables = response.data.items;
@@ -473,7 +492,7 @@ export default {
                 this.loadingCharts = true;
 
                 // Enviar el rango de fechas correctamente
-                const response = await axios.post(route('robag.get-data-by-date-range', {
+                const response = await axios.post(route('machine-data.get-data-by-date-range', {
                     date: [`${this.date} ${this.timeSlots[0].split(' ')[1]}`, `${this.date} ${this.timeSlots[this.timeSlots.length - 1].split(' ')[1]}`],
                     subHours: 0,
                 }));
@@ -503,7 +522,8 @@ export default {
 
 <style>
 .loader {
-    border-top-color: #1676A2; /* Cambia el color del spinner aquí */
+    border-top-color: #1676A2;
+    /* Cambia el color del spinner aquí */
     animation: spinner 1.5s infinite linear;
 }
 
@@ -511,6 +531,7 @@ export default {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }

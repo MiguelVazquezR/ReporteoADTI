@@ -2,11 +2,9 @@
     <section class="flex space-x-4 w-full min-h-screen mb-10">
         <!-- Imagen de la maquina -->
         <figure class="w-1/4">
-            <h1 class="font-bold text-xl mb-6 ml-4">ROBAG</h1>
-            <img class="rounded-[20px] border border-grayD9 p-4 w-full" src="@/../../public/images/machine_1.png"
-                alt="">
+            <img class="rounded-[20px] border border-grayD9 p-4 w-full " :src="getAppUrl()+'/storage/'+machine.image"
+                :alt="machine.name">
         </figure>
-
         <!-- graficas -->
         <article class="w-3/4">
             <div class="flex items-center justify-between space-x-3">
@@ -27,8 +25,10 @@
                 </div>
             </div>
 
-            <h1 v-if="!data.length" class="text-blue-600 font-bold text-sm text-center py-1 mt-2 bg-blue-100">
-                *No hay datos para este intervalo de tiempo
+            <h1 v-if="!data.length" class="text-yellow-600 font-bold text-sm py-1 px-3 mt-2 bg-yellow-100">
+                <i class="fa-regular fa-hand-point-up mr-3"></i>
+                No hay datos para este intervalo de tiempo
+                <i class="fa-regular fa-hand-point-up ml-3"></i>
             </h1>
 
             <OEEPanel ref="oeePanel" :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm" />
@@ -85,6 +85,7 @@ export default {
     emits: ['updated-dates'],
     props: {
         bpm: Number,
+        machine: Object,
     },
     watch: {
         bpm() {
@@ -92,6 +93,9 @@ export default {
         }
     },
     methods: {
+        getAppUrl() {
+            return window.location.origin;
+        },
         handleStartDateChange(value) {
             this.startDate = value;
             // Si finishDate es nulo, aplica la regla de deshabilitación
@@ -121,7 +125,7 @@ export default {
         async getDataByDateRange() {
             this.loading = true;
             try {
-                const response = await axios.post(route('robag.get-data-by-date-range'), { date: this.searchDate });
+                const response = await axios.post(route('machine-data.get-data-by-date-range'), { date: this.searchDate });
                 if (response.status === 200) {
                     this.data = response.data.data;
                     this.$emit(
