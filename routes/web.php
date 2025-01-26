@@ -7,6 +7,7 @@ use App\Http\Controllers\ModbusConfigurationController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\RobagDataController;
 use App\Http\Controllers\ScheduleEmailController;
+use App\Http\Controllers\TutorialController;
 use App\Models\Machine;
 use App\Models\MachineVariable;
 use App\Models\ModbusConfiguration;
@@ -56,6 +57,10 @@ Route::get('machine-variables-get-variables', [MachineVariableController::class,
 Route::resource('machines', MachineController::class);
 Route::put('machines/update-in-view/{machine}', [MachineController::class, 'updateInView'])->name('machines.update-in-view');
 Route::post('machines/update-with-media/{machine}', [MachineController::class, 'updateWithMedia'])->name('machines.update-with-media');
+
+
+// ------- tutoriales rutas --------
+Route::resource('tutorials', TutorialController::class);
 
 
 //--------------- robag data routes ------------------

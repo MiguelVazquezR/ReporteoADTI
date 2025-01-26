@@ -178,6 +178,11 @@
                             <span>Ir a análisis de datos en Metabase</span>
                             <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
                         </div>
+                        <div @click="$inertia.visit(route('tutorials.index'))"
+                            class="flex items-center justify-between mx-3 mb-2 px-4 border-t border-grayD9 pt-1 cursor-pointer">
+                            <span>Tutoriales</span>
+                            <i class="fa-solid fa-chevron-right text-primary text-[10px]"></i>
+                        </div>
                         <!-- <div @click="openModbusMonitor"
                             class="flex items-center justify-between mx-3 mb-2 px-4 border-t border-grayD9 pt-1 cursor-pointer">
                             <span>Lectura tiempo real</span>
