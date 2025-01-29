@@ -12,7 +12,7 @@
             </section>
             <section class="mx-16">
                 <h1 class="font-bold text-4xl text-center mt-6 text-primary">Metabase</h1>
-                <div class="grid grid-cols-4 gap-x-8 mt-6">
+                <div class="grid grid-cols-4 gap-x-8 gap-y-3 mt-6">
                     <div v-for="video in videos" :key="video.id"
                         class="bg-white shadow-md rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition duration-300"
                         @click="openVideo(video.path)">
@@ -40,15 +40,21 @@ import PublicLayout from '@/Layouts/PublicLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { Link } from '@inertiajs/vue3';
 
-import thumbnail1 from '@/../../public/images/metabase1.png';
-import thumbnail2 from '@/../../public/images/metabase2.png';
+import thumbnail1 from '@/../../public/images/thn1.png';
+import thumbnail2 from '@/../../public/images/thn2.png';
+import thumbnail3 from '@/../../public/images/thn3.png';
+import thumbnail4 from '@/../../public/images/thn4.png';
+import thumbnail5 from '@/../../public/images/thn5.png';
 
 export default {
     data() {
         return {
             videos: [
-                { id: 1, title: 'Sección de configuraciones', duration: '10:00', thumbnail: thumbnail1, path: '/videos/video1.mp4' },
-                { id: 2, title: 'Creación de graficas y dashboards', duration: '15:30', thumbnail: thumbnail2, path: '/videos/video2.mp4' },
+                { id: 1, title: 'Conexión de base de datos', duration: '00:49', thumbnail: thumbnail1, path: '/videos/Conexión de base de datos.mp4' },
+                { id: 2, title: 'Creación de preguntas', duration: '03:16', thumbnail: thumbnail2, path: '/videos/Creación de preguntas.mp4' },
+                { id: 3, title: 'Creación de pregunta con sql', duration: '02:06', thumbnail: thumbnail3, path: '/videos/Creación de pregunta con sql.mp4' },
+                { id: 4, title: 'Crear dashboard', duration: '03:24', thumbnail: thumbnail4, path: '/videos/Crear dashboard.mp4' },
+                { id: 5, title: 'Envío de reportes por correo', duration: '01:21', thumbnail: thumbnail5, path: '/videos/Envío de reportes por correo.mp4' },
             ]
         }
     },
