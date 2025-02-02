@@ -67,11 +67,33 @@ class MachineController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255|unique:machines,name,' . $machine->id,
             'class_name' => 'required|string|max:255|unique:machines,class_name,' . $machine->id,
-            // 'image' => 'nullable|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Actualizar la máquina
+        $validatedData['class_name'] = "App\Models\\{$validatedData['class_name']}";
+        $machine->update($validatedData);
+
+        return to_route('home');
+    }
+    
+    public function updateWithMedia(Request $request, Machine $machine)
+    {
+        // Validar los datos recibidos
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255|unique:machines,name,' . $machine->id,
+            'class_name' => 'required|string|max:255|unique:machines,class_name,' . $machine->id,
+            'image' => 'nullable|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Manejar la subida de la imagen
         if ($request->hasFile('image')) {
+            //eliminar la imagen anterior
+            if ($machine->image) {
+                $path = storage_path('app/public/' . $machine->image);
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+            }
             // guardar el path en carpeta storage/app/machines y en la base de datos
             $path = $request->file('image')->store('machines', 'public');
             $validatedData['image'] = $path;

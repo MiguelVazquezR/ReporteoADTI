@@ -19,11 +19,11 @@
                             <el-input v-model="form.class_name" placeholder="Solo para desarrollador" clearable />
                             <InputError :message="form.errors.class_name" />
                         </div>
-                        <!-- <div>
+                        <div>
                             <InputLabel value="Imagen *" />
                             <input type="file" accept="image/*" @change="onFileChanged($event)" />
                             <InputError :message="form.errors.image" />
-                        </div> -->
+                        </div>
                     </div>
                     <div class="flex items-center justify-end space-x-1 mt-6">
                         <PrimaryButton :disabled="form.processing">
@@ -68,17 +68,32 @@ export default {
     },
     methods: {
         update() {
-            this.form.put(route('machines.update', this.machine), {
-                onSuccess: () => {
-                    this.$notify({
-                        title: 'Correcto',
-                        type: 'success'
-                    })
-                },
-                onError: (error) => {
-                    console.log(error);
-                },
-            });
+            if (this.form.image) {
+                this.form.post(route('machines.update-with-media', this.machine), {
+                    _method: 'put',
+                    onSuccess: () => {
+                        this.$notify({
+                            title: 'Correcto',
+                            type: 'success'
+                        })
+                    },
+                    onError: (error) => {
+                        console.log(error);
+                    },
+                });
+            } else {
+                this.form.put(route('machines.update', this.machine), {
+                    onSuccess: () => {
+                        this.$notify({
+                            title: 'Correcto',
+                            type: 'success'
+                        })
+                    },
+                    onError: (error) => {
+                        console.log(error);
+                    },
+                });
+            }
         },
         onFileChanged(event) {
             this.form.image = event.target.files[0];
