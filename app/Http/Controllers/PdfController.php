@@ -148,8 +148,8 @@ class PdfController extends Controller
             ]);
             $cardDetails = json_decode($response->getBody(), true);
             $cardName = $cardDetails['name'] ?? 'Gráfico sin nombrar';
-            $xName = $cardDetails['visualization_settings']['graph.x_axis.title_text'] ?? 'Eje X';
-            $yName = $cardDetails['visualization_settings']['graph.y_axis.title_text'] ?? 'Eje Y';
+            $xName = $cardDetails['visualization_settings']['graph.dimensions'][0] ?? 'Eje X';
+            $yName = $cardDetails['visualization_settings']['graph.metrics'][0] ?? 'Eje Y';
 
             $response = $client->request('POST', $baseUrl . '/card/' . $cardId . '/query', [
                 'headers' => ['x-api-key' => $apiKey]
@@ -169,6 +169,9 @@ class PdfController extends Controller
         }
         // 4. Generar PDF con la data obtenida
         $pdf = Pdf::loadView('pdf.report', ['cardsData' => $cardsData]);
+
+        // return $cardDetails;
+        return $pdf->stream('reporte.pdf');
 
         return $pdf->download('reporte.pdf');
     }
