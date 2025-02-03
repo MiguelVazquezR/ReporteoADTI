@@ -17,7 +17,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 45px;
         }
 
         th,
@@ -35,7 +35,6 @@
         /* Estilos para la gráfica compatibles con Dompdf */
         .chart-container {
             width: 100%;
-            height: 33%;
             text-align: center;
             padding-top: 3px;
             position: relative;
@@ -69,13 +68,13 @@
 <body>
     @if (app()->environment() === 'production')
         {{-- en servidor cpanel colocar asset --}}
-        <img style="position: absolute; right: 0; top: 0; width: auto; height: 45px;"
+        <img style="position: absolute; right: 0; top: 0; width: auto; height: 30px;"
             src="{{ asset('images/logo_colors.png') }}">
     @else
-        <img style="position: absolute; right: 0; top: 0; width: auto; height: 45px;"
+        <img style="position: absolute; right: 0; top: 0; width: auto; height: 30px;"
             src="{{ public_path('images\logo_colors.png') }}">
     @endif
-    <h1 style="margin: 0">Reporte: Robag1</h1>
+    <h1 style="margin: 0; font-size: 13px">Reporte: Robag1</h1>
     @foreach ($cardsData as $card)
         <div class="card">
             @php
@@ -112,7 +111,7 @@
                 <p style="margin: 0"><strong>{{ $card['x_name'] }}</strong> vs <strong>{{ $card['y_name'] }}</strong></p>
                 @foreach ($filteredRows as $row)
                     @php
-                        $barHeightPx = is_numeric($row[1]) ? ($row[1] / $maxY) * 200 : 0;
+                        $barHeightPx = is_numeric($row[1]) ? ($row[1] / $maxY) * 130 : 0;
                     @endphp
                     <div class="bar-wrapper">
                         <div class="bar" style="height: {{ $barHeightPx }}px; width: {{ $barWidth }}px;"></div>
@@ -124,7 +123,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th># Registro</th>
+                        <th>#</th>
                         <th>{{ $card['x_name'] }}</th>
                         <th>{{ $card['y_name'] }}</th>
                     </tr>
