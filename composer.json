@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.2",
         "aldas/modbus-tcp-client": "^3.5",
+        "barryvdh/laravel-dompdf": "*",
         "inertiajs/inertia-laravel": "^1.0",
         "laravel/framework": "^11.9",
         "laravel/jetstream": "^5.1",
