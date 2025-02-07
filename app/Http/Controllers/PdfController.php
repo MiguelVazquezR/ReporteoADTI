@@ -150,6 +150,8 @@ class PdfController extends Controller
             $cardName = $cardDetails['name'] ?? 'Gráfico sin nombrar';
             $xName = $cardDetails['visualization_settings']['graph.dimensions'][0] ?? 'Eje X';
             $yName = $cardDetails['visualization_settings']['graph.metrics'][0] ?? 'Eje Y';
+            // obtener un color aleatorio pero que contraste bien con el fondo blanco
+            $color =  '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
 
             $response = $client->request('POST', $baseUrl . '/card/' . $cardId . '/query', [
                 'headers' => ['x-api-key' => $apiKey]
@@ -164,13 +166,13 @@ class PdfController extends Controller
                 'card_name' => $cardName,
                 'x_name'  => $xName,
                 'y_name'  => $yName,
-                'rows'    => $rows
+                'color' => $color,
+                'rows' => array_slice($rows, -96) //los ultimos 96 reigstros (8 horas)
             ];
         }
         // 4. Generar PDF con la data obtenida
         $pdf = Pdf::loadView('pdf.report', ['cardsData' => $cardsData]);
-
-        // return $cardDetails;
+        
         return $pdf->stream('reporte.pdf');
 
         return $pdf->download('reporte.pdf');
