@@ -1,7 +1,7 @@
 <template>
     <PublicLayout title="Crear Programación de correos">
         <main class="lg:py-10 lg:px-14">
-            <Link :href="route('home')"
+            <Link :href="route('schedule-email-settings.index')"
                 class="bg-grayED text-secondary rounded-full size-6 text-xs flex items-center justify-center">
             <i class="fa-solid fa-chevron-left"></i>
             </Link>

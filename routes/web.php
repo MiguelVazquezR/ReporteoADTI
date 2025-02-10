@@ -68,6 +68,8 @@ Route::post('machine-data-email-report', [MachineDataController::class, 'emailRe
 
 // --------------- rutas de configuraciones de programacion de correo -------------------------
 Route::resource('schedule-email-settings', ScheduleEmailController::class);
+Route::post('schedule-email-settings/massive-delete', [ScheduleEmailController::class, 'massiveDelete'])->name('schedule-email-settings.massive-delete');
+Route::post('schedule-email-settings/massive-update', [ScheduleEmailController::class, 'massiveUpdate'])->name('schedule-email-settings.massive-update');
 
 
 //--------------- rutas configuracon de modbus ----------------------
