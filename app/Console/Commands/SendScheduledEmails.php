@@ -33,7 +33,7 @@ class SendScheduledEmails extends Command
 
         // si son las 00:00 de hoy, cambiar a null propiedad last_send_at de todos los registros (limpiar envios)
         if ($now->format('H:i') == '13:00') {
-            $scheduledEmails->each(fn ($schedule) => $schedule->update(['last_send_at' => null]));
+            $scheduledEmails->each(fn($schedule) => $schedule->update(['last_send_at' => null]));
             Log::info('Envios limpios');
             return;
         }
@@ -60,11 +60,10 @@ class SendScheduledEmails extends Command
 
         $counEmails = count($scheduledEmails);
         if ($counEmails > 0) {
-            // ejecutar metodo generateReport() de PdfController para guardar el reporte en la carpeta storage
-            $pdfController = new PdfController();
-            $pdfPath = $pdfController->generateReport();
-
             foreach ($scheduledEmails as $email) {
+                // ejecutar metodo generateReport() de PdfController para guardar el reporte en la carpeta storage
+                $pdfController = new PdfController();
+                $pdfPath = $pdfController->generateReport($email->report_name);
                 // Enviar el correo electrónico
                 Mail::to($email->main_email)
                     ->cc($email->cco)
@@ -73,10 +72,11 @@ class SendScheduledEmails extends Command
                 // Actualizar la propiedad last_send_at
                 $email->last_send_at = $now;
                 $email->save();
+
+                // eliminar el archivo PDF
+                unlink($pdfPath);
             }
 
-            // eliminar el archivo PDF
-            unlink($pdfPath);
             Log::info($counEmails . " Correos enviados");
         }
     }

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Reporte Robag1</title>
+    <title>Reporte {{ $dashboardName }}</title>
     <style>
         body {
             font-family: sans-serif;
@@ -79,7 +79,7 @@
         <img style="position: absolute; right: 0; top: 0; width: auto; height: 30px;"
             src="{{ public_path('images\logo_colors.png') }}">
     @endif
-    <h1 style="margin: 0; font-size: 13px">Reporte: Robag1</h1>
+    <h1 style="margin: 0; font-size: 13px">Reporte: {{ $dashboardName }}</h1>
     @foreach ($cardsData as $card)
         <div class="card">
             @php

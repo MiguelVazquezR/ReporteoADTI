@@ -104,13 +104,13 @@ class PdfController extends Controller
         }
     }
 
-    public function generateReport()
+    public function generateReport($dashboardName)
     {
         $apiKey  = env('METABASE_API_KEY');
         $baseUrl = env('METABASE_API_URL');
         $client  = new Client();
 
-        // 1. Obtener lista de dashboards y buscar "Robag1"
+        // 1. Obtener lista de dashboards y buscar $dashboardName
         $response = $client->request('GET', $baseUrl . '/dashboard', [
             'headers' => ['x-api-key' => $apiKey]
         ]);
@@ -118,13 +118,13 @@ class PdfController extends Controller
 
         $dashboardId = null;
         foreach ($dashboards as $dashboard) {
-            if (isset($dashboard['name']) && $dashboard['name'] === 'Robag1') {
+            if (isset($dashboard['name']) && $dashboard['name'] === $dashboardName) {
                 $dashboardId = $dashboard['id'];
                 break;
             }
         }
         if (!$dashboardId) {
-            abort(404, 'Dashboard "Robag1" no encontrado');
+            abort(404, "Dashboard {$dashboardName} no encontrado");
         }
 
         // 2. Obtener detalles del dashboard y extraer los card_ids
@@ -170,7 +170,7 @@ class PdfController extends Controller
             ];
         }
         // 4. Generar PDF con la data obtenida
-        $pdf = Pdf::loadView('pdf.report', ['cardsData' => $cardsData]);
+        $pdf = Pdf::loadView('pdf.report', ['cardsData' => $cardsData, 'dashboardName' => $dashboardName]);
         
         // ver en navegador
         // return $pdf->stream('reporte.pdf');
