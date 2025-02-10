@@ -107,8 +107,8 @@ class PdfController extends Controller
 
     public function generateReport()
     {
-        $apiKey  = 'mb_bF3v/xGVEZxOBpGkLCdug9jHvLg3uhZaAsvRGZ7pk3M=';
-        $baseUrl = 'http://localhost:3000/api';
+        $apiKey  = env('METABASE_API_KEY');
+        $baseUrl = env('METABASE_API_URL');
         $client  = new Client();
 
         // 1. Obtener lista de dashboards y buscar "Robag1"

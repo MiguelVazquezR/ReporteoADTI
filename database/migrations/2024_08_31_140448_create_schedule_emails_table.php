@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('schedule_emails', function (Blueprint $table) {
             $table->id();
-            $table->string('machine');
+            $table->string('report_name');
             $table->string('main_email');
             $table->json('cco')->nullable();
             $table->string('subject');
             $table->text('description')->nullable();
-            $table->date('date');
+            $table->string('weekday')->nullable();
             $table->string('frecuency');
             $table->string('time');
             $table->timestamps();

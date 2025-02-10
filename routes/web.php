@@ -5,24 +5,20 @@ use App\Http\Controllers\MachineController;
 use App\Http\Controllers\MachineDataController;
 use App\Http\Controllers\ModbusConfigurationController;
 use App\Http\Controllers\PdfController;
-use App\Http\Controllers\RobagDataController;
 use App\Http\Controllers\ScheduleEmailController;
 use App\Http\Controllers\TutorialController;
 use App\Models\Machine;
 use App\Models\MachineVariable;
 use App\Models\ModbusConfiguration;
-use App\Models\ScheduleEmail;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     $machineInView = Machine::firstWhere('in_view', true);
-    $schedule_settings = ScheduleEmail::firstWhere('machine', 'Robag1');
     $modbus_configurations = ModbusConfiguration::firstWhere('machine', 'Robag1');
     $variables = MachineVariable::where('machine_id', $machineInView?->id)->get();
 
     return Inertia::render('Home/Home', [
-        'schedule_settings' => $schedule_settings,
         'modbus_configurations' => $modbus_configurations,
         'variables' => $variables,
         'machines' => Machine::all(),
@@ -64,21 +60,10 @@ Route::post('machines/update-with-media/{machine}', [MachineController::class, '
 Route::resource('tutorials', TutorialController::class);
 
 
-//--------------- robag data routes ------------------
-// Route::get('robag-export-report', [RobagDataController::class, 'generateReport'])->name('robag.export-report');
-// Route::get('robag-get-variable-data', [RobagDataController::class, 'getVariableData'])->name('robag.get-variable-data');
-// Route::post('robag-get-data-by-date-range', [RobagDataController::class, 'getDataByDateRange'])->name('robag.get-data-by-date-range');
-// Route::post('robag-email-report', [RobagDataController::class, 'emailReport'])->name('robag.email-report');
-// Route::get('/robag-get-modbus-registers', [RobagDataController::class, 'getModbusRegisters'])->name('robag.get-modbus-registers');
-
-
 //--------------- machines data routes ------------------
-// Route::get('machine-data-export-report', [RobagDataController::class, 'generateReport'])->name('machine-data.export-report');
-// Route::get('machine-data-get-variable-data', [RobagDataController::class, 'getVariableData'])->name('machine-data.get-variable-data');
 Route::post('machine-data-get-data-by-date-range', [MachineDataController::class, 'getDataByDateRange'])->name('machine-data.get-data-by-date-range');
 Route::get('/machine-data-pdf-template', [MachineDataController::class, 'pdfTemplate'])->name('machine-data.pdf-template');
 Route::post('machine-data-email-report', [MachineDataController::class, 'emailReport'])->name('machine-data.email-report');
-// Route::get('machine-data-get-modbus-registers', [RobagDataController::class, 'getModbusRegisters'])->name('machine-data.get-modbus-registers');
 
 
 // --------------- rutas de configuraciones de programacion de correo -------------------------
@@ -87,18 +72,6 @@ Route::resource('schedule-email-settings', ScheduleEmailController::class);
 
 //--------------- rutas configuracon de modbus ----------------------
 Route::resource('/modbus-configuration', ModbusConfigurationController::class);
-// Route::get('/modbus-configuration-test', [ModbusConfigurationController::class, 'readModbusData']);//**// PRUEBAS DE LECTURA */
-
-
-// Route::get('/pdf-template', function () {
-//     $bpm = intval(request('bpm'));
-//     $dates = request('dates');
-//     $date = request('date');
-//     $timeSlots = request('timeSlots');
-//     $selectedVariables = request('selectedVariables') ?? [];
-//     // return compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'); 
-//     return inertia('Home/Template', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'));
-// })->name('robag.pdf-template');
 
 
 Route::get('/pdf-example', function () {
