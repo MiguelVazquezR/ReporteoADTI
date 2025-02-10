@@ -1,14 +1,22 @@
 <template>
     <PublicLayout title="Crear Programación de correos">
         <main class="lg:py-10 lg:px-14">
-            <Link :href="route('home')" class="bg-grayED text-secondary rounded-full size-6 text-xs flex items-center justify-center">
-                <i class="fa-solid fa-chevron-left"></i>
+            <Link :href="route('schedule-email-settings.index')"
+                class="bg-grayED text-secondary rounded-full size-6 text-xs flex items-center justify-center">
+            <i class="fa-solid fa-chevron-left"></i>
             </Link>
             <section class="w-full">
                 <form @submit.prevent="store" class="border border-grayD9 px-4 py-3 rounded-xl w-1/2 mx-auto">
                     <h1 class="font-bold">Envío de reporte automático</h1>
+                    <div class="mt-2">
+                        <InputLabel value="Reporte de metabase" />
+                        <el-select v-model="form.report_name" placeholder="Selecciona">
+                            <el-option v-for="item in dashboards" :key="item" :label="item" :value="item" />
+                        </el-select>
+                        <InputError :message="form.errors.report_name" />
+                    </div>
                     <div class="mt-3">
-                        <InputLabel value="Correo electrónico detinatario*" />
+                        <InputLabel value="Correo electrónico principal*" />
                         <el-input v-model="form.main_email" placeholder="Ej. admin@gmail.com" clearable />
                         <InputError :message="form.errors.main_email" />
                     </div>
@@ -31,19 +39,19 @@
                             placeholder="Escribe una descripción si es necesario" clearable />
                         <InputError :message="form.errors.description" />
                     </div>
-                    <h2 class="text-sm font-bold mt-3">Frecuencia de envío de correos automáticos</h2>
                     <div class="mt-2">
-                        <InputLabel value="Fecha de envío" />
-                        <el-date-picker v-model="form.date" type="date" class="!w-1/2" placeholder="Selecciona"
-                            format="DD MMM, YY" value-format="YYYY-MM-DD" />
-                        <InputError :message="form.errors.date" />
-                    </div>
-                    <div class="mt-2">
-                        <InputLabel value="Opciones de frecuencia" />
+                        <InputLabel value="Frecuencia de envío" />
                         <el-select v-model="form.frecuency" placeholder="Selecciona" class="!w-1/2">
                             <el-option v-for="item in frecuencyList" :key="item" :label="item" :value="item" />
                         </el-select>
                         <InputError :message="form.errors.frecuency" />
+                    </div>
+                    <div v-if="form.frecuency == 'Una vez a la semana'" class="mt-2">
+                        <InputLabel value="Día de envío" />
+                        <el-select v-model="form.weekday" placeholder="Selecciona" class="!w-1/2">
+                            <el-option v-for="item in weekdays" :key="item" :label="item" :value="item" />
+                        </el-select>
+                        <InputError :message="form.errors.date" />
                     </div>
                     <div class="mt-2">
                         <InputLabel value="Hora de envío" />
@@ -74,13 +82,13 @@ import InputLabel from '@/Components/InputLabel.vue';
 export default {
     data() {
         const form = useForm({
-            machine: 'Robag1',
+            report_name: null,
             main_email: null,
             cco: [],
             subject: null,
             description: null,
-            date: null,
-            frecuency: 'Mensualmente',
+            frecuency: 'Diariamente',
+            weekday: null,
             time: null,
         });
 
@@ -90,9 +98,16 @@ export default {
             // general
             frecuencyList: [
                 'Diariamente',
-                'Semanalmente',
-                'Quincenalmente',
-                'Mensualmente',
+                'Una vez a la semana',
+            ],
+            weekdays: [
+                'lunes',
+                'martes',
+                'miércoles',
+                'jueves',
+                'viernes',
+                'sábado',
+                'domingo',
             ],
         }
     },
@@ -104,13 +119,18 @@ export default {
         InputLabel,
         Link
     },
+    props: {
+        dashboards: {
+            type: Array,
+            required: true,
+        },
+    },
     methods: {
         store() {
             this.form.post(route('schedule-email-settings.store'), {
                 onSuccess: () => {
                     this.$notify({
-                        title: 'Programación de correos creada',
-                        message: '',
+                        title: 'Programación creada',
                         type: 'success'
                     })
                 },
