@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('weekday')->nullable();
             $table->string('frecuency');
             $table->string('time');
+            $table->timestamp('last_send_at')->nullable();
             $table->timestamps();
         });
     }

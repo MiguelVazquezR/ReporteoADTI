@@ -71,7 +71,7 @@ class ScheduleEmailController extends Controller
         ]);
 
         $schedule_email = ScheduleEmail::find($schedule_email);
-        $schedule_email->update($request->all());
+        $schedule_email->update($request->all() + ['last_send_at' => null]);
 
         return to_route('schedule-email-settings.index');
     }

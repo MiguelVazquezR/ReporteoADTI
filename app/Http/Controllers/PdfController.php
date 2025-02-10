@@ -104,7 +104,6 @@ class PdfController extends Controller
         }
     }
 
-
     public function generateReport()
     {
         $apiKey  = env('METABASE_API_KEY');
@@ -173,8 +172,14 @@ class PdfController extends Controller
         // 4. Generar PDF con la data obtenida
         $pdf = Pdf::loadView('pdf.report', ['cardsData' => $cardsData]);
         
-        return $pdf->stream('reporte.pdf');
+        // ver en navegador
+        // return $pdf->stream('reporte.pdf');
+        // descargar
+        // return $pdf->download('reporte.pdf');
+        
+        // Guardar el PDF en la carpeta storage/app/public y devolver la ruta completa del archivo
+        $pdf->save(storage_path('app/public/reporte.pdf'));
+        return storage_path('app/public/reporte.pdf');
 
-        return $pdf->download('reporte.pdf');
     }
 }

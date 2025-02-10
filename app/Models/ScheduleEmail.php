@@ -18,9 +18,11 @@ class ScheduleEmail extends Model
         'weekday',
         'frecuency',
         'time',
+        'last_send_at',
     ];
 
     protected $casts = [
         'cco' => 'array',
+        'last_send_at' => 'datetime',
     ];
 }

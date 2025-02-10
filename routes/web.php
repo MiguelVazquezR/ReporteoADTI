@@ -76,6 +76,7 @@ Route::post('schedule-email-settings/massive-update', [ScheduleEmailController::
 Route::resource('/modbus-configuration', ModbusConfigurationController::class);
 
 
-Route::get('/pdf-example', function () {
-    return inertia('Home/ExamplePdf');
-})->name('pdf.example');
+//// Ruta para ver reporte en navegador para desarrollo
+// Route::get('/pdf-example', function () {
+//     return inertia('Home/ExamplePdf');
+// })->name('pdf.example');
