@@ -104,11 +104,10 @@ class PdfController extends Controller
         }
     }
 
-
     public function generateReport()
     {
-        $apiKey  = 'mb_bF3v/xGVEZxOBpGkLCdug9jHvLg3uhZaAsvRGZ7pk3M=';
-        $baseUrl = 'http://localhost:3000/api';
+        $apiKey  = env('METABASE_API_KEY');
+        $baseUrl = env('METABASE_API_URL');
         $client  = new Client();
 
         // 1. Obtener lista de dashboards y buscar "Robag1"
@@ -173,8 +172,14 @@ class PdfController extends Controller
         // 4. Generar PDF con la data obtenida
         $pdf = Pdf::loadView('pdf.report', ['cardsData' => $cardsData]);
         
-        return $pdf->stream('reporte.pdf');
+        // ver en navegador
+        // return $pdf->stream('reporte.pdf');
+        // descargar
+        // return $pdf->download('reporte.pdf');
+        
+        // Guardar el PDF en la carpeta storage/app/public y devolver la ruta completa del archivo
+        $pdf->save(storage_path('app/public/reporte.pdf'));
+        return storage_path('app/public/reporte.pdf');
 
-        return $pdf->download('reporte.pdf');
     }
 }

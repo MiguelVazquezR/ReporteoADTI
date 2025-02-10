@@ -10,17 +10,19 @@ class ScheduleEmail extends Model
     use HasFactory;
 
     protected $fillable = [
-        'machine',
+        'report_name', // Nombre de dashboard de metabase
         'main_email',
         'cco',
         'subject',
         'description',
-        'date',
+        'weekday',
         'frecuency',
         'time',
+        'last_send_at',
     ];
 
     protected $casts = [
         'cco' => 'array',
+        'last_send_at' => 'datetime',
     ];
 }

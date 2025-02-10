@@ -1,11 +1,8 @@
 <?php
 
-use App\Models\ModbusConfiguration;
-use App\Models\RobagData;
-use App\Services\ModbusService;
 use Illuminate\Support\Facades\Schedule;
 
-// Schedule::command('reports:send-scheduled-emails')->everyTwoMinutes();
+Schedule::command('reports:send-scheduled-emails')->everyThirtyMinutes();
 Schedule::command('app:db-backup')->dailyAt('00:00');
 
 // leer datos de maquina 'Robag1' y guardar en BDD local
