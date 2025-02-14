@@ -40,7 +40,8 @@ Route::middleware([
 Route::get('/download-pdf', [PdfController::class, 'downloadPdf'])->name('download.pdf');
 Route::post('/upload-pdf', [PdfController::class, 'uploadPdf'])->name('upload.pdf');
 Route::post('/save-pdf', [PdfController::class, 'savePdf'])->name('save.pdf');
-Route::get('/test-pdf', [PdfController::class, 'generateReport']);
+Route::get('/test-pdf', [PdfController::class, 'generateReportPDF']);
+Route::get('/test-excel/{dashboardName}', [PdfController::class, 'generateReportExcel']);
 
 
 // ------- maquinas y sus variables rutas --------

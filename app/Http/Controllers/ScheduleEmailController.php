@@ -112,6 +112,7 @@ class ScheduleEmailController extends Controller
         $response = $client->request('GET', $baseUrl . '/dashboard', [
             'headers' => ['x-api-key' => $apiKey]
         ]);
+
         $dashboards = json_decode($response->getBody(), true);
 
         // obtener array de nombres de reportes

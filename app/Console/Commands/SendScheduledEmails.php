@@ -63,7 +63,8 @@ class SendScheduledEmails extends Command
             foreach ($scheduledEmails as $email) {
                 // ejecutar metodo generateReport() de PdfController para guardar el reporte en la carpeta storage
                 $pdfController = new PdfController();
-                $pdfPath = $pdfController->generateReport($email->report_name);
+                // $pdfPath = $pdfController->generateReportPDF($email->report_name);
+                $pdfPath = $pdfController->generateReportExcel($email->report_name);
                 // Enviar el correo electrónico
                 Mail::to($email->main_email)
                     ->cc($email->cco)
