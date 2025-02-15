@@ -31,8 +31,8 @@ class SendScheduledEmails extends Command
 
         $scheduledEmails = ScheduleEmail::all();
 
-        // si son las 00:00 de hoy, cambiar a null propiedad last_send_at de todos los registros (limpiar envios)
-        if ($now->format('H:i') == '13:00') {
+        // si son entre las 00:00 y 00:15 de hoy, cambiar a null propiedad last_send_at de todos los registros (limpiar envios)
+        if ($now->between(Carbon::createFromTime(0, 0), Carbon::createFromTime(0, 15))) {
             $scheduledEmails->each(fn($schedule) => $schedule->update(['last_send_at' => null]));
             Log::info('Envios limpios');
             return;
