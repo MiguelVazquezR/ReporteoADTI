@@ -65,11 +65,23 @@ class SendScheduledEmails extends Command
                 $pdfController = new PdfController();
                 // $pdfPath = $pdfController->generateReportPDF($email->report_name);
                 $pdfPath = $pdfController->generateReportExcel($email->report_name);
-                // Enviar el correo electrónico
-                Mail::to($email->main_email)
-                    ->cc($email->cco)
-                    ->send(new ReportEmail($email->subject, $email->description, $pdfPath));
+                try {
+                    // Enviar el correo electrónico
+                    Mail::to($email->main_email)
+                        ->send(new ReportEmail($email->subject, $email->description, $pdfPath));
+                } catch (\Exception $e) {
+                    Log::error('Error al enviar el correo a ' . $email->main_email . ': ' . $e->getMessage());
+                }
 
+                // Enviar el correo electrónico a las copias
+                foreach ($email->cco as $cco) {
+                    try {
+                        Mail::to($cco)
+                            ->send(new ReportEmail($email->subject, $email->description, $pdfPath));
+                    } catch (\Exception $e) {
+                        Log::error('Error al enviar el correo a ' . $cco . ': ' . $e->getMessage());
+                    }
+                }
                 // Actualizar la propiedad last_send_at
                 $email->last_send_at = $now;
                 $email->save();
