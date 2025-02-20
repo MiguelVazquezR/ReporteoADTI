@@ -1,6 +1,6 @@
 <template>
     <div id="chart">
-        <apexchart type="bar" :options="chartOptions" :series="series" :width="width" :height="height"></apexchart>
+        <apexchart type="bar" height="280" :options="chartOptions" :series="series" :width="width"></apexchart>
     </div>
 </template>
 <script>
@@ -94,7 +94,6 @@ export default {
         series: Array,
         chartOptions: Object,
         width: String,
-        height: String,
     }
 }
 </script>

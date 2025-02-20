@@ -72,7 +72,7 @@ class MachineDataController extends Controller
         // Enviar el correo con el archivo adjunto
         Mail::to($mainEmail)
             ->cc($cco)
-            ->send(new ReportEmail($subject, $description, $filePath));
+            ->send(new ReportEmail($subject, $description, $filePath, null));
     }
 
     public function getMetrics()

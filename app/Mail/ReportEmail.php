@@ -32,14 +32,28 @@ class ReportEmail extends Mailable
 
     public function attachments(): array
     {
-        return [
-            Attachment::fromPath($this->excelPath)
-                ->as(basename($this->excelPath))
-                ->withMime('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+        if ($this->excelPath && $this->pdfPath) {
+            return [
+                Attachment::fromPath($this->excelPath)
+                    ->as(basename($this->excelPath))
+                    ->withMime('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
 
-            Attachment::fromPath($this->pdfPath)
-                ->as(basename($this->pdfPath))
-                ->withMime('application/pdf'),
-        ];
+                Attachment::fromPath($this->pdfPath)
+                    ->as(basename($this->pdfPath))
+                    ->withMime('application/pdf'),
+            ];
+        } else if ($this->excelPath) {
+            return [
+                Attachment::fromPath($this->excelPath)
+                    ->as(basename($this->excelPath))
+                    ->withMime('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+            ];
+        } else {
+            return [
+                Attachment::fromPath($this->pdfPath)
+                    ->as(basename($this->pdfPath))
+                    ->withMime('application/pdf'),
+            ];
+        }
     }
 }

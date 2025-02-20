@@ -4,7 +4,7 @@
             Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
         </div>
 
-        <div class="flex flex-col justify-center items-center" v-else>
+        <div v-else>
             <div class="flex items-center space-x-1">
                 <p class="text-[#6D6E72] font-bold text-sm">HISTOGRAMA</p>
                 <el-tooltip placement="top">
@@ -24,7 +24,7 @@
                     </svg>
                 </el-tooltip>
             </div>
-            <WithRotatedLabels :series="updatedSeries" :chartOptions="updatedChartOptions" :width="width" height="230" />
+            <WithRotatedLabels :series="updatedSeries" :chartOptions="updatedChartOptions" :width="width" />
         </div>
     </main>
 </template>

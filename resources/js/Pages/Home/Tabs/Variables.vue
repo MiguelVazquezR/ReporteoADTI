@@ -74,7 +74,7 @@
                         </div>
                         <div v-else class="mt-6 grid grid-cols-2 gap-3">
                             <div v-for="(variable, index) in selectedVariables" :key="index">
-                                <VariablePanel :variableName="variable" height="280"
+                                <VariablePanel :variableName="variable" height="180"
                                     :data="variablesMapped[variable]" />
                             </div>
                             <div v-if="!selectedVariables.length" class="col-span-full mt-20">

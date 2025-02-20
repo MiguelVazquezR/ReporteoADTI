@@ -55,8 +55,8 @@ export default {
                 // obtener parametro de url llamado dashboard
                 const currentURL = new URL(window.location.href);
                 // Extraer el valor de 'currentTab' de los parámetros de búsqueda
-                // this.dashboard = currentURL.searchParams.get('dashboard');
-                this.dashboard = 'Robag1';
+                this.dashboard = currentURL.searchParams.get('dashboard');
+                // this.dashboard = 'Robag1';
 
                 const response = await axios.get(route('metabase.get-dashboard', this.dashboard));
 
