@@ -62,8 +62,9 @@ Route::resource('tutorials', TutorialController::class);
 
 
 //--------------- machines data routes ------------------
+Route::get('machine-data-pdf-template', [MachineDataController::class, 'pdfTemplate'])->name('machine-data.pdf-template');
+Route::get('oee-metrics', [MachineDataController::class, 'getMetrics'])->name('oee.get-metrics');
 Route::post('machine-data-get-data-by-date-range', [MachineDataController::class, 'getDataByDateRange'])->name('machine-data.get-data-by-date-range');
-Route::get('/machine-data-pdf-template', [MachineDataController::class, 'pdfTemplate'])->name('machine-data.pdf-template');
 Route::post('machine-data-email-report', [MachineDataController::class, 'emailReport'])->name('machine-data.email-report');
 
 

@@ -1,6 +1,6 @@
 <template>
     <div id="chart">
-        <apexchart type="radialBar" height="150" :width="width" :options="chartOptions" :series="series"></apexchart>
+        <apexchart type="radialBar" height="160" :width="width" :options="chartOptions" :series="series"></apexchart>
     </div>
 </template>
 
@@ -11,7 +11,7 @@ export default {
             // series: [70],
             chartOptions: {
                 chart: {
-                    height: 150,
+                    height: 160,
                     type: 'radialBar',
                 },
                 plotOptions: {
@@ -61,20 +61,28 @@ export default {
     props: {
         series: {
             type: Array,
-            default: 0
+            default: [0]
         },
         width: String,
+        bad: {
+            type: Number,
+            default: 30
+        },
+        regular: {
+            type: Number,
+            default: 60
+        },
         // chartOptions: Object,
     },
     computed: {
         gradientColors() {
             const value = this.series[0]; // Se asume que 'series' es un array con un solo valor
-            if (value <= 30) {
+            if (value <= this.bad) {
                 return [
                     { offset: 0, color: '#FF0000' }, // Rojo en la parte superior
                     { offset: 100, color: '#FF6347' } // Un rojo más claro en la parte inferior
                 ];
-            } else if (value > 30 && value <= 60) {
+            } else if (value > this.bad && value <= this.regular) {
                 return [
                     { offset: 0, color: '#FFA500' }, // Naranja en la parte superior
                     { offset: 100, color: '#FFD700' } // Amarillo en la parte inferior

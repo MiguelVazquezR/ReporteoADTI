@@ -31,7 +31,8 @@
                 <i class="fa-regular fa-hand-point-up ml-3"></i>
             </h1>
 
-            <OEEPanel ref="oeePanel" :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm" />
+            <!-- <OEEPanel ref="oeePanel" :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm" /> -->
+            <OEEPanelV2 ref="oeePanel" :loading="loading" />
             <div class="mt-4 space-y-4">
                 <div class="flex space-x-4">
                     <TimePanel :date="searchDate" :items="data" :loading="loading" class="w-1/3" />
@@ -57,6 +58,7 @@ import VelocityPanel from '@/MyComponents/Home/VelocityPanel.vue';
 import DesviacionPanel from '@/MyComponents/Home/DesviacionPanel.vue';
 import FilmPanel from '@/MyComponents/Home/FilmPanel.vue';
 import ScalePanel from '@/MyComponents/Home/ScalePanel.vue';
+import OEEPanelV2 from '@/MyComponents/Home/OEEPanelV2.vue';
 
 export default {
     data() {
@@ -81,6 +83,7 @@ export default {
         TimePanel,
         FilmPanel,
         OEEPanel,
+        OEEPanelV2,
     },
     emits: ['updated-dates'],
     props: {
