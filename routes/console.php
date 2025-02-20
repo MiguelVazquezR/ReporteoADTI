@@ -2,8 +2,10 @@
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('reports:send-scheduled-emails')->everyThirtyMinutes();
-Schedule::command('app:db-backup')->dailyAt('00:00');
+Schedule::command('reports:send-scheduled-emails')->everyFifteenMinutes();
+Schedule::command('app:db-backup')->everyFifteenMinutes()->when(function () {
+    return now()->between(\Carbon\Carbon::createFromTime(0, 0), \Carbon\Carbon::createFromTime(0, 15));
+});
 
 // leer datos de maquina 'Robag1' y guardar en BDD local
 // $samplingMinutes = ModbusConfiguration::first()->sampling_minutes;

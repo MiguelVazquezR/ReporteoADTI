@@ -48,6 +48,13 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="time" label="Hora" />
+                    <el-table-column prop="las_send_at" label="Estatus">
+                        <template #default="scope">
+                            <p class="text-xs" :class="scope.row.last_send_at ? 'text-green-700' : null">
+                                {{ scope.row.last_send_at ? 'Enviado el ' + formatDateTime(scope.row.last_send_at) : 'No enviado aún' }}
+                            </p>
+                        </template>
+                    </el-table-column>
                 </el-table>
             </section>
         </main>
@@ -123,6 +130,8 @@ import CancelButton from '@/Components/CancelButton.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import InputError from '@/Components/InputError.vue';
 import DialogModal from '@/Components/DialogModal.vue';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export default {
     data() {
@@ -158,6 +167,9 @@ export default {
         dashboards: Array,
     },
     methods: {
+        formatDateTime(dateTime) {
+            return format(dateTime, "dd MMM - H:mm a");
+        },
         openMassiveEditModal() {
             this.showMassiveEditModal = true;
             this.form.selections = this.$refs.multipleTableRef.value;
