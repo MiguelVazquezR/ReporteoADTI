@@ -51,13 +51,13 @@
                 <TimePanel :date="dates" :items="data" :loading="loadingCharts" />
 
                 <!-- PRODUCCIÓN DIARIA -->
-                <ProductionPanel :items="data" :loading="loadingCharts" />
+                <ProductionPanel :items="data" :loading="loadingCharts" width="400" height="300" />
 
                 <!-- Velocidad -->
                 <VelocityPanel :items="data" :loading="loadingCharts" />
 
                 <!-- HISTOGRAMA -->
-                <DesviacionPanel :items="data" :loading="loadingCharts" />
+                <DesviacionPanel :items="data" :loading="loadingCharts" width="500" height="450" />
 
                 <!-- PELICULA -->
                 <FilmPanel :items="data" :loading="loadingCharts" />

@@ -30,7 +30,7 @@ class MachineDataController extends Controller
         $machine = Machine::firstWhere('in_view', true);
 
         // return compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'); 
-        return inertia('Home/Report1', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables', 'machine'));
+        return inertia('Home/Template', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables', 'machine'));
     }
 
     // funciones privadas
