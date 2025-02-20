@@ -28,6 +28,7 @@ class MachineDataController extends Controller
         $timeSlots = request('timeSlots');
         $selectedVariables = request('selectedVariables') ?? [];
         $machine = Machine::firstWhere('in_view', true);
+
         // return compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables'); 
         return inertia('Home/Template', compact('bpm', 'dates', 'date', 'timeSlots', 'selectedVariables', 'machine'));
     }
@@ -71,7 +72,7 @@ class MachineDataController extends Controller
         // Enviar el correo con el archivo adjunto
         Mail::to($mainEmail)
             ->cc($cco)
-            ->send(new ReportEmail($subject, $description, $filePath));
+            ->send(new ReportEmail($subject, $description, $filePath, null));
     }
 
     public function getMetrics()

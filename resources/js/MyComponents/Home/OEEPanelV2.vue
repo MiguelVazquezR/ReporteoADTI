@@ -7,7 +7,7 @@
             <div v-else>
                 <div>
                     <p class="text-black font-bold">OEE</p>
-                    <Semicircle :series="oee" :bad="65" :regular="85" />
+                    <Basic :series="oee" :bad="65" :regular="85" />
                 </div>
             </div>
         </section>
@@ -56,7 +56,6 @@
 
 <script>
 import Basic from '@/MyComponents/Chart/RadialBar/Basic.vue';
-import Semicircle from '@/MyComponents/Chart/RadialBar/Semicircle.vue';
 import axios from 'axios';
 
 export default {
@@ -72,7 +71,6 @@ export default {
     },
     components: {
         Basic,
-        Semicircle
     },
     props: {
     },
@@ -94,7 +92,6 @@ export default {
                 this.loading = false;
             }
         },
-
     },
     mounted() {
         this.fetchOEE();
