@@ -4,7 +4,7 @@
             Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
         </div>
 
-        <div class="flex items-center justify-center" v-else>
+        <div v-else>
             <p class="text-[#6D6E72] font-bold text-sm">USO DE PELÍCULA</p>
             <SimpleDonut width="400" :series="getFilmChartSeries" :chartOptions="chartOptions" />
         </div>

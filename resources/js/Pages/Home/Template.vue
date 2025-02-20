@@ -29,9 +29,6 @@
         <!-- <button :disabled="loadingPDF" v-if="!loadingTemplate && !printing" @click="generatePdf" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Descargar PDF</button>
             <button :disabled="loadingPDF" v-if="!loadingTemplate && !printing" @click="showEmailModal = true" class="bg-primary text-white font-bold py-1 px-3 rounded-md text-sm mt-3 disabled:bg-gray-500 disabled:cursor-not-allowed">Enviar por correo</button> -->
     </div>
-    <div class="text-center mt-4">
-        <i v-if="loadingPDF" class="fa-solid fa-circle-notch fa-spin text-xl mr-2"></i>
-    </div>
     <Loading v-if="loadingTemplate" class="mt-16" />
     <main v-else class="px-10 min-h-screen my-4" id="pdf-content">
         <header class="text-center font-bold">
@@ -51,13 +48,13 @@
                 <TimePanel :date="dates" :items="data" :loading="loadingCharts" />
 
                 <!-- PRODUCCIÓN DIARIA -->
-                <ProductionPanel :items="data" :loading="loadingCharts" />
+                <ProductionPanel :items="data" :loading="loadingCharts" width="400" height="300" />
 
                 <!-- Velocidad -->
                 <VelocityPanel :items="data" :loading="loadingCharts" />
 
                 <!-- HISTOGRAMA -->
-                <DesviacionPanel :items="data" :loading="loadingCharts" />
+                <DesviacionPanel :items="data" :loading="loadingCharts" width="500" height="450" />
 
                 <!-- PELICULA -->
                 <FilmPanel :items="data" :loading="loadingCharts" />

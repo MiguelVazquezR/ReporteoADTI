@@ -1,12 +1,12 @@
- <template>
+<template>
     <main class="rounded-[20px] border border-grayD9 p-4 h-80">
         <div v-if="loading" class="text-sm my-4 text-center">
             Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
         </div>
 
-        <div class="flex flex-col items-center justify-center" v-else>
-            <p class="text-[#6D6E72] font-bold text-sm">TIEMPOS</p>
-            <div class="flex items-center justify-center space-x-1">
+        <div v-else>
+            <div class="flex items-center space-x-1">
+                <p class="text-[#6D6E72] font-bold text-sm">TIEMPOS</p>
                 <el-tooltip placement="top">
                     <template #content>
                         <p>

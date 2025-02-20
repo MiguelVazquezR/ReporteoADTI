@@ -10,7 +10,6 @@ use GuzzleHttp\Client;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PdfController extends Controller
 {
@@ -30,49 +29,6 @@ class PdfController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="example.pdf"',
         ]);
-        // -------------------------------------------------------------------------------------
-
-
-
-        // Abrir pdf sin descargar. Funciona bien con url-------------------------------------
-        // $pdf = Browsershot::url('https://reporteo.dtw.com.mx/')
-        // // ->setIncludePath('$PATH:/c/Program Files/nodejs')
-        //     ->format('A4')
-        //     ->landscape()
-        //     ->showBackground()
-        //     ->waitUntilNetworkIdle() // Espera a que se carguen todos los recursos (JS, CSS)
-        //     ->pdf(); //genera el pdf
-        //     // ->savePdf('laravel.pdf'); //guarda el pdf en public
-
-        //     return response($pdf, 200, [
-        //         'Content-Type' => 'application/pdf',
-        //         'Content-Disposition' => 'inline; filename="example.pdf"',
-        //     ]);
-        //     // return response()->download('app/public/laravel.pdf');
-        // -------------------------------------------------------------------------------------
-
-
-
-        // Descarga el archivo del path indicado -----------------------------------------------
-        // $url = 'https://reporteo.dtw.com.mx/'; // Cambia esta URL por la que quieres convertir
-
-        // // Generar PDF a partir de HTML
-        // $pdfPath = storage_path('app/public/example.pdf'); // Ruta donde se guardará el PDF
-
-        // // pagina web url (mas acercada)
-        // Browsershot::url($url)
-        //     // ->format('A4')
-        //     // ->landscape()
-        //     ->paperSize('280', '280')
-        //     ->scale(0.75)
-        //     // ->margins('2', '2', '2', '2' )
-        //     ->showBackground()
-        //     ->save($pdfPath); // Guarda el PDF en la carpeta 'storage/app/public/'
-
-        // // Retornar el PDF como una descarga
-        // return response()->download($pdfPath);
-        // ----------------------------------------------------------------------------------------
-
     }
 
     public function uploadPdf(Request $request)
@@ -107,6 +63,12 @@ class PdfController extends Controller
         }
     }
 
+    public function renderReport1()
+    {
+        return inertia('Home/Report1');
+    }
+
+    // reporte con plantilla blade y dompdf
     public function generateReportPDF($dashboardName)
     {
         $apiKey  = env('METABASE_API_KEY');
@@ -183,6 +145,76 @@ class PdfController extends Controller
         // Guardar el PDF en la carpeta storage/app/public y devolver la ruta completa del archivo
         $pdf->save(storage_path('app/public/reporte.pdf'));
         return storage_path('app/public/reporte.pdf');
+    }
+
+    // obtener datos de graficas de metabase de $dashboardName
+    public function getMetabaseDataFromDashboard($dashboardName)
+    {
+        $apiKey  = env('METABASE_API_KEY');
+        $baseUrl = env('METABASE_API_URL');
+        $client  = new Client();
+
+        // 1. Obtener lista de dashboards y buscar $dashboardName
+        $response = $client->request('GET', $baseUrl . '/dashboard', [
+            'headers' => ['x-api-key' => $apiKey]
+        ]);
+        $dashboards = json_decode($response->getBody(), true);
+
+        $dashboardId = null;
+        foreach ($dashboards as $dashboard) {
+            if (isset($dashboard['name']) && $dashboard['name'] === $dashboardName) {
+                $dashboardId = $dashboard['id'];
+                break;
+            }
+        }
+        if (!$dashboardId) {
+            abort(404, "Dashboard {$dashboardName} no encontrado");
+        }
+
+        // 2. Obtener detalles del dashboard y extraer los card_ids
+        $response = $client->request('GET', $baseUrl . '/dashboard/' . $dashboardId, [
+            'headers' => ['x-api-key' => $apiKey]
+        ]);
+        $dashboardDetails = json_decode($response->getBody(), true);
+        $dashcards = $dashboardDetails['dashcards'] ?? [];
+
+        $cardsData = [];
+        foreach ($dashcards as $card) {
+            $cardId = $card['card_id'] ?? null;
+            if (!$cardId) {
+                continue;
+            }
+
+            // 3. Obtener data de cada card: data.rows y cols.display_name (eje X e Y)
+            $response = $client->request('GET', $baseUrl . '/card/' . $cardId, [
+                'headers' => ['x-api-key' => $apiKey]
+            ]);
+            $cardDetails = json_decode($response->getBody(), true);
+            $cardName = $cardDetails['name'] ?? 'Gráfico sin nombrar';
+            $xName = $cardDetails['visualization_settings']['graph.dimensions'][0] ?? 'Eje X';
+            $yName = $cardDetails['visualization_settings']['graph.metrics'][0] ?? 'Eje Y';
+            // obtener un color aleatorio pero que contraste bien con el fondo blanco
+            $color =  '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+
+            $response = $client->request('POST', $baseUrl . '/card/' . $cardId . '/query', [
+                'headers' => ['x-api-key' => $apiKey]
+            ]);
+            $cardResult = json_decode($response->getBody(), true);
+            $data = $cardResult['data'] ?? [];
+            $rows = $data['rows'] ?? [];
+
+            $cardsData[] = [
+                'card_id' => $cardId,
+                'card_name' => $cardName,
+                'x_name'  => $xName,
+                'y_name'  => $yName,
+                'color' => $color,
+                'rows' => array_slice($rows, -96) //los ultimos 96 reigstros (8 horas)
+            ];
+        }
+        
+        // 4. enviar datos a cliente por json
+        return response()->json(compact('cardsData'));
     }
 
     public function generateReportExcel($dashboardName)

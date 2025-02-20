@@ -6,12 +6,12 @@
             <div v-if="loading" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
-            <article class="w-full flex justify-center items-center" v-else>
+            <div v-else>
                 <div>
-                    <p class="text-black font-bold ml-4">OEE</p>
-                    <Semicircle :series="oee" width="250" />
+                    <p class="text-black font-bold">OEE</p>
+                    <Semicircle :series="oee" :width="width" />
                 </div>
-            </article>
+            </div>
             <!-- <p v-else-if="!loading" class="text-sm text-gray-600">No hay datos</p> -->
         </section>
 
@@ -20,17 +20,17 @@
             <div v-if="loading" class="text-xs my-4 text-center">
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
-            <div class="w-1/2" v-else>
-                <p class="text-black font-bold">Disponibilidad</p>
+            <div v-else>
                 <article>
+                    <p class="text-black font-bold">Disponibilidad</p>
                     <div class="flex space-x-3 items-center justify-between">
-                        <div class="text-center text-xs">
+                        <div class="text-center text-xs w-1/2">
                             <p class="text-gray9A">Disponible</p>
                             <p class="text-black">{{ formatNumber(totalTime) }} min</p>
                             <p class="text-gray9A mt-2">Producción</p>
                             <p class="text-black">{{ formatNumber(productionTime) }} min</p>
                         </div>
-                        <Basic :series="availabilityPercentage" class="w-full" width="150" />
+                        <Basic :series="availabilityPercentage" class="w-full" :width="width" />
                     </div>
                 </article>
             </div>
@@ -43,17 +43,17 @@
                 Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
             </div>
 
-            <div class="w-full" v-else>
-                <p class="text-black font-bold">Rendimiento</p>
+            <div v-else>
                 <section>
+                    <p class="text-black font-bold">Rendimiento</p>
                     <div class="flex space-x-3 items-center justify-between">
-                        <div class="text-center text-xs w-1/4">
+                        <div class="text-center text-xs w-1/2">
                             <p class="text-gray9A">Prod. Teórica</p>
                             <p class="text-black">{{ formatNumber(teoricProduction) }} bpm</p>
                             <p class="text-gray9A mt-2">Prod. Real</p>
                             <p class="text-black">{{ formatNumber(realProduction) }} bpm</p>
                         </div>
-                        <Basic :series="performancePercentage" class="w-full" width="150" />
+                        <Basic :series="performancePercentage" class="w-full" :width="width" />
                     </div>
                 </section>
             </div>
@@ -78,7 +78,7 @@
                             <p class="text-gray9A mt-1">Bolsas malas</p>
                             <p class="text-black ml-2">{{ formatNumber(totalWasteBags) }}</p>
                         </div>
-                        <Basic :series="quality" width="150" />
+                        <Basic :series="quality" :width="width" />
                     </div>
                 </section>
             </div>
