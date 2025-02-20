@@ -32,7 +32,7 @@
             </h1>
 
             <!-- <OEEPanel ref="oeePanel" :date="searchDate" :items="data" :loading="loading" :teoricProduction="bpm" /> -->
-            <OEEPanelV2 ref="oeePanel" :loading="loading" />
+            <OEEPanelV2 />
             <div class="mt-4 space-y-4">
                 <div class="flex space-x-4">
                     <TimePanel :date="searchDate" :items="data" :loading="loading" class="w-1/3" />
