@@ -63,12 +63,29 @@ class SendScheduledEmails extends Command
             foreach ($scheduledEmails as $email) {
                 // ejecutar metodo generateReport() de PdfController para guardar el reporte en la carpeta storage
                 $pdfController = new PdfController();
+                // generar pdf con dompdf y blade
                 // $pdfPath = $pdfController->generateReportPDF($email->report_name);
-                $pdfPath = $pdfController->generateReportExcel($email->report_name);
+
+                // generar excel
+                $excelPath = $pdfController->generateReportExcel($email->report_name);
+
+                // Ruta del PDF
+                $pdfPath = base_path('reporte.pdf'); // Ubicado en la raíz del proyecto
+
+                // Ejecutar el script de Node.js con la URL como argumento
+                $command = "node generarPdf.js " . "\"$email->report_name\"";
+                Log::info($command);
+                exec($command, $output, $returnVar);
+
+                if ($returnVar !== 0) {
+                    Log::error('Error al generar el PDF con Puppeteer. ' . $output);
+                    continue;
+                }
+
                 try {
                     // Enviar el correo electrónico
                     Mail::to($email->main_email)
-                        ->send(new ReportEmail($email->subject, $email->description, $pdfPath));
+                        ->send(new ReportEmail($email->subject, $email->description, $excelPath, $pdfPath));
                 } catch (\Exception $e) {
                     Log::error('Error al enviar el correo a ' . $email->main_email . ': ' . $e->getMessage());
                 }
@@ -77,7 +94,7 @@ class SendScheduledEmails extends Command
                 foreach ($email->cco as $cco) {
                     try {
                         Mail::to($cco)
-                            ->send(new ReportEmail($email->subject, $email->description, $pdfPath));
+                            ->send(new ReportEmail($email->subject, $email->description, $excelPath, $pdfPath));
                     } catch (\Exception $e) {
                         Log::error('Error al enviar el correo a ' . $cco . ': ' . $e->getMessage());
                     }
@@ -86,8 +103,14 @@ class SendScheduledEmails extends Command
                 $email->last_send_at = $now;
                 $email->save();
 
-                // eliminar el archivo PDF
-                unlink($pdfPath);
+                // Eliminar los archivos generados
+                if (file_exists($pdfPath)) {
+                    unlink($pdfPath);
+                }
+
+                if (file_exists($excelPath)) {
+                    unlink($excelPath);
+                }
             }
 
             Log::info($counEmails . " Correos enviados");

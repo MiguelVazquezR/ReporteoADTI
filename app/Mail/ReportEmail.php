@@ -14,7 +14,7 @@ class ReportEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public $subject, public $description, public $filePath) {}
+    public function __construct(public $subject, public $description, public $excelPath, public $pdfPath) {}
 
     public function envelope(): Envelope
     {
@@ -33,9 +33,13 @@ class ReportEmail extends Mailable
     public function attachments(): array
     {
         return [
-            Attachment::fromPath($this->filePath)
-                ->as(basename($this->filePath))
+            Attachment::fromPath($this->excelPath)
+                ->as(basename($this->excelPath))
                 ->withMime('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+
+            Attachment::fromPath($this->pdfPath)
+                ->as(basename($this->pdfPath))
+                ->withMime('application/pdf'),
         ];
     }
 }
