@@ -1,9 +1,9 @@
 <template>
-    <main class="rounded-[20px] border border-grayD9 p-4 h-80">
+    <main class="rounded-[20px] border border-grayD9 p-4 h-[410px]">
         <div v-if="loading" class="text-xs my-4 text-center">
             Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-primary"></i>
         </div>
-        <div v-else>
+        <div class="flex flex-col items-center justify-center" v-else>
             <div class="flex items-center space-x-1">
                 <p class="text-[#6D6E72] font-bold text-sm">PRODUCCIÓN POR DIA</p>
                 <el-tooltip placement="top">
@@ -22,7 +22,7 @@
                     </svg>
                 </el-tooltip>
             </div>
-            <ColumnWithMarkers :series="updatedSeries" :chartOptions="chartOptions" :width="width" />
+            <ColumnWithMarkers :series="updatedSeries" :chartOptions="chartOptions" :width="width" :height="height" />
         </div>
     </main>
 </template>
@@ -75,6 +75,7 @@ export default {
             type: Array,
         },
         width: String,
+        height: String,
         loading: Boolean, //estado de carga al obtener las datos
     },
     computed: {

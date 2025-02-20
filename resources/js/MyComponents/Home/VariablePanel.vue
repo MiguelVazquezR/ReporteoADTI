@@ -1,6 +1,6 @@
 <template>
-    <main class="rounded-[20px] border border-grayD9 p-4 h-[220px]">
-        <div>
+    <main class="rounded-[20px] border border-grayD9 p-4 h-[330px]">
+        <div class="flex flex-col justify-center items-center">
             <p class="text-[#6D6E72] font-bold text-sm">{{ variableName }}</p>
             <BasicArea :series="series" :chartOptions="chartOptions" :width="width" :height="height" />
         </div>
