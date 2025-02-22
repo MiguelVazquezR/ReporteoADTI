@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 use GuzzleHttp\Client;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -68,211 +69,93 @@ class PdfController extends Controller
         return inertia('Home/Report1');
     }
 
-    // reporte con plantilla blade y dompdf
-    public function generateReportPDF($dashboardName)
-    {
-        $apiKey  = env('METABASE_API_KEY');
-        $baseUrl = env('METABASE_API_URL');
-        $client  = new Client();
-
-        // 1. Obtener lista de dashboards y buscar $dashboardName
-        $response = $client->request('GET', $baseUrl . '/dashboard', [
-            'headers' => ['x-api-key' => $apiKey]
-        ]);
-        $dashboards = json_decode($response->getBody(), true);
-
-        $dashboardId = null;
-        foreach ($dashboards as $dashboard) {
-            if (isset($dashboard['name']) && $dashboard['name'] === $dashboardName) {
-                $dashboardId = $dashboard['id'];
-                break;
-            }
-        }
-        if (!$dashboardId) {
-            abort(404, "Dashboard {$dashboardName} no encontrado");
-        }
-
-        // 2. Obtener detalles del dashboard y extraer los card_ids
-        $response = $client->request('GET', $baseUrl . '/dashboard/' . $dashboardId, [
-            'headers' => ['x-api-key' => $apiKey]
-        ]);
-        $dashboardDetails = json_decode($response->getBody(), true);
-        $dashcards = $dashboardDetails['dashcards'] ?? [];
-
-        $cardsData = [];
-        foreach ($dashcards as $card) {
-            $cardId = $card['card_id'] ?? null;
-            if (!$cardId) {
-                continue;
-            }
-
-            // 3. Obtener data de cada card: data.rows y cols.display_name (eje X e Y)
-            $response = $client->request('GET', $baseUrl . '/card/' . $cardId, [
-                'headers' => ['x-api-key' => $apiKey]
-            ]);
-            $cardDetails = json_decode($response->getBody(), true);
-            $cardName = $cardDetails['name'] ?? 'Gráfico sin nombrar';
-            $xName = $cardDetails['visualization_settings']['graph.dimensions'][0] ?? 'Eje X';
-            $yName = $cardDetails['visualization_settings']['graph.metrics'][0] ?? 'Eje Y';
-            // obtener un color aleatorio pero que contraste bien con el fondo blanco
-            $color =  '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
-
-            $response = $client->request('POST', $baseUrl . '/card/' . $cardId . '/query', [
-                'headers' => ['x-api-key' => $apiKey]
-            ]);
-            $cardResult = json_decode($response->getBody(), true);
-            $data = $cardResult['data'] ?? [];
-            $rows = $data['rows'] ?? [];
-
-
-            $cardsData[] = [
-                'card_id' => $cardId,
-                'card_name' => $cardName,
-                'x_name'  => $xName,
-                'y_name'  => $yName,
-                'color' => $color,
-                'rows' => array_slice($rows, -96) //los ultimos 96 reigstros (8 horas)
-            ];
-        }
-        // 4. Generar PDF con la data obtenida
-        $pdf = Pdf::loadView('pdf.report', ['cardsData' => $cardsData, 'dashboardName' => $dashboardName]);
-
-        // ver en navegador
-        // return $pdf->stream('reporte.pdf');
-        // descargar
-        // return $pdf->download('reporte.pdf');
-
-        // Guardar el PDF en la carpeta storage/app/public y devolver la ruta completa del archivo
-        $pdf->save(storage_path('app/public/reporte.pdf'));
-        return storage_path('app/public/reporte.pdf');
-    }
-
     // obtener datos de graficas de metabase de $dashboardName
-    public function getMetabaseDataFromDashboard($dashboardName)
+    public function getMetabaseDataFromDashboard($dashboardName, $from_client = true)
     {
         $apiKey  = env('METABASE_API_KEY');
         $baseUrl = env('METABASE_API_URL');
         $client  = new Client();
 
-        // 1. Obtener lista de dashboards y buscar $dashboardName
-        $response = $client->request('GET', $baseUrl . '/dashboard', [
-            'headers' => ['x-api-key' => $apiKey]
-        ]);
-        $dashboards = json_decode($response->getBody(), true);
-
-        $dashboardId = null;
-        foreach ($dashboards as $dashboard) {
-            if (isset($dashboard['name']) && $dashboard['name'] === $dashboardName) {
-                $dashboardId = $dashboard['id'];
-                break;
-            }
-        }
-        if (!$dashboardId) {
-            abort(404, "Dashboard {$dashboardName} no encontrado");
-        }
-
-        // 2. Obtener detalles del dashboard y extraer los card_ids
-        $response = $client->request('GET', $baseUrl . '/dashboard/' . $dashboardId, [
-            'headers' => ['x-api-key' => $apiKey]
-        ]);
-        $dashboardDetails = json_decode($response->getBody(), true);
-        $dashcards = $dashboardDetails['dashcards'] ?? [];
-
-        $cardsData = [];
-        foreach ($dashcards as $card) {
-            $cardId = $card['card_id'] ?? null;
-            if (!$cardId) {
-                continue;
-            }
-
-            // 3. Obtener data de cada card: data.rows y cols.display_name (eje X e Y)
-            $response = $client->request('GET', $baseUrl . '/card/' . $cardId, [
+        try {
+            // 1. Obtener lista de dashboards y buscar $dashboardName
+            $response = $client->request('GET', $baseUrl . '/dashboard', [
                 'headers' => ['x-api-key' => $apiKey]
             ]);
-            $cardDetails = json_decode($response->getBody(), true);
-            $cardName = $cardDetails['name'] ?? 'Gráfico sin nombrar';
-            $xName = $cardDetails['visualization_settings']['graph.dimensions'][0] ?? 'Eje X';
-            $yName = $cardDetails['visualization_settings']['graph.metrics'][0] ?? 'Eje Y';
-            // obtener un color aleatorio pero que contraste bien con el fondo blanco
-            $color =  '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+            $dashboards = json_decode($response->getBody(), true);
 
-            $response = $client->request('POST', $baseUrl . '/card/' . $cardId . '/query', [
+            $dashboardId = null;
+            foreach ($dashboards as $dashboard) {
+                if (isset($dashboard['name']) && $dashboard['name'] === $dashboardName) {
+                    $dashboardId = $dashboard['id'];
+                    break;
+                }
+            }
+            if (!$dashboardId) {
+                abort(404, "Dashboard {$dashboardName} no encontrado");
+            }
+
+            // 2. Obtener detalles del dashboard y extraer los card_ids
+            $response = $client->request('GET', $baseUrl . '/dashboard/' . $dashboardId, [
                 'headers' => ['x-api-key' => $apiKey]
             ]);
-            $cardResult = json_decode($response->getBody(), true);
-            $data = $cardResult['data'] ?? [];
-            $rows = $data['rows'] ?? [];
+            $dashboardDetails = json_decode($response->getBody(), true);
+            $dashcards = $dashboardDetails['dashcards'] ?? [];
 
-            $cardsData[] = [
-                'card_id' => $cardId,
-                'card_name' => $cardName,
-                'x_name'  => $xName,
-                'y_name'  => $yName,
-                'color' => $color,
-                'rows' => array_slice($rows, -96) //los ultimos 96 reigstros (8 horas)
-            ];
+            $cardsData = [];
+            foreach ($dashcards as $card) {
+                $cardId = $card['card_id'] ?? null;
+                if (!$cardId) {
+                    continue;
+                }
+
+                // 3. Obtener data de cada card: data.rows y cols.display_name (eje X e Y)
+                $response = $client->request('GET', $baseUrl . '/card/' . $cardId, [
+                    'headers' => ['x-api-key' => $apiKey]
+                ]);
+                $cardDetails = json_decode($response->getBody(), true);
+                $cardName = $cardDetails['name'] ?? 'Gráfico sin nombrar';
+                $xName = $cardDetails['visualization_settings']['graph.dimensions'][0] ?? 'Eje X';
+                $yName = $cardDetails['visualization_settings']['graph.metrics'][0] ?? 'Eje Y';
+                // obtener un color aleatorio pero que contraste bien con el fondo blanco
+                $color =  '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+
+                $response = $client->request('POST', $baseUrl . '/card/' . $cardId . '/query', [
+                    'headers' => ['x-api-key' => $apiKey]
+                ]);
+                $cardResult = json_decode($response->getBody(), true);
+                $data = $cardResult['data'] ?? [];
+                $rows = $data['rows'] ?? [];
+
+                $cardsData[] = [
+                    'card_id' => $cardId,
+                    'card_name' => $cardName,
+                    'x_name'  => $xName,
+                    'y_name'  => $yName,
+                    'color' => $color,
+                    'rows' => array_slice($rows, -96) //los ultimos 96 reigstros (8 horas)
+                ];
+            }
+        } catch (\Exception $e) {
+            // Registrar el error
+            Log::error('Error al intentar conectar con Metabase: ' . $e->getMessage());
+            $cardsData = [];
         }
-        
-        // 4. enviar datos a cliente por json
-        return response()->json(compact('cardsData'));
+
+        // 4. enviar datos a cliente por json o en array si es solicitud desde mismo servidor
+        if ($from_client) {
+            return response()->json(compact('cardsData'));
+        } else {
+            return $cardsData;
+        }
     }
 
     public function generateReportExcel($dashboardName)
     {
-        $apiKey  = env('METABASE_API_KEY');
-        $baseUrl = env('METABASE_API_URL');
-        $client  = new \GuzzleHttp\Client();
+        $cardsData = $this->getMetabaseDataFromDashboard($dashboardName, false);
 
-        // 1. Obtener lista de dashboards y buscar $dashboardName
-        $response = $client->request('GET', $baseUrl . '/dashboard', [
-            'headers' => ['x-api-key' => $apiKey]
-        ]);
-        $dashboards = json_decode($response->getBody(), true);
-
-        $dashboardId = null;
-        foreach ($dashboards as $dashboard) {
-            if (isset($dashboard['name']) && $dashboard['name'] === $dashboardName) {
-                $dashboardId = $dashboard['id'];
-                break;
-            }
-        }
-        if (!$dashboardId) {
-            abort(404, "Dashboard {$dashboardName} no encontrado");
-        }
-
-        // 2. Obtener detalles del dashboard y extraer los card_ids
-        $response = $client->request('GET', $baseUrl . '/dashboard/' . $dashboardId, [
-            'headers' => ['x-api-key' => $apiKey]
-        ]);
-        $dashboardDetails = json_decode($response->getBody(), true);
-        $dashcards = $dashboardDetails['dashcards'] ?? [];
-
-        $cardsData = [];
-        foreach ($dashcards as $card) {
-            $cardId = $card['card_id'] ?? null;
-            if (!$cardId) continue;
-
-            // Obtener detalles de la tarjeta
-            $response = $client->request('GET', $baseUrl . '/card/' . $cardId, [
-                'headers' => ['x-api-key' => $apiKey]
-            ]);
-            $cardDetails = json_decode($response->getBody(), true);
-            $cardName = $cardDetails['name'] ?? 'Gráfico sin nombrar';
-            $yName = $cardDetails['visualization_settings']['graph.metrics'][0] ?? 'Eje Y';
-
-            // Obtener datos de la tarjeta
-            $response = $client->request('POST', $baseUrl . '/card/' . $cardId . '/query', [
-                'headers' => ['x-api-key' => $apiKey]
-            ]);
-            $cardResult = json_decode($response->getBody(), true);
-            $rows = array_slice($cardResult['data']['rows'] ?? [], -96); // Últimos 96 registros (8 horas)
-
-            $cardsData[] = [
-                'card_id' => $cardId,
-                'card_name' => $cardName,
-                'y_name' => $yName,
-                'rows' => $rows
-            ];
+        // retornar null si no hay info de cards o si no hay datos que mostrar ($cardsData['rows'])
+        if (!count($cardsData) || !count($cardsData[0]['rows'])) {
+            return null;
         }
 
         // Crear un nuevo archivo de Excel
@@ -313,13 +196,12 @@ class PdfController extends Controller
             $row++;
         }
 
-        // Guardar el archivo Excel
+        // // Descargar el archivo
+        // Primero Guardar el archivo Excel
         // $writer = new Xlsx($spreadsheet);
         // $fileName = 'reporte_' . $dashboardName . '_' . now()->format('Ymd_His') . '.xlsx';
         // $temp_file = tempnam(sys_get_temp_dir(), $fileName);
         // $writer->save($temp_file);
-
-        // // Descargar el archivo
         // return response()->download($temp_file, $fileName)->deleteFileAfterSend(true);
 
         // Guardar el archivo Excel en storage/app/public/
@@ -330,5 +212,28 @@ class PdfController extends Controller
 
         // Retornar el path relativo para usarlo en un correo
         return storage_path('app/public/' . $fileName);
+    }
+
+    // reporte con plantilla blade y dompdf
+    public function generateReportPDF($dashboardName)
+    {
+        $cardsData = $this->getMetabaseDataFromDashboard($dashboardName, false);
+
+        // retornar null si no hay info de cards o si no hay datos que mostrar ($cardsData['rows'])
+        if (!count($cardsData) || !count($cardsData[0]['rows'])) {
+            return null;
+        }
+
+        // Generar PDF con la data obtenida
+        $pdf = Pdf::loadView('pdf.report', ['cardsData' => $cardsData, 'dashboardName' => $dashboardName]);
+
+        // ver en navegador
+        // return $pdf->stream('reporte.pdf');
+        // descargar
+        // return $pdf->download('reporte.pdf');
+
+        // Guardar el PDF en la carpeta storage/app/public y devolver la ruta completa del archivo
+        $pdf->save(storage_path('app/public/reporte.pdf'));
+        return storage_path('app/public/reporte.pdf');
     }
 }

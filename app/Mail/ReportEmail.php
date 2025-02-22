@@ -32,6 +32,10 @@ class ReportEmail extends Mailable
 
     public function attachments(): array
     {
+        if (!$this->excelPath && !$this->pdfPath) {
+            return [];
+        }
+
         if ($this->excelPath && $this->pdfPath) {
             return [
                 Attachment::fromPath($this->excelPath)

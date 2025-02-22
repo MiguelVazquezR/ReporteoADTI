@@ -6,6 +6,7 @@ use App\Models\Machine;
 use App\Models\ScheduleEmail;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ScheduleEmailController extends Controller
 {
@@ -108,18 +109,24 @@ class ScheduleEmailController extends Controller
         $baseUrl = env('METABASE_API_URL');
         $client  = new Client();
 
-        // obtener lista de nombres de reportes o dashboards de metabase
-        $response = $client->request('GET', $baseUrl . '/dashboard', [
-            'headers' => ['x-api-key' => $apiKey]
-        ]);
+        try {
+            // obtener lista de nombres de reportes o dashboards de metabase
+            $response = $client->request('GET', $baseUrl . '/dashboard', [
+                'headers' => ['x-api-key' => $apiKey]
+            ]);
 
-        $dashboards = json_decode($response->getBody(), true);
+            $dashboards = json_decode($response->getBody(), true);
 
-        // obtener array de nombres de reportes
-        $dashboards = array_map(function ($dashboard) {
-            return $dashboard['name'];
-        }, $dashboards);
+            // obtener array de nombres de reportes
+            $dashboards = array_map(function ($dashboard) {
+                return $dashboard['name'];
+            }, $dashboards);
 
-        return $dashboards;
+            return $dashboards;
+        } catch (\Exception $e) {
+            // Registrar el error
+            Log::error('Error al obtener los dashboards de Metabase: ' . $e->getMessage());
+            return [];
+        }
     }
 }
