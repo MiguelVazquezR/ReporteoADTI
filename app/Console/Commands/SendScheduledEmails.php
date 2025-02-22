@@ -108,7 +108,7 @@ class SendScheduledEmails extends Command
                 foreach ($email->cco as $cco) {
                     try {
                         Mail::to($cco)
-                            ->send(new ReportEmail($email->subject, $email->description, $excelPath, $pdfPath));
+                            ->send(new ReportEmail($email->subject, $description, $excelPath, $pdfPath));
                     } catch (\Exception $e) {
                         Log::error('Error al enviar el correo a ' . $cco . ': ' . $e->getMessage());
                     }
