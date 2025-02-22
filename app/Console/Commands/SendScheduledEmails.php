@@ -31,11 +31,15 @@ class SendScheduledEmails extends Command
 
         $scheduledEmails = ScheduleEmail::all();
 
-        // si son entre las 00:00 y 00:15 de hoy, cambiar a null propiedad last_send_at de todos los registros (limpiar envios)
-        if ($now->between(Carbon::createFromTime(0, 0), Carbon::createFromTime(0, 15))) {
-            $scheduledEmails->each(fn($schedule) => $schedule->update(['last_send_at' => null]));
-            Log::info('Envios limpios');
-            return;
+        // Obtener el inicio y el fin del día de ayer
+        $yesterdayStart = $now->copy()->subDay()->startOfDay();
+        $yesterdayEnd = $now->copy()->subDay()->endOfDay();
+
+        foreach ($scheduledEmails as $schedule) {
+            // Verificar si last_send_at es una instancia de Carbon y si está dentro del rango de ayer
+            if ($schedule->last_send_at && $schedule->last_send_at->between($yesterdayStart, $yesterdayEnd)) {
+                $schedule->update(['last_send_at' => null]);
+            }
         }
 
         // Filtrar los correos programados que deben enviarse
@@ -63,29 +67,39 @@ class SendScheduledEmails extends Command
             foreach ($scheduledEmails as $email) {
                 // ejecutar metodo generateReport() de PdfController para guardar el reporte en la carpeta storage
                 $pdfController = new PdfController();
+
                 // generar pdf con dompdf y blade
                 // $pdfPath = $pdfController->generateReportPDF($email->report_name);
 
                 // generar excel
                 $excelPath = $pdfController->generateReportExcel($email->report_name);
 
-                // Ruta del PDF
-                $pdfPath = base_path('reporte.pdf'); // Ubicado en la raíz del proyecto
+                // si $excelPath es diferente de null, quiere decir que hay datos para mostrar en el reporte,
+                // por lo tanto se procede a generar PDF
+                if ($excelPath) {
+                    $description = $email->descriotion;
+                    // Ruta del PDF
+                    $pdfPath = base_path('reporte.pdf'); // Ubicado en la raíz del proyecto
 
-                // Ejecutar el script de Node.js con la URL como argumento
-                $command = "node generarPdf.js " . "\"$email->report_name\"";
-                Log::info($command);
-                exec($command, $output, $returnVar);
+                    // Ejecutar el script de Node.js con la URL como argumento
+                    $command = "node generarPdf.js " . "\"$email->report_name\"";
+                    exec($command, $output, $returnVar);
 
-                if ($returnVar !== 0) {
-                    Log::error('Error al generar el PDF con Puppeteer. ' . $output);
-                    continue;
+                    if ($returnVar !== 0) {
+                        Log::error('Error al generar el PDF con Puppeteer. ' . $output);
+                        continue;
+                    }
+                } else {
+                    $pdfPath = null;
+                    $description = "No se encontraron datos para mostrar en el reporte de las últimas 8 horas.
+                                           Es posible que la máquina esté desconectada o que no se haya iniciado el 
+                                           servicio de generación de reportes (Metabase)";
                 }
 
                 try {
                     // Enviar el correo electrónico
                     Mail::to($email->main_email)
-                        ->send(new ReportEmail($email->subject, $email->description, $excelPath, $pdfPath));
+                        ->send(new ReportEmail($email->subject, $description, $excelPath, $pdfPath));
                 } catch (\Exception $e) {
                     Log::error('Error al enviar el correo a ' . $email->main_email . ': ' . $e->getMessage());
                 }
@@ -100,8 +114,7 @@ class SendScheduledEmails extends Command
                     }
                 }
                 // Actualizar la propiedad last_send_at
-                $email->last_send_at = $now;
-                $email->save();
+                $email->update(['last_send_at' => $now]);
 
                 // Eliminar los archivos generados
                 if (file_exists($pdfPath)) {

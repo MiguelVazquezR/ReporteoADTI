@@ -11,6 +11,11 @@
                 <PrimaryButton @click="$inertia.visit(route('schedule-email-settings.create'))">Crear nuevo
                 </PrimaryButton>
             </section>
+            <section v-if="!dashboards.length" class="my-4">
+                <div class="bg-red-200 rounded-md text-center px-10 py-3 text-sm">
+                    No se pudieron obtener los dashboards de Metabase. Favor de iniciar el servicio o resetearlo.
+                </div>
+            </section>
             <section class="flex flex-col items-center">
                 <div class="lg:flex justify-between mb-2 mt-6">
                     <el-dropdown :disabled="disableMassiveActions" @command="handleCommand">
@@ -51,7 +56,10 @@
                     <el-table-column prop="las_send_at" label="Estatus">
                         <template #default="scope">
                             <p class="text-xs" :class="scope.row.last_send_at ? 'text-green-700' : null">
-                                {{ scope.row.last_send_at ? 'Enviado el ' + formatDateTime(scope.row.last_send_at) : 'No enviado aún' }}
+                                {{
+                                    scope.row.last_send_at ?
+                                        'Enviado el ' + formatDateTime(scope.row.last_send_at) : 'No enviado aún'
+                                }}
                             </p>
                         </template>
                     </el-table-column>
