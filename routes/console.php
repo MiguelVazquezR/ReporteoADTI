@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('reports:send-scheduled-emails')->everyFifteenMinutes();
+Schedule::command('reports:send-scheduled-emails')->everyMinute();
 Schedule::command('app:db-backup')->everyFifteenMinutes()->when(function () {
     return now()->between(\Carbon\Carbon::createFromTime(0, 0), \Carbon\Carbon::createFromTime(0, 15));
 });
