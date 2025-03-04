@@ -31,13 +31,12 @@ class SendScheduledEmails extends Command
 
         $scheduledEmails = ScheduleEmail::all();
 
-        // Obtener el inicio y el fin del día de ayer
-        $yesterdayStart = $now->copy()->subDay()->startOfDay();
+        // Obtener el fin del día de ayer
         $yesterdayEnd = $now->copy()->subDay()->endOfDay();
 
         foreach ($scheduledEmails as $schedule) {
-            // Verificar si last_send_at es una instancia de Carbon y si está dentro del rango de ayer
-            if ($schedule->last_send_at && $schedule->last_send_at->between($yesterdayStart, $yesterdayEnd)) {
+            // Verificar si last_send_at es una instancia de Carbon y si es de ayer o antes
+            if ($schedule->last_send_at && $schedule->last_send_at->lte($yesterdayEnd)) {
                 $schedule->update(['last_send_at' => null]);
             }
         }
